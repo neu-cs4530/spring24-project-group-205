@@ -1,12 +1,12 @@
-/** 
+/**
  * This class represents the different themepacks that the player can purchase in the Scavenger Hunt game.
  * Each themepack has a different set of objects that the player needs to find in the game, all following a specific theme.
  * The themepacks are either "nature", "city", or "fantasy".
- * 
+ *
  * Each themepack also has a price that the player needs to pay in order to purchase it.
  */
 
-import Item from "./Item";
+import Item from './Item';
 
 export default class Themepack {
   private _name: string;
@@ -52,7 +52,7 @@ export default class Themepack {
     return this._price;
   }
 
-  /** 
+  /**
    * Sets the price of the themepack.
    * @param price the price of the themepack
    */
@@ -67,6 +67,4 @@ export default class Themepack {
   addItem(item: Item) {
     this._items.push(item);
   }
-
 }
-

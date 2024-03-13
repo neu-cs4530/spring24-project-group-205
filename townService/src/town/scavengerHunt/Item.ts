@@ -1,10 +1,11 @@
-/** 
- * This class represents one singlular item that is a part of the scavenger hunt. 
- * Each item has a name and a location. 
+/**
+ * This class represents one singlular item that is a part of the scavenger hunt.
+ * Each item has a name and a location.
  */
 
 export default class Item {
   private _name: string;
+
   private _location: string;
 
   /**
