@@ -115,6 +115,13 @@ export interface TicTacToeMove {
   col: TicTacToeGridPosition;
 }
 
+export interface ScavengerHuntItem {
+  id: string;
+  name: string;
+  location: XY;
+  foundBy?: PlayerID;
+}
+
 /**
  * Type for the state of a TicTacToe game
  * The state of the game is represented as a list of moves, and the playerIDs of the players (x and o)
@@ -124,6 +131,11 @@ export interface TicTacToeGameState extends WinnableGameState {
   moves: ReadonlyArray<TicTacToeMove>;
   x?: PlayerID;
   o?: PlayerID;
+}
+
+export interface ScavengerHuntGameState extends WinnableGameState {
+  scavenger?: PlayerID;
+  items: ReadonlyArray<ScavengerHuntItem>;
 }
 
 /**
