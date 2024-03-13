@@ -11,7 +11,7 @@
 
 import Player from '../../lib/Player';
 import { GameMode } from '../../types/CoveyTownSocket';
-import Leaderboard from './Leaderboard';
+import Leaderboard from './Leaderboards';
 import Themepack from './Themepack';
 
 export default class Hub {
@@ -87,14 +87,7 @@ export default class Hub {
    * @throws an error if the game mode is not found
    */
   getLeaderboard() {
-    if (this.getGameMode() === 'competitive') {
-      return this._leaderboard.top5Leaderboard();
-    }
-    if (this.getGameMode() === 'leisure') {
-      return this._leaderboard.entireLeaderboard();
-    }
-
-    throw new Error('Game mode not found, so leaderboard cannot be displayed');
+    return this._leaderboard.top5ActiveLeaderboard();
   }
 
   /**
@@ -166,7 +159,7 @@ export default class Hub {
    * @param time_seconds the time it took for the player to complete the scavenger hunt
    */
   addLeaderboardEntry() {
-    this._leaderboard.addLeaderboardEntry(this._player, this._timeInSeconds);
+    this._leaderboard.addActiveLeaderboardEntry(this._player, this._timeInSeconds);
   }
 
   /**
