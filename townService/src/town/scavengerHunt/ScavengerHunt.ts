@@ -17,10 +17,6 @@ export default class ScavengerHunt extends Game<ScavengerHuntGameState, Scavenge
     });
   }
 
-  public randomizeItems(items: ScavengerHuntItem[]): void {
-    // use Item class to randomize locations?
-  }
-
   public applyMove(move: GameMove<ScavengerHuntItem>): void {
     if (!this.state.scavenger) {
       throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
