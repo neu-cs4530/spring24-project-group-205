@@ -122,7 +122,6 @@ export interface ScavengerHuntItem {
   foundBy?: PlayerID;
 }
 
-
 /**
  * Type for the state of a TicTacToe game
  * The state of the game is represented as a list of moves, and the playerIDs of the players (x and o)
