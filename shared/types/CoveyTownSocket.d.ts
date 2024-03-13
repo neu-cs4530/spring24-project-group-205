@@ -74,6 +74,12 @@ export interface ViewingArea extends Interactable {
   elapsedTimeSec: number;
 }
 
+/**
+ * This type represents the different game modes that the player can play in the Scavenger Hunt game.
+ * The game modes are either competitive or leisure.
+ */
+export type GameMode = 'competitive' | 'leisure';
+
 export type GameStatus = 'IN_PROGRESS' | 'WAITING_TO_START' | 'OVER' | 'WAITING_FOR_PLAYERS';
 /**
  * Base type for the state of a game
