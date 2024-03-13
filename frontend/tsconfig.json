@@ -40,7 +40,7 @@
     "src",
     "generated",
     "pages"
-, "../townService/src/town/scavengerHunt"  ],
+],
   "references": [
     {
       "path": "../shared/"
