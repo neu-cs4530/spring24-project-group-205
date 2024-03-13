@@ -9,7 +9,6 @@ import ConversationArea from './interactables/ConversationArea';
 import GameArea from './interactables/GameArea';
 import Transporter from './interactables/Transporter';
 import ViewingArea from './interactables/ViewingArea';
-import ScavengerHuntItem from '../../scavengerHunt/ScavengerHunt';
 
 // Still not sure what the right type is here... "Interactable" doesn't do it
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -514,23 +513,6 @@ export default class TownGameScene extends Phaser.Scene {
     this._onGameReadyListeners.forEach(listener => listener());
     this._onGameReadyListeners = [];
     this.coveyTownController.addListener('playersChanged', players => this.updatePlayers(players));
-  }
-
-   /**
-     * Generates a random location in the town for the objects of the scavenger hunt
-     */
-  public randomLocation(item: ScavengerHuntItem): void {
-    
-    // Get town bounds
-    const mapWidth = this._map.widthInPixels; 
-    const mapHeight = this._map.heightInPixels;
-
-    // Generate random location within the town boundaries
-    const randomX = Math.floor(Math.random() * mapWidth);
-    const randomY = Math.floor(Math.random() * mapHeight);
-
-    // set the item location to be the randomly generated location
-    item.location = { x: randomX, y: randomY };
   }
 
   createPlayerSprites(player: PlayerController) {

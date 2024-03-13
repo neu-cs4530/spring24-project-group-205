@@ -1,35 +1,29 @@
-/** 
- * This class represents one singlular item that is a part of the scavenger hunt. 
- * Each item has a name and a location. 
- */
+import { ScavengerHuntItem, XY } from '../../types/CoveyTownSocket';
 
-export default class Item {
-  private _name: string;
-  private _location: string;
+export default class Item implements ScavengerHuntItem {
+  id: string;
 
-  /**
-   * Creates a new item for the scavenger hunt game.
-   * @param name the name of the item
-   * @param location the location of the item
-   */
-  constructor(name: string, location: string) {
-    this._name = name;
-    this._location = location;
+  name: string;
+
+  location: XY;
+
+  foundBy?: string | undefined;
+
+  constructor(id: string, name: string, location: XY) {
+    this.id = id;
+    this.name = name;
+    this.location = location;
   }
 
-  /**
-   * Returns the name of the item.
-   * @returns the name of the item
-   */
-  getItem() {
-    return this._name;
+  public setID(id: string): void {
+    this.id = id;
   }
 
-  /**
-   * Returns the location of the item.
-   * @returns the location of the item
-   */
-  getLocation() {
-    return this._location;
+  public setName(name: string): void {
+    this.name = name;
+  }
+
+  public setLocation(location: XY): void {
+    this.location = location;
   }
 }

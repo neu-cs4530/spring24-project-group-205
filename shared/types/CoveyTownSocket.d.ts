@@ -74,12 +74,6 @@ export interface ViewingArea extends Interactable {
   elapsedTimeSec: number;
 }
 
-/**
- * This type represents the different game modes that the player can play in the Scavenger Hunt game.
- * The game modes are either competitive or leisure.
- */
-export type GameMode = 'competitive' | 'leisure';
-
 export type GameStatus = 'IN_PROGRESS' | 'WAITING_TO_START' | 'OVER' | 'WAITING_FOR_PLAYERS';
 /**
  * Base type for the state of a game
@@ -115,6 +109,13 @@ export interface TicTacToeMove {
   col: TicTacToeGridPosition;
 }
 
+export interface ScavengerHuntItem {
+  id: string;
+  name: string;
+  location: XY;
+  foundBy?: PlayerID;
+}
+
 /**
  * Type for the state of a TicTacToe game
  * The state of the game is represented as a list of moves, and the playerIDs of the players (x and o)
@@ -124,6 +125,11 @@ export interface TicTacToeGameState extends WinnableGameState {
   moves: ReadonlyArray<TicTacToeMove>;
   x?: PlayerID;
   o?: PlayerID;
+}
+
+export interface ScavengerHuntGameState extends WinnableGameState {
+  scavenger?: PlayerID;
+  items: ReadonlyArray<ScavengerHuntItem>;
 }
 
 /**
