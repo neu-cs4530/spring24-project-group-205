@@ -7,13 +7,41 @@ import InvalidParametersError, {
 } from '../../lib/InvalidParametersError';
 import Player from '../../lib/Player';
 import { GameMove, ScavengerHuntGameState, ScavengerHuntItem } from '../../types/CoveyTownSocket';
+import InteractableArea from '../InteractableArea';
 import Game from '../games/Game';
+import { randomLocation } from './scavengerHuntUtils';
 
 export default class ScavengerHunt extends Game<ScavengerHuntGameState, ScavengerHuntItem> {
   public constructor() {
     super({
       items: [],
       status: 'WAITING_TO_START',
+    });
+  }
+
+  public startGame(player: Player, interactables: InteractableArea[]): void {
+    if (this.state.status !== 'WAITING_TO_START') {
+      throw new InvalidParametersError(GAME_FULL_MESSAGE);
+    }
+    if (this.state.scavenger) {
+      throw new InvalidParametersError(PLAYER_ALREADY_IN_GAME_MESSAGE);
+    }
+    this.state = {
+      ...this.state,
+      status: 'IN_PROGRESS',
+    };
+    // Use the utility function to generate random locations for items
+    this._assignRandomLocations(interactables);
+  }
+
+  private _assignRandomLocations(interactables: InteractableArea[]): void {
+    if (this.state.items.length === 0) {
+      throw new Error('No items available in the scavenger hunt');
+    }
+    this.state.items.forEach(item => {
+      if (!item.location) {
+        randomLocation(item, interactables);
+      }
     });
   }
 
