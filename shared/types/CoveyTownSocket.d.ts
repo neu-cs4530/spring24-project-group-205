@@ -120,6 +120,7 @@ export interface ScavengerHuntItem {
   name: string;
   location: XY;
   foundBy?: PlayerID;
+  hint: string;
 }
 
 /**
