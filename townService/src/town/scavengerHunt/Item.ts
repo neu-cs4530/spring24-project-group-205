@@ -9,13 +9,10 @@ export default class Item implements ScavengerHuntItem {
 
   foundBy?: string | undefined;
 
-  hint: string;
-
-  constructor(id: string, name: string, location: XY, hint: string) {
+  constructor(id: string, name: string, location: XY) {
     this.id = id;
     this.name = name;
     this.location = location;
-    this.hint = hint;
   }
 
   public setID(id: string): void {
@@ -28,9 +25,5 @@ export default class Item implements ScavengerHuntItem {
 
   public setLocation(location: XY): void {
     this.location = location;
-  }
-
-  public setHint(hint: string): void {
-    this.hint = hint;
   }
 }
