@@ -5,12 +5,13 @@ import {
   PLAYER_NOT_IN_GAME_MESSAGE,
 } from '../../lib/InvalidParametersError';
 import ScavengerHunt from './ScavengerHunt';
+import ScavengerHuntRelaxed from './ScavengerHuntRelaxed';
 
 describe('ScavengerHunt', () => {
   let game: ScavengerHunt;
 
   beforeEach(() => {
-    game = new ScavengerHunt();
+    game = new ScavengerHuntRelaxed();
   });
 
   describe('_join', () => {
