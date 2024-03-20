@@ -46,7 +46,7 @@ export default class Hub {
 
   public constructor(player: Player) {
     this._player = player;
-    this._gameMode = 'leisure';
+    this._gameMode = 'relaxed';
     this._themepack = new Themepack('nature', 0);
     this._hints = [];
   }
@@ -65,9 +65,9 @@ export default class Hub {
   setGameMode(gameMode: GameMode) {
     this._gameMode = gameMode;
 
-    if (gameMode === 'competitive') {
+    if (gameMode === 'timed') {
       this._rules = 'Complete the scavenger hunt as fast as you can to get on the leaderboard!';
-    } else if (gameMode === 'leisure') {
+    } else if (gameMode === 'relaxed') {
       this._rules =
         'Take your time and enjoy the game! Collect as many objects as possible to get on the leaderboard!';
     }
