@@ -9,12 +9,27 @@ import Player from '../../lib/Player';
 import { GameMove, ScavengerHuntGameState, ScavengerHuntItem } from '../../types/CoveyTownSocket';
 import Game from '../games/Game';
 
+const TIME_ALLOWED = 120;
+
 export default class ScavengerHunt extends Game<ScavengerHuntGameState, ScavengerHuntItem> {
+  private _timerIntervalId?: NodeJS.Timeout;
+
   public constructor() {
     super({
+      timeLeft: TIME_ALLOWED,
       items: [],
       status: 'WAITING_TO_START',
     });
+  }
+
+  public iterateClock(): void {
+    const newTimeLeft = this.state.timeLeft - 1;
+    if (newTimeLeft >= 0) {
+      this.state = {
+        ...this.state,
+        timeLeft: newTimeLeft,
+      };
+    }
   }
 
   public applyMove(move: GameMove<ScavengerHuntItem>): void {
