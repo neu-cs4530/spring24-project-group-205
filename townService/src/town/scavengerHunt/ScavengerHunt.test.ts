@@ -28,11 +28,11 @@ describe('ScavengerHunt', () => {
       expect(() => game.join(player2)).toThrowError(GAME_FULL_MESSAGE);
     });
     describe('When the player can be added', () => {
-      it('makes the first player X and initializes the state with status WAITING_TO_START', () => {
+      it('makes the player the current scavenger and starts the game', () => {
         const player = createPlayerForTesting();
         game.join(player);
         expect(game.state.scavenger).toEqual(player.id);
-        expect(game.state.status).toEqual('WAITING_TO_START');
+        expect(game.state.status).toEqual('IN_PROGRESS');
         expect(game.state.winner).toBeUndefined();
       });
     });
