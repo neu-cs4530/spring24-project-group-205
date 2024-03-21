@@ -4,6 +4,7 @@ import InvalidParametersError, {
   INVALID_MOVE_MESSAGE,
   PLAYER_ALREADY_IN_GAME_MESSAGE,
   PLAYER_NOT_IN_GAME_MESSAGE,
+  TIME_OVER_MESSAGE,
 } from '../../lib/InvalidParametersError';
 import Player from '../../lib/Player';
 import { GameMove, ScavengerHuntGameState, ScavengerHuntItem } from '../../types/CoveyTownSocket';
@@ -12,6 +13,8 @@ import Game from '../games/Game';
 const TIME_ALLOWED = 120;
 
 export default class ScavengerHunt extends Game<ScavengerHuntGameState, ScavengerHuntItem> {
+  private _gameStartTime?: number;
+
   private _timerIntervalId?: NodeJS.Timeout;
 
   public constructor() {
@@ -42,6 +45,10 @@ export default class ScavengerHunt extends Game<ScavengerHuntGameState, Scavenge
     if (this.state.status === 'OVER') {
       throw new InvalidParametersError(GAME_OVER_MESSAGE);
     }
+    if (!this._timeRemaining(Date.now())) {
+      throw new InvalidParametersError(TIME_OVER_MESSAGE);
+    }
+
     move.move.foundBy = this.state.scavenger;
     this.state = {
       ...this.state,
@@ -64,9 +71,41 @@ export default class ScavengerHunt extends Game<ScavengerHuntGameState, Scavenge
         ...this.state,
         scavenger: player.id,
       };
+
+      this._gameStartTime = Date.now();
+
+      this._timerIntervalId = setInterval(() => {
+        this._endGameIfTimesUp();
+      }, 500);
     } else {
       throw new InvalidParametersError(GAME_FULL_MESSAGE);
     }
+  }
+
+  /**
+   * Ends the game if the time is up
+   */
+  private _endGameIfTimesUp() {
+    if (!this._timeRemaining(Date.now())) {
+      this._endGame();
+    }
+  }
+
+  /**
+   * Determines if the current time (within milliseconds) is within the allotted time given
+   * @param currentTime the current time in milliseconds
+   * @returns true if the time is within the allotted time, false otherwise
+   */
+  private _timeRemaining(currentTime: number): boolean {
+    if (!this._gameStartTime) {
+      return false;
+    }
+
+    if (currentTime < this._gameStartTime) {
+      return false;
+    }
+
+    return (currentTime - this._gameStartTime) / 1000 < TIME_ALLOWED;
   }
 
   protected _leave(player: Player): void {
@@ -77,5 +116,17 @@ export default class ScavengerHunt extends Game<ScavengerHuntGameState, Scavenge
       ...this.state,
       status: 'OVER',
     };
+  }
+
+  /**
+   * Ends the game and clears the timer
+   */
+  private _endGame(): void {
+    this.state = {
+      ...this.state,
+      status: 'OVER',
+    };
+
+    clearInterval(this._timerIntervalId);
   }
 }
