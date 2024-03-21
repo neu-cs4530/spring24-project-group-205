@@ -23,9 +23,17 @@ export default class ScavengerHuntTimed extends ScavengerHunt {
       throw new InvalidParametersError(GAME_OVER_MESSAGE);
     }
     move.move.foundBy = this.state.scavenger;
+    this._itemsFound += 1;
     this.state = {
       ...this.state,
       items: this.state.items.map(item => (item.id === move.move.id ? move.move : item)),
     };
+    if (this.state.items.every(item => item.foundBy)) {
+      this.state = {
+        ...this.state,
+        status: 'OVER',
+        winner: this.state.scavenger,
+      };
+    }
   }
 }

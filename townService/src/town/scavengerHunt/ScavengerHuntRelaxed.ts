@@ -6,7 +6,7 @@ import InvalidParametersError, {
 import { GameMove, ScavengerHuntItem } from '../../types/CoveyTownSocket';
 import ScavengerHunt from './ScavengerHunt';
 
-export default class ScavengerHunRelaxed extends ScavengerHunt {
+export default class ScavengerHuntRelaxed extends ScavengerHunt {
   public constructor() {
     super();
     this._gameMode = 'relaxed';
@@ -23,16 +23,10 @@ export default class ScavengerHunRelaxed extends ScavengerHunt {
       throw new InvalidParametersError(GAME_OVER_MESSAGE);
     }
     move.move.foundBy = this.state.scavenger;
+    this._itemsFound += 1;
     this.state = {
       ...this.state,
       items: this.state.items.map(item => (item.id === move.move.id ? move.move : item)),
     };
-    if (this.state.items.every(item => item.foundBy)) {
-      this.state = {
-        ...this.state,
-        status: 'OVER',
-        winner: this.state.scavenger,
-      };
-    }
   }
 }

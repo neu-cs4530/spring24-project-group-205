@@ -1,7 +1,5 @@
 import InvalidParametersError, {
   GAME_FULL_MESSAGE,
-  GAME_OVER_MESSAGE,
-  INVALID_MOVE_MESSAGE,
   PLAYER_ALREADY_IN_GAME_MESSAGE,
   PLAYER_NOT_IN_GAME_MESSAGE,
 } from '../../lib/InvalidParametersError';
@@ -42,6 +40,9 @@ export default abstract class ScavengerHunt extends Game<
   // The hints the player has requested
   private _hints?: string[];
 
+  // number of items found by the player
+  protected _itemsFound = 0;
+
   public constructor() {
     super({
       items: [],
@@ -57,12 +58,33 @@ export default abstract class ScavengerHunt extends Game<
    */
   public abstract applyMove(move: GameMove<ScavengerHuntItem>): void;
 
+  /**
+   * Adds a new item to the game.
+   * @param item A scavenger hunt item to add to the game.
+   */
+  public addItem(item: ScavengerHuntItem): void {
+    this.state = {
+      ...this.state,
+      items: [...this.state.items, item],
+    };
+  }
+
+  /**
+   * Gives the total number of items found at this point in the game.
+   * @returns number of items found.
+   */
+  public getScore(): number {
+    return this._itemsFound;
+  }
+
+  // player joins the game and the game starts immediately, assuming we will have one button anyways
   protected _join(player: Player): void {
     if (this.state.scavenger === player.id) {
       throw new InvalidParametersError(PLAYER_ALREADY_IN_GAME_MESSAGE);
     } else if (!this.state.scavenger) {
       this.state = {
         ...this.state,
+        status: 'IN_PROGRESS',
         scavenger: player.id,
       };
     } else {
