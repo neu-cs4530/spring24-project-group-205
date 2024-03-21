@@ -6,10 +6,15 @@ import InvalidParametersError, {
   PLAYER_NOT_IN_GAME_MESSAGE,
 } from '../../lib/InvalidParametersError';
 import Player from '../../lib/Player';
-import { GameMove, ScavengerHuntGameState, ScavengerHuntItem } from '../../types/CoveyTownSocket';
+import {
+  GameMove,
+  PlayerLocation,
+  ScavengerHuntGameState,
+  ScavengerHuntItem,
+} from '../../types/CoveyTownSocket';
 import InteractableArea from '../InteractableArea';
 import Game from '../games/Game';
-import { randomLocation } from './scavengerHuntUtils';
+import { generateHint, randomLocation } from './scavengerHuntUtils';
 
 export default class ScavengerHunt extends Game<ScavengerHuntGameState, ScavengerHuntItem> {
   public constructor() {
@@ -90,5 +95,34 @@ export default class ScavengerHunt extends Game<ScavengerHuntGameState, Scavenge
       ...this.state,
       status: 'OVER',
     };
+  }
+
+  // Method to generate hint based on player location
+  public generateHint(player: Player): string {
+    const playerLocation = player.location;
+    const closestItemLocation = this._getClosestItemLocation(playerLocation);
+    if (closestItemLocation) {
+      return generateHint(playerLocation, closestItemLocation);
+    }
+    return 'No items found.';
+  }
+
+  private _getClosestItemLocation(playerLocation: PlayerLocation): PlayerLocation | null {
+    let closestItemLocation: { x: number; y: number } | null = null;
+    let closestDistance = Number.MAX_SAFE_INTEGER;
+
+    this.state.items.forEach(item => {
+      if (item.location) {
+        const distance = Math.sqrt(
+          (playerLocation.x - item.location.x) ** 2 + (playerLocation.y - item.location.y) ** 2,
+        );
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestItemLocation = item.location;
+        }
+      }
+    });
+
+    return closestItemLocation;
   }
 }
