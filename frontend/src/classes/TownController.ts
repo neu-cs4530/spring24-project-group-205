@@ -30,6 +30,7 @@ import {
 import {
   isConnectFourArea,
   isConversationArea,
+  isScavengerHuntArea,
   isTicTacToeArea,
   isViewingArea,
 } from '../types/TypeUtils';
@@ -40,6 +41,7 @@ import InteractableAreaController, {
   BaseInteractableEventMap,
   GenericInteractableAreaController,
 } from './interactable/InteractableAreaController';
+import ScavengerHuntAreaController from './interactable/ScavengerHuntAreaController';
 import TicTacToeAreaController from './interactable/TicTacToeAreaController';
 import ViewingAreaController from './interactable/ViewingAreaController';
 import PlayerController from './PlayerController';
@@ -630,6 +632,10 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
           } else if (isConnectFourArea(eachInteractable)) {
             this._interactableControllers.push(
               new ConnectFourAreaController(eachInteractable.id, eachInteractable, this),
+            );
+          } else if (isScavengerHuntArea(eachInteractable)) {
+            this._interactableControllers.push(
+              new ScavengerHuntAreaController(eachInteractable.id, eachInteractable, this),
             );
           }
         });
