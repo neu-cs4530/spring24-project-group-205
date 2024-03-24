@@ -63,65 +63,69 @@ function GameArea({ interactableID }: { interactableID: InteractableID }): JSX.E
   }, [townController, gameAreaController]);
   return (
     <>
-      <Accordion allowToggle>
-        <AccordionItem>
-          <Heading as='h3'>
-            <AccordionButton>
-              <Box flex='1' textAlign='left'>
-                Leaderboard
-              </Box>
-              <AccordionIcon />
-            </AccordionButton>
-            <AccordionPanel>
-              <Leaderboard results={history} />
-            </AccordionPanel>
-          </Heading>
-        </AccordionItem>
-        <AccordionItem>
-          <Heading as='h3'>
-            <AccordionButton>
-              <Box as='span' flex='1' textAlign='left'>
-                Current Observers
-                <AccordionIcon />
-              </Box>
-            </AccordionButton>
-          </Heading>
-          <AccordionPanel>
-            <List aria-label='list of observers in the game'>
-              {observers.map(player => {
-                return <ListItem key={player.id}>{player.userName}</ListItem>;
-              })}
-            </List>
-          </AccordionPanel>
-        </AccordionItem>
-      </Accordion>
-      <Flex>
-        <Box>
-          {gameAreaController.toInteractableAreaModel().type === 'ConnectFourArea' ? (
-            <ConnectFourArea interactableID={interactableID} />
-          ) : gameAreaController.toInteractableAreaModel().type === 'TicTacToeArea' ? (
-            <TicTacToeArea interactableID={interactableID} />
-          ) : gameAreaController.toInteractableAreaModel().type === 'ScavengerHuntArea' ? (
-            <ScavengerHuntArea interactableID={interactableID} />
-          ) : (
-            <>{INVALID_GAME_AREA_TYPE_MESSAGE}</>
-          )}
-        </Box>
-        <Box
-          style={{
-            height: '400px',
-            overflowY: 'scroll',
-          }}>
-          <div
-            style={{
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'column',
-            }}>
-            <ChatChannel interactableID={gameAreaController.id} />
-          </div>
-        </Box>
-      </Flex>
+      {gameAreaController.toInteractableAreaModel().type === 'ScavengerHuntArea' ? (
+        <ScavengerHuntArea interactableID={interactableID} />
+      ) : (
+        <>
+          <Accordion allowToggle>
+            <AccordionItem>
+              <Heading as='h3'>
+                <AccordionButton>
+                  <Box flex='1' textAlign='left'>
+                    Leaderboard
+                  </Box>
+                  <AccordionIcon />
+                </AccordionButton>
+                <AccordionPanel>
+                  <Leaderboard results={history} />
+                </AccordionPanel>
+              </Heading>
+            </AccordionItem>
+            <AccordionItem>
+              <Heading as='h3'>
+                <AccordionButton>
+                  <Box as='span' flex='1' textAlign='left'>
+                    Current Observers
+                    <AccordionIcon />
+                  </Box>
+                </AccordionButton>
+              </Heading>
+              <AccordionPanel>
+                <List aria-label='list of observers in the game'>
+                  {observers.map(player => {
+                    return <ListItem key={player.id}>{player.userName}</ListItem>;
+                  })}
+                </List>
+              </AccordionPanel>
+            </AccordionItem>
+          </Accordion>
+          <Flex>
+            <Box>
+              {gameAreaController.toInteractableAreaModel().type === 'ConnectFourArea' ? (
+                <ConnectFourArea interactableID={interactableID} />
+              ) : gameAreaController.toInteractableAreaModel().type === 'TicTacToeArea' ? (
+                <TicTacToeArea interactableID={interactableID} />
+              ) : (
+                <>{INVALID_GAME_AREA_TYPE_MESSAGE}</>
+              )}
+            </Box>
+            <Box
+              style={{
+                height: '400px',
+                overflowY: 'scroll',
+              }}>
+              <div
+                style={{
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}>
+                <ChatChannel interactableID={gameAreaController.id} />
+              </div>
+            </Box>
+          </Flex>
+        </>
+      )}
     </>
   );
 }
