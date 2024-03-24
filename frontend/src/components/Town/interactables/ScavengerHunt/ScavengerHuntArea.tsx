@@ -1,10 +1,30 @@
-import { Button, Container, Flex, Heading, List, ListItem, useToast } from '@chakra-ui/react';
+import { Button, Flex, Heading, useToast } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 import ScavengerHuntAreaController from '../../../../classes/interactable/ScavengerHuntAreaController';
 import { useInteractableAreaController } from '../../../../classes/TownController';
 import useTownController from '../../../../hooks/useTownController';
 import { InteractableID } from '../../../../types/CoveyTownSocket';
 
+/**
+ * The ScavengerHuntArea component renders the Scavenger Hunt game area.
+ * It renders the current state of the area, optionally allowing the player to join the game.
+ *
+ * It uses Chakra-UI components (does not use other GUI widgets)
+ *
+ * It uses the ScavengerHuntAreaController to get the current state of the game.
+ * It listens for the 'gameUpdated' and 'gameEnd' events on the controller, and re-renders accordingly.
+ * It subscribes to these events when the component mounts, and unsubscribes when the component unmounts. It also unsubscribes when the gameAreaController changes.
+ *
+ * It renders the following:
+ * - A radio button picker for choosing the game mode (timed or relaxed)
+ * - A leaderboard of the game results for the selected game mode
+ * - A radio button picker for choosing the theme (fruit, dessert, or animals)
+ * - A button to request a hint
+ * - A list of hints that the player has requested
+ * - A button to start the game
+ * - A button to end the game
+ *
+ */
 export default function ScavengerHuntArea({
   interactableID,
 }: {

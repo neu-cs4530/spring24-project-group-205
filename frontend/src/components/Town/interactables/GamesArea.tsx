@@ -38,12 +38,13 @@ export const INVALID_GAME_AREA_TYPE_MESSAGE = 'Invalid game area type';
  *
  * It uses the GameAreaController corresponding to the provided interactableID to get the current state of the game. (@see useInteractableAreaController)
  *
- * It renders the following:
+ * It renders the following for ConnectFourArea or TicTacToeArea:
  *  - A leaderboard of the game results
  *  - A list of observers' usernames (in a list with the aria-label 'list of observers in the game')
  *  - The game area component (either ConnectFourArea or TicTacToeArea). If the game area is NOT a ConnectFourArea or TicTacToeArea, then the message INVALID_GAME_AREA_TYPE_MESSAGE appears within the component
  *  - A chat channel for the game area (@see ChatChannel.tsx), with the property interactableID set to the interactableID of the game area
  *
+ * It renders the ScavengerHuntArea component if the game area is a ScavengerHuntArea.
  */
 function GameArea({ interactableID }: { interactableID: InteractableID }): JSX.Element {
   const gameAreaController =
