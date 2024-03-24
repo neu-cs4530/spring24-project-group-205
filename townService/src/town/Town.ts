@@ -376,29 +376,6 @@ export default class Town {
   }
 
   /**
-   * Generates a random interactable from the list of interactable areas in this town.
-   * @returns A random InteractableArea object
-   */
-  public generateRandomInteractable(): InteractableArea {
-    if (this._interactables.length === 0) {
-      throw new Error('No interactable areas available in this town');
-    }
-    const randomIndex = Math.floor(Math.random() * this._interactables.length);
-    return this._interactables[randomIndex];
-  }
-
-  /**
-   * Generates a random location in the boundaries of this town and assigns it to the given item.
-   * @param item The ScavengerHuntItem to assign a random location to
-   */
-  public randomLocation(item: ScavengerHuntItem): void {
-    const area = this.generateRandomInteractable();
-    const randomLocation = area.generateRandomLocation();
-
-    item.location = randomLocation;
-  }
-
-  /**
    * Informs all players' clients that they are about to be disconnected, and then
    * disconnects all players.
    */
