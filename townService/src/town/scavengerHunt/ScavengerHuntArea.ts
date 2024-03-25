@@ -104,6 +104,11 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
     this._stateUpdated(game.toModel());
   }
 
+  /**
+   * Method to start the timer of the game.
+   * Increments the timer every second if the game is in progress and there is time left
+   * @throws an error if there is no game in progress
+   */
   private _startTimer() {
     const intervalId = setInterval(() => {
       if (this.game && this.game.state.status === 'IN_PROGRESS' && this.game.state.timeLeft > 0) {

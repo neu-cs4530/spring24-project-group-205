@@ -25,9 +25,12 @@ export default class ScavengerHunt extends Game<ScavengerHuntGameState, Scavenge
     });
   }
 
+  /**
+   * Updates the time left in the game by decreasing it by 1 second
+   */
   public iterateClock(): void {
-    const newTimeLeft = this.state.timeLeft - 1;
-    if (newTimeLeft >= 0) {
+    const newTimeLeft = TIME_ALLOWED - 1;
+    if (newTimeLeft < TIME_ALLOWED) {
       this.state = {
         ...this.state,
         timeLeft: newTimeLeft,
@@ -45,7 +48,7 @@ export default class ScavengerHunt extends Game<ScavengerHuntGameState, Scavenge
     if (this.state.status === 'OVER') {
       throw new InvalidParametersError(GAME_OVER_MESSAGE);
     }
-    if (!this._timeRemaining(Date.now())) {
+    if (!this._isTimeRemaining(Date.now())) {
       throw new InvalidParametersError(TIME_OVER_MESSAGE);
     }
 
@@ -86,7 +89,7 @@ export default class ScavengerHunt extends Game<ScavengerHuntGameState, Scavenge
    * Ends the game if the time is up
    */
   private _endGameIfTimesUp() {
-    if (!this._timeRemaining(Date.now())) {
+    if (!this._isTimeRemaining(Date.now())) {
       this._endGame();
     }
   }
@@ -96,12 +99,14 @@ export default class ScavengerHunt extends Game<ScavengerHuntGameState, Scavenge
    * @param currentTime the current time in milliseconds
    * @returns true if the time is within the allotted time, false otherwise
    */
-  private _timeRemaining(currentTime: number): boolean {
+  private _isTimeRemaining(currentTime: number): boolean {
+    // If the game hasn't started yet, there is no time remaining
     if (!this._gameStartTime) {
       return false;
     }
 
-    if (currentTime < this._gameStartTime) {
+    // If the game has been running for longer than the allotted time, there is no time remaining
+    if (currentTime >= (TIME_ALLOWED + this._gameStartTime) / 1000) {
       return false;
     }
 
