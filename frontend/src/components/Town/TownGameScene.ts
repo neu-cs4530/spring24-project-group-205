@@ -39,6 +39,8 @@ export default class TownGameScene extends Phaser.Scene {
 
   private _interactables: Interactable[] = [];
 
+  private _scavengerHuntItems = 0;
+
   private _cursors: Phaser.Types.Input.Keyboard.CursorKeys[] = [];
 
   private _cursorKeys?: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -264,6 +266,7 @@ export default class TownGameScene extends Phaser.Scene {
             moving: isMoving,
           };
         }
+        // console.log('Emitting movement', this._lastLocation);
         this._lastLocation.x = x;
         this._lastLocation.y = y;
         this._lastLocation.rotation = primaryDirection || this._lastLocation.rotation || 'front';
@@ -288,6 +291,13 @@ export default class TownGameScene extends Phaser.Scene {
           player.gameObjects.label.setX(player.gameObjects.sprite.body.x);
           player.gameObjects.label.setY(player.gameObjects.sprite.body.y - 20);
         }
+      }
+
+      // Update dynamic scavenger hunt items test
+      const worldLayer = this._map?.getLayer('World')?.tilemapLayer;
+      if (worldLayer && this._scavengerHuntItems < 1) {
+        const testTile = worldLayer.putTileAtWorldXY(26, 3110.91, 845.83);
+        console.log('put tile at 3110, 850', this._scavengerHuntItems++, testTile);
       }
     }
   }
