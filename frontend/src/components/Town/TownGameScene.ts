@@ -62,6 +62,8 @@ export default class TownGameScene extends Phaser.Scene {
 
   private _onGameReadyListeners: Callback[] = [];
 
+  private _tileset: Phaser.Tilemaps.Tileset[] = [];
+
   /**
    * Layers that the player can collide with.
    */
@@ -129,6 +131,7 @@ export default class TownGameScene extends Phaser.Scene {
       '16_Grocery_store_32x32',
       this._resourcePathPrefix + '/assets/tilesets/16_Grocery_store_32x32.png',
     );
+    this.load.image('Food_16x16', this._resourcePathPrefix + '/assets/tilesets/Food_16x16.png');
     this.load.tilemapTiledJSON('map', this._resourcePathPrefix + '/assets/tilemaps/indoors.json');
     this.load.atlas(
       'atlas',
@@ -296,9 +299,33 @@ export default class TownGameScene extends Phaser.Scene {
       // Update dynamic scavenger hunt items test
       const worldLayer = this._map?.getLayer('World')?.tilemapLayer;
       if (worldLayer && this._scavengerHuntItems < 1) {
-        const testTile = worldLayer.putTileAtWorldXY(26, 3110.91, 845.83);
-        console.log('put tile at 3110, 850', this._scavengerHuntItems++, testTile);
+        // can make a call to our class that manages items and pass the world layer
+        // TO-DO: example item in spawn room, delete later
+        this._addTileForPlayer('wQUVArEzxAW2LQ0cpSeAg', 15053, 97, 27);
+        console.log('put tiles', this._scavengerHuntItems++); // iterator still gets called every frame
       }
+    }
+  }
+
+  private _addTileForPlayer(playerId: string, tileId: number, xTile: number, yTile: number) {
+    const playerLayer = this._getPlayerLayer(playerId);
+    playerLayer?.putTileAt(tileId, xTile, yTile);
+  }
+
+  private _getPlayerLayer(playerId: string) {
+    const layerName = `playerLayer-${playerId}`;
+    const existingLayer = this._map?.getLayer(layerName);
+    if (existingLayer) {
+      return existingLayer.tilemapLayer;
+    } else {
+      console.log('layerName:', layerName);
+      console.log('map:', this._map);
+      const playerLayer = this._map?.createLayer(layerName, this._tileset, 0, 0);
+      console.log('playerLayer', playerLayer);
+      assert(playerLayer);
+      playerLayer.setCollisionByProperty({ collides: true });
+      playerLayer.setDepth(5);
+      return playerLayer;
     }
   }
 
@@ -332,7 +359,8 @@ export default class TownGameScene extends Phaser.Scene {
     /* Parameters are the name you gave the tileset in Tiled and then the key of the
          tileset image in Phaser's cache (i.e. the name you used in preload)
          */
-    const tileset = [
+
+    this._tileset = [
       'Room_Builder_32x32',
       '22_Museum_32x32',
       '5_Classroom_and_library_32x32',
@@ -341,32 +369,32 @@ export default class TownGameScene extends Phaser.Scene {
       '13_Conference_Hall_32x32',
       '14_Basement_32x32',
       '16_Grocery_store_32x32',
+      'Food_16x16',
     ].map(v => {
       const ret = this.map.addTilesetImage(v);
       assert(ret);
       return ret;
     });
-
     this._collidingLayers = [];
     // Parameters: layer name (or index) from Tiled, tileset, x, y
-    const belowLayer = this.map.createLayer('Below Player', tileset, 0, 0);
+    const belowLayer = this.map.createLayer('Below Player', this._tileset, 0, 0);
     assert(belowLayer);
     belowLayer.setDepth(-10);
-    const wallsLayer = this.map.createLayer('Walls', tileset, 0, 0);
-    const onTheWallsLayer = this.map.createLayer('On The Walls', tileset, 0, 0);
+    const wallsLayer = this.map.createLayer('Walls', this._tileset, 0, 0);
+    const onTheWallsLayer = this.map.createLayer('On The Walls', this._tileset, 0, 0);
     assert(wallsLayer);
     assert(onTheWallsLayer);
     wallsLayer.setCollisionByProperty({ collides: true });
     onTheWallsLayer.setCollisionByProperty({ collides: true });
 
-    const worldLayer = this.map.createLayer('World', tileset, 0, 0);
+    const worldLayer = this.map.createLayer('World', this._tileset, 0, 0);
     assert(worldLayer);
     worldLayer.setCollisionByProperty({ collides: true });
-    const aboveLayer = this.map.createLayer('Above Player', tileset, 0, 0);
+    const aboveLayer = this.map.createLayer('Above Player', this._tileset, 0, 0);
     assert(aboveLayer);
     aboveLayer.setCollisionByProperty({ collides: true });
 
-    const veryAboveLayer = this.map.createLayer('Very Above Player', tileset, 0, 0);
+    const veryAboveLayer = this.map.createLayer('Very Above Player', this._tileset, 0, 0);
     assert(veryAboveLayer);
     /* By default, everything gets depth sorted on the screen in the order we created things.
          Here, we want the "Above Player" layer to sit on top of the player, so we explicitly give

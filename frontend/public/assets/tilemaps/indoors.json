@@ -33862,6 +33862,19 @@
                         }]
                 }],
          "tilewidth":32
+        }, 
+        {
+         "columns":8,
+         "firstgid":15053,
+         "image":"..\/tilesets\/Food_16x16.png",
+         "imageheight":128,
+         "imagewidth":128,
+         "margin":0,
+         "name":"Food_16x16",
+         "spacing":0,
+         "tilecount":64,
+         "tileheight":16,
+         "tilewidth":16
         }],
  "tilewidth":32,
  "type":"map",
