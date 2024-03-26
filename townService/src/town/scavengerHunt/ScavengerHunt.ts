@@ -7,7 +7,6 @@ import Player from '../../lib/Player';
 import {
   GameMode,
   GameMove,
-  PlayerLocation,
   ScavengerHuntGameState,
   ScavengerHuntItem,
 } from '../../types/CoveyTownSocket';
@@ -15,7 +14,7 @@ import InteractableArea from '../InteractableArea';
 import Game from '../games/Game';
 import Leaderboard from './Leaderboards';
 import Themepack from './Themepack';
-import { generateHint, randomLocation } from './Utils';
+import { setRandomLocationAndHint } from './Utils';
 
 export default abstract class ScavengerHunt extends Game<
   ScavengerHuntGameState,
@@ -65,16 +64,16 @@ export default abstract class ScavengerHunt extends Game<
       status: 'IN_PROGRESS',
     };
     // Use the utility function to generate random locations for items
-    this._assignRandomLocations(interactables);
+    this._assignRandomLocations();
   }
 
-  private _assignRandomLocations(interactables: InteractableArea[]): void {
+  public _assignRandomLocations(): void {
     if (this.state.items.length === 0) {
       throw new Error('No items available in the scavenger hunt');
     }
     this.state.items.forEach(item => {
       if (!item.location) {
-        randomLocation(item, interactables);
+        setRandomLocationAndHint(item);
       }
     });
   }
@@ -133,34 +132,5 @@ export default abstract class ScavengerHunt extends Game<
       ...this.state,
       status: 'OVER',
     };
-  }
-
-  // Method to generate hint based on player location
-  public generateHint(player: Player): string {
-    const playerLocation = player.location;
-    const closestItemLocation = this._getClosestItemLocation(playerLocation);
-    if (closestItemLocation) {
-      return generateHint(playerLocation, closestItemLocation);
-    }
-    return 'No items found.';
-  }
-
-  private _getClosestItemLocation(playerLocation: PlayerLocation): PlayerLocation | null {
-    let closestItemLocation: { x: number; y: number } | null = null;
-    let closestDistance = Number.MAX_SAFE_INTEGER;
-
-    this.state.items.forEach(item => {
-      if (item.location) {
-        const distance = Math.sqrt(
-          (playerLocation.x - item.location.x) ** 2 + (playerLocation.y - item.location.y) ** 2,
-        );
-        if (distance < closestDistance) {
-          closestDistance = distance;
-          closestItemLocation = item.location;
-        }
-      }
-    });
-
-    return closestItemLocation;
   }
 }

@@ -87,17 +87,6 @@ export default abstract class InteractableArea {
   }
 
   /**
-   * Generates a random location within the bounds of this InteractableArea.
-   * @returns Random location within the bounds of the area
-   */
-  public generateRandomLocation(): { x: number; y: number } {
-    const randomX = this._x + Math.random() * this._width;
-    const randomY = this._y + Math.random() * this._height;
-
-    return { x: randomX, y: randomY };
-  }
-
-  /**
    * Removes a player from this interactable area.
    *
    * Removes the player from this area's occupants array, clears the player's interactableID, informs players in the town

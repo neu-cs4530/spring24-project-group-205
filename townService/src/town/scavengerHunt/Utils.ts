@@ -1,37 +1,51 @@
-// Utils.ts
+import { ScavengerHuntItem, XY } from '../../types/CoveyTownSocket';
 
-import { PlayerLocation, ScavengerHuntItem } from '../../types/CoveyTownSocket';
-import InteractableArea from '../InteractableArea';
-
-export function generateRandomInteractable(interactables: InteractableArea[]): InteractableArea {
-  if (interactables.length === 0) {
-    throw new Error('No interactable areas available');
-  }
-  const randomIndex = Math.floor(Math.random() * interactables.length);
-  return interactables[randomIndex];
+interface HidingSpot {
+  topLeft: [number, number];
+  topRight: [number, number];
+  bottomLeft: [number, number];
+  bottomRight: [number, number];
+  hint: string;
 }
 
-export function randomLocation(item: ScavengerHuntItem, interactables: InteractableArea[]): void {
-  const area = generateRandomInteractable(interactables);
-  const newRandomLocation = area.generateRandomLocation();
+const HIDING_SPOTS: HidingSpot[] = [
+  {
+    topLeft: [7, 26],
+    topRight: [77, 26],
+    bottomLeft: [7, 28],
+    bottomRight: [77, 28],
+    hint: 'above trophy cases',
+  },
+  {
+    topLeft: [7, 32],
+    topRight: [59, 32],
+    bottomLeft: [7, 33],
+    bottomRight: [59, 33],
+    hint: 'above foyer tables',
+  },
+  // Add more hiding spots here
+];
 
-  item.location = newRandomLocation;
+export function pickRandomHidingSpot(boxes: HidingSpot[]): HidingSpot {
+  if (boxes.length === 0) {
+    throw new Error('No hiding spots available');
+  }
+  const randomIndex = Math.floor(Math.random() * boxes.length);
+  return boxes[randomIndex];
 }
 
-export function generateHint(playerLocation: PlayerLocation, itemLocation: PlayerLocation): string {
-  const distance = Math.sqrt(
-    (playerLocation.x - itemLocation.x) ** 2 + (playerLocation.y - itemLocation.y) ** 2,
-  );
+export function setRandomLocationAndHint(item: ScavengerHuntItem): XY {
+  const box = pickRandomHidingSpot(HIDING_SPOTS);
+  const minX = Math.min(box.topLeft[0], box.bottomLeft[0]);
+  const maxX = Math.max(box.topRight[0], box.bottomRight[0]);
+  const minY = Math.min(box.topLeft[1], box.topRight[1]);
+  const maxY = Math.max(box.bottomLeft[1], box.bottomRight[1]);
 
-  // we can adjust this
-  const closeThreshold = 100;
-  const mediumThreshold = 200;
+  const randomX = Math.random() * (maxX - minX) + minX;
+  const randomY = Math.random() * (maxY - minY) + minY;
 
-  if (distance < closeThreshold) {
-    return 'You are very close to the item!';
-  }
-  if (distance < mediumThreshold) {
-    return 'You are getting closer to the item.';
-  }
-  return 'You are far from the item.';
+  item.hint = box.hint;
+  item.location = { x: randomX, y: randomY };
+
+  return item.location;
 }

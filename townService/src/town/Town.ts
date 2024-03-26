@@ -14,7 +14,6 @@ import {
   InteractableCommand,
   InteractableCommandBase,
   PlayerLocation,
-  ScavengerHuntItem,
   ServerToClientEvents,
   SocketData,
   ViewingArea as ViewingAreaModel,
