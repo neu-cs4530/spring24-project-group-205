@@ -67,7 +67,7 @@ export default abstract class ScavengerHunt extends Game<
     this._assignRandomLocations();
   }
 
-  public _assignRandomLocations(): void {
+  private _assignRandomLocations(): void {
     if (this.state.items.length === 0) {
       throw new Error('No items available in the scavenger hunt');
     }
