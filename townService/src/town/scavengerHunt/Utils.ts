@@ -23,7 +23,62 @@ const HIDING_SPOTS: HidingSpot[] = [
     bottomRight: [59, 33],
     hint: 'above foyer tables',
   },
-  // Add more hiding spots here
+  {
+    topLeft: [7, 39],
+    topRight: [76, 39],
+    bottomLeft: [7, 40],
+    bottomRight: [76, 40],
+    hint: 'below foyer tables',
+  },
+  {
+    topLeft: [56, 29],
+    topRight: [59, 29],
+    bottomLeft: [56, 40],
+    bottomRight: [59, 40],
+    hint: 'near foyer table 7',
+  },
+  {
+    topLeft: [61, 31],
+    topRight: [74, 31],
+    bottomLeft: [61, 33],
+    bottomRight: [74, 33],
+    hint: 'gated area',
+  },
+  {
+    topLeft: [84, 12],
+    topRight: [104, 12],
+    bottomLeft: [84, 15],
+    bottomRight: [104, 15],
+    hint: 'butterfly room',
+  },
+  {
+    topLeft: [107, 28],
+    topRight: [115, 28],
+    bottomLeft: [107, 32],
+    bottomRight: [115, 32],
+    hint: 'under basement TV',
+  },
+  {
+    topLeft: [61, 14],
+    topRight: [75, 14],
+    bottomLeft: [61, 21],
+    bottomRight: [75, 21],
+    hint: 'lecture hall',
+  },
+  {
+    topLeft: [22, 14],
+    topRight: [30, 14],
+    bottomLeft: [22, 17],
+    bottomRight: [30, 17],
+    hint: 'vases room',
+  },
+  {
+    topLeft: [9, 6],
+    topRight: [51, 6],
+    bottomLeft: [9, 8],
+    bottomRight: [51, 8],
+    hint: 'dino room',
+  },
 ];
 
 export function pickRandomHidingSpot(boxes: HidingSpot[]): HidingSpot {

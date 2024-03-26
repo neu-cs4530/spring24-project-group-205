@@ -13,18 +13,10 @@ import {
 } from '../../types/CoveyTownSocket';
 import GameArea from '../games/GameArea';
 import ScavengerHunt from './ScavengerHunt';
-import InteractableArea from '../InteractableArea';
 import ScavengerHuntTimed from './ScavengerHuntTimed';
 import ScavengerHuntRelaxed from './ScavengerHuntRelaxed';
 
 export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
-  private _interactables: InteractableArea[] = [];
-
-  // Method to set interactables
-  public setInteractables(interactables: InteractableArea[]): void {
-    this._interactables = interactables;
-  }
-
   protected getType(): InteractableType {
     return 'ScavengerHuntArea' as InteractableType;
   }
@@ -87,8 +79,7 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
       if (this._game?.id !== command.gameID) {
         throw new InvalidParametersError(GAME_ID_MISSMATCH_MESSAGE);
       }
-      const interactables = this._interactables;
-      game.startGame(player, interactables);
+      game.startGame(player);
       this._stateUpdated(game.toModel());
       return undefined as InteractableCommandReturnType<CommandType>;
     }
