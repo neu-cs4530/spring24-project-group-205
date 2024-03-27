@@ -47,7 +47,7 @@ export default class Hub {
   public constructor(player: Player) {
     this._player = player;
     this._gameMode = 'relaxed';
-    this._themepack = new Themepack('nature', 0);
+    this._themepack = new Themepack('nature');
     this._hints = [];
   }
 
@@ -96,24 +96,6 @@ export default class Hub {
    */
   getRules() {
     return this._rules;
-  }
-
-  /**
-   * Allows the player to purchase a new themepack for the game and sets the
-   * current themepack to the puchased one.
-   * @param themepack the themepack the player wants to purchase
-   * @throws an error if the player does not have enough coins to purchase the themepack
-   * @throws an error if the themepack does not exist
-   */
-  purchaseThemepack(themepack: Themepack) {
-    if (this._coins < themepack.getPrice()) {
-      throw new Error('Not enough coins to purchase themepack');
-    } else if (!this._allThemepacks.includes(themepack)) {
-      throw new Error('Themepack does not exist');
-    } else {
-      this.deductCoins(themepack.getPrice());
-      this._themepack = themepack;
-    }
   }
 
   /**
