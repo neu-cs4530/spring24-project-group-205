@@ -16,7 +16,7 @@ export default class ScavengerHuntRelaxed extends ScavengerHunt {
 
   public iterateClock(): void {
     this.state = {
-      ...this.state
+      ...this.state,
     };
   }
 
@@ -44,7 +44,7 @@ export default class ScavengerHuntRelaxed extends ScavengerHunt {
 
   /**
    * Always returns true for relaxed mode since there is no time limit
-   * @param currentTime 
+   * @param currentTime
    * @returns true if the game has been started and the game is not over
    */
   protected _isTimeRemaining(currentTime: number): boolean {
@@ -54,6 +54,4 @@ export default class ScavengerHuntRelaxed extends ScavengerHunt {
 
     return true;
   }
-
-
 }

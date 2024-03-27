@@ -88,12 +88,10 @@ export default abstract class ScavengerHunt extends Game<
     });
   }
 
-
   /**
-  * Updates the time left in the game
-  */
+   * Updates the time left in the game
+   */
   public abstract iterateClock(): void;
-
 
   /**
    * gets the time left in the game
