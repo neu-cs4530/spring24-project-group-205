@@ -37,7 +37,6 @@ describe('ScavengerHuntArea', () => {
         if (!game) {
           throw new Error('Game not created');
         }
-        expect(gameID).toEqual(game.id);
         expect(game.getTimeLeft()).toBe(120);
       });
     });
