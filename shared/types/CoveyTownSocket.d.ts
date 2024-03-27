@@ -17,7 +17,7 @@ export type TownJoinResponse = {
   interactables: TypedInteractable[];
 }
 
-export type InteractableType = 'ConversationArea' | 'ViewingArea' | 'TicTacToeArea' | 'ConnectFourArea';
+export type InteractableType = 'ConversationArea' | 'ViewingArea' | 'TicTacToeArea' | 'ConnectFourArea' | 'ScavengerHuntArea';
 export interface Interactable {
   type: InteractableType;
   id: InteractableID;
@@ -120,6 +120,7 @@ export interface ScavengerHuntItem {
   name: string;
   location: XY;
   foundBy?: PlayerID;
+  hint: string;
 }
 
 /**
