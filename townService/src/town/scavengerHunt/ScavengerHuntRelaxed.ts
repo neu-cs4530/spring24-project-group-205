@@ -14,6 +14,12 @@ export default class ScavengerHuntRelaxed extends ScavengerHunt {
     this._gameMode = 'relaxed';
   }
 
+  public iterateClock(): void {
+    this.state = {
+      ...this.state,
+    };
+  }
+
   public applyMove(move: GameMove<ScavengerHuntItem>): void {
     if (!this.state.scavenger) {
       throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
@@ -34,5 +40,18 @@ export default class ScavengerHuntRelaxed extends ScavengerHunt {
       ...this.state,
       items: this.state.items.map(item => (item.id === move.move.id ? move.move : item)),
     };
+  }
+
+  /**
+   * Always returns true for relaxed mode since there is no time limit
+   * @param currentTime
+   * @returns true if the game has been started and the game is not over
+   */
+  protected _isTimeRemaining(currentTime: number): boolean {
+    if (!this._gameStartTime && this.state.status === 'IN_PROGRESS') {
+      return false;
+    }
+
+    return true;
   }
 }

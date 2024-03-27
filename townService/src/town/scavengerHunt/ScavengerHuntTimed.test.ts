@@ -35,6 +35,9 @@ describe('ScavengerHunt', () => {
       expect(game.state.status).toBe('OVER');
       expect(game.getScore()).toBe(2);
       expect(game.state.items[1].foundBy).toBe(player.id);
+      expect(game.getTimeLeft()).toBe(120);
+      game.iterateClock();
+      expect(game.getTimeLeft()).toBe(119);
     });
   });
 });

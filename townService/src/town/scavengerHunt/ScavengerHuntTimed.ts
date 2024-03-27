@@ -8,10 +8,25 @@ import { GameMove, ScavengerHuntItem } from '../../types/CoveyTownSocket';
 import ScavengerHunt from './ScavengerHunt';
 import Themepack from './Themepack';
 
+const TIME_ALLOWED = 120;
+
 export default class ScavengerHuntTimed extends ScavengerHunt {
   public constructor(themePack?: Themepack) {
     super(themePack);
-    this._gameMode = 'relaxed';
+    this._gameMode = 'timed';
+  }
+
+  /**
+   * Updates the time left in the game by decreasing it by 1 second
+   */
+  public iterateClock(): void {
+    const newTimeLeft = TIME_ALLOWED - 1;
+    if (newTimeLeft < TIME_ALLOWED) {
+      this.state = {
+        ...this.state,
+        timeLeft: newTimeLeft,
+      };
+    }
   }
 
   public applyMove(move: GameMove<ScavengerHuntItem>): void {
@@ -41,5 +56,19 @@ export default class ScavengerHuntTimed extends ScavengerHunt {
         winner: this.state.scavenger,
       };
     }
+  }
+
+  protected _isTimeRemaining(currentTime: number): boolean {
+    // If the game hasn't started yet, there is no time remaining
+    if (!this._gameStartTime) {
+      return false;
+    }
+
+    // If the game has been running for longer than the allotted time, there is no time remaining
+    if (currentTime >= (TIME_ALLOWED + this._gameStartTime) / 1000) {
+      return false;
+    }
+
+    return (currentTime - this._gameStartTime) / 1000 < TIME_ALLOWED;
   }
 }

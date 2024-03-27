@@ -16,6 +16,8 @@ import Leaderboard from './Leaderboards';
 import Themepack from './Themepack';
 import { setRandomLocationAndHint } from './Utils';
 
+const TIME_ALLOWED = 120;
+
 export default abstract class ScavengerHunt extends Game<
   ScavengerHuntGameState,
   ScavengerHuntItem
@@ -36,8 +38,13 @@ export default abstract class ScavengerHunt extends Game<
   // number of items found by the player
   protected _itemsFound = 0;
 
+  protected _gameStartTime?: number;
+
+  private _timerIntervalId?: NodeJS.Timeout;
+
   public constructor(themePack?: Themepack) {
     super({
+      timeLeft: TIME_ALLOWED,
       items: [],
       status: 'WAITING_TO_START',
     });
@@ -82,6 +89,19 @@ export default abstract class ScavengerHunt extends Game<
   }
 
   /**
+   * Updates the time left in the game
+   */
+  public abstract iterateClock(): void;
+
+  /**
+   * gets the time left in the game
+   * @returns the time left in the game
+   */
+  public getTimeLeft(): number {
+    return this.state.timeLeft;
+  }
+
+  /**
    * Apply a move to the game.
    * This method should be implemented by subclasses.
    * @param move A move to apply to the game.
@@ -119,10 +139,39 @@ export default abstract class ScavengerHunt extends Game<
         status: 'WAITING_TO_START',
         scavenger: player.id,
       };
+
+      this._gameStartTime = Date.now();
+
+      this._timerIntervalId = setInterval(() => {
+        this._endGameIfTimesUp();
+      }, 500);
     } else {
       throw new InvalidParametersError(GAME_FULL_MESSAGE);
     }
   }
+
+  /**
+   * Ends the game if the time is up
+   */
+  private _endGameIfTimesUp() {
+    if (!this._isTimeRemaining(Date.now())) {
+      this._endGame();
+    }
+  }
+
+  /**
+   *  Method to clear the interval for testing purposes
+   */
+  clearTimerInterval() {
+    clearInterval(this._timerIntervalId);
+  }
+
+  /**
+   * Determines if the current time (within milliseconds) is within the allotted time given
+   * @param currentTime the current time in milliseconds
+   * @returns true if the time is within the allotted time, false otherwise
+   */
+  protected abstract _isTimeRemaining(currentTime: number): boolean;
 
   protected _leave(player: Player): void {
     if (this.state.scavenger !== player.id) {
@@ -132,5 +181,17 @@ export default abstract class ScavengerHunt extends Game<
       ...this.state,
       status: 'OVER',
     };
+  }
+
+  /**
+   * Ends the game and clears the timer
+   */
+  private _endGame(): void {
+    this.state = {
+      ...this.state,
+      status: 'OVER',
+    };
+
+    clearInterval(this._timerIntervalId);
   }
 }

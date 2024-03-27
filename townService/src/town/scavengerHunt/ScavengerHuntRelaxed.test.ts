@@ -32,6 +32,10 @@ describe('ScavengerHunt', () => {
       game.applyMove({ gameID: '5678', playerID: player.id, move: sushi });
       expect(game.state.items[1].foundBy).toBe(player.id);
       expect(game.getScore()).toBe(2);
+      expect(game.getTimeLeft()).toBe(120);
+      game.iterateClock();
+      expect(game.getTimeLeft()).toBe(120);
+      game.clearTimerInterval();
     });
   });
 });
