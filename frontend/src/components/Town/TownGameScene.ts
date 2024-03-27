@@ -301,33 +301,33 @@ export default class TownGameScene extends Phaser.Scene {
       if (worldLayer && this._scavengerHuntItems < 1) {
         // can make a call to our class that manages items and pass the world layer
         // TO-DO: example item in spawn room, delete later
-        this._addTileForPlayer('wQUVArEzxAW2LQ0cpSeAg', 15053, 97, 27);
+        worldLayer.putTileAt(15053, 97, 27);
         console.log('put tiles', this._scavengerHuntItems++); // iterator still gets called every frame
       }
     }
   }
 
-  private _addTileForPlayer(playerId: string, tileId: number, xTile: number, yTile: number) {
-    const playerLayer = this._getPlayerLayer(playerId);
-    playerLayer?.putTileAt(tileId, xTile, yTile);
-  }
+  // private _addTileForPlayer(playerId: string, tileId: number, xTile: number, yTile: number) {
+  //   const playerLayer = this._getPlayerLayer(playerId);
+  //   playerLayer?.putTileAt(tileId, xTile, yTile);
+  // }
 
-  private _getPlayerLayer(playerId: string) {
-    const layerName = `playerLayer-${playerId}`;
-    const existingLayer = this._map?.getLayer(layerName);
-    if (existingLayer) {
-      return existingLayer.tilemapLayer;
-    } else {
-      console.log('layerName:', layerName);
-      console.log('map:', this._map);
-      const playerLayer = this._map?.createLayer(layerName, this._tileset, 0, 0);
-      console.log('playerLayer', playerLayer);
-      assert(playerLayer);
-      playerLayer.setCollisionByProperty({ collides: true });
-      playerLayer.setDepth(5);
-      return playerLayer;
-    }
-  }
+  // private _getPlayerLayer(playerId: string) {
+  //   const layerName = `playerLayer-${playerId}`;
+  //   const existingLayer = this._map?.getLayer(layerName);
+  //   if (existingLayer) {
+  //     return existingLayer.tilemapLayer;
+  //   } else {
+  //     console.log('layerName:', layerName);
+  //     console.log('map:', this._map);
+  //     const playerLayer = this._map?.createLayer(layerName, this._tileset, 0, 0);
+  //     console.log('playerLayer', playerLayer);
+  //     assert(playerLayer);
+  //     playerLayer.setCollisionByProperty({ collides: true });
+  //     playerLayer.setDepth(5);
+  //     return playerLayer;
+  //   }
+  // }
 
   private _map?: Phaser.Tilemaps.Tilemap;
 
