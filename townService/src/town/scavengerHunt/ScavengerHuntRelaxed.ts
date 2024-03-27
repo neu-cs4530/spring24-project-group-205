@@ -1,14 +1,16 @@
 import InvalidParametersError, {
+  GAME_NOT_IN_PROGRESS_MESSAGE,
   GAME_OVER_MESSAGE,
   INVALID_MOVE_MESSAGE,
   PLAYER_NOT_IN_GAME_MESSAGE,
 } from '../../lib/InvalidParametersError';
 import { GameMove, ScavengerHuntItem } from '../../types/CoveyTownSocket';
 import ScavengerHunt from './ScavengerHunt';
+import Themepack from './Themepack';
 
 export default class ScavengerHuntRelaxed extends ScavengerHunt {
-  public constructor() {
-    super();
+  public constructor(themePack?: Themepack) {
+    super(themePack);
     this._gameMode = 'relaxed';
   }
 
@@ -27,6 +29,10 @@ export default class ScavengerHuntRelaxed extends ScavengerHunt {
     }
     if (this.state.status === 'OVER') {
       throw new InvalidParametersError(GAME_OVER_MESSAGE);
+    }
+
+    if (this.state.status !== 'IN_PROGRESS') {
+      throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
     }
     move.move.foundBy = this.state.scavenger;
     this._itemsFound += 1;
