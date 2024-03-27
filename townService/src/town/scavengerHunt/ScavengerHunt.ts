@@ -60,15 +60,12 @@ export default abstract class ScavengerHunt extends Game<
   /**
    * Updates the time left in the game by decreasing it by 1 second
    */
-  public iterateClock(): void {
-    const newTimeLeft = TIME_ALLOWED - 1;
-    if (newTimeLeft < TIME_ALLOWED) {
-      this.state = {
-        ...this.state,
-        timeLeft: newTimeLeft,
-      };
-    }
-  }
+  public abstract iterateClock(): void;
+
+    /**
+   * Updates the time left in the game
+   */
+    public abstract iterateClock(): void;
 
 
   /**
@@ -78,11 +75,6 @@ export default abstract class ScavengerHunt extends Game<
   public getTimeLeft(): number {
     return this.state.timeLeft;
   }
-
-  /**
-   * Updates the time left in the game
-   */
-  public abstract iterateClock(): void;
 
   /**
    * Apply a move to the game.

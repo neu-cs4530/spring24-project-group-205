@@ -14,6 +14,8 @@ import {
 import GameArea from '../games/GameArea';
 import ScavengerHunt from './ScavengerHunt';
 import InteractableArea from '../InteractableArea';
+import ScavengerHuntTimed from './ScavengerHuntTimed';
+import ScavengerHuntRelaxed from './ScavengerHuntRelaxed';
 
 export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
   private _interactables: InteractableArea[] = [];
@@ -51,11 +53,22 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
     command: CommandType,
     player: Player,
   ): InteractableCommandReturnType<CommandType> {
-    if (command.type === 'JoinGame') {
+    if (command.type === 'JoinTimedGame') {
       let game = this._game;
       if (!game || game.state.status === 'OVER') {
         // No game in progress or game over, create a new one
-        game = new ScavengerHunt();
+        game = new ScavengerHuntTimed();
+        this._game = game;
+      }
+      game.join(player);
+      this._stateUpdated(game.toModel());
+      return { gameID: game.id } as InteractableCommandReturnType<CommandType>;
+    }
+    if (command.type === 'JoinRelaxedGame') {
+      let game = this._game;
+      if (!game || game.state.status === 'OVER') {
+        // No game in progress or game over, create a new one
+        game = new ScavengerHuntRelaxed();
         this._game = game;
       }
       game.join(player);
