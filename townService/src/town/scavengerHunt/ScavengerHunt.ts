@@ -136,7 +136,7 @@ export default abstract class ScavengerHunt extends Game<
     } else if (!this.state.scavenger) {
       this.state = {
         ...this.state,
-        status: 'IN_PROGRESS',
+        status: 'WAITING_TO_START',
         scavenger: player.id,
       };
 

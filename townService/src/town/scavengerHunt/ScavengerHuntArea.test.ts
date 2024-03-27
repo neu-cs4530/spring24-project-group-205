@@ -33,7 +33,6 @@ describe('ScavengerHuntArea', () => {
     describe('JoinTimedGame', () => {
       it('should create a new game if no game is in progress', () => {
         const { gameID } = gameArea.handleCommand({ type: 'JoinTimedGame' }, player1);
-        gameArea.handleCommand({ type: 'JoinTimedGame' }, player1);
         expect(gameID).toBeDefined();
         if (!game) {
           throw new Error('Game not created');
