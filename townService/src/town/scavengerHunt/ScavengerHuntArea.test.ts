@@ -1,16 +1,16 @@
 import { nanoid } from 'nanoid';
 import { mock } from 'jest-mock-extended';
 import ScavengerHunt from './ScavengerHunt';
-import ScavengerHuntArea from './ScavengerHuntArea';
 import ScavengerHuntTimed from './ScavengerHuntTimed';
 import Themepack from './Themepack';
 import { TownEmitter } from '../../types/CoveyTownSocket';
 import { createPlayerForTesting } from '../../TestUtils';
 import Player from '../../lib/Player';
+import ScavengerHuntGameArea from './ScavengerHuntGameArea';
 
 describe('ScavengerHuntArea', () => {
   let game: ScavengerHunt;
-  let gameArea: ScavengerHuntArea;
+  let gameArea: ScavengerHuntGameArea;
   let themepack: Themepack;
   let player1: Player;
   let player2: Player;
@@ -20,7 +20,7 @@ describe('ScavengerHuntArea', () => {
     game = new ScavengerHuntTimed(themepack);
     player1 = createPlayerForTesting();
     player2 = createPlayerForTesting();
-    gameArea = new ScavengerHuntArea(
+    gameArea = new ScavengerHuntGameArea(
       nanoid(),
       { x: 0, y: 0, width: 100, height: 100 },
       mock<TownEmitter>(),
