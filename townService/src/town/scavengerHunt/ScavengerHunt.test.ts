@@ -27,6 +27,11 @@ describe('ScavengerHunt', () => {
     themepack.addItem(sushi);
   });
 
+  afterEach(() => {
+    gameRelaxed.clearTimerInterval();
+    gameTimed.clearTimerInterval();
+  });
+
   describe('_join', () => {
     it('should throw an error if the player is already in the game', () => {
       const player = createPlayerForTesting();

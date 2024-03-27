@@ -35,6 +35,7 @@ describe('ScavengerHunt', () => {
       expect(game.getTimeLeft()).toBe(120);
       game.iterateClock();
       expect(game.getTimeLeft()).toBe(120);
+      game.clearTimerInterval();
     });
   });
 });
