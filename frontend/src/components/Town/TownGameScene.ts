@@ -62,7 +62,7 @@ export default class TownGameScene extends Phaser.Scene {
 
   private _onGameReadyListeners: Callback[] = [];
 
-  private _tileset: Phaser.Tilemaps.Tileset[] = [];
+  //private _tileset: Phaser.Tilemaps.Tileset[] = [];
 
   /**
    * Layers that the player can collide with.
@@ -296,12 +296,21 @@ export default class TownGameScene extends Phaser.Scene {
         }
       }
 
+      // Check for and create player layers for scavenger hunt items
+      for (const player of this._players) {
+        if (this.map?.getLayer(`playerLayer-${player.id}`)) {
+          console.log('layer exists: ', `playerLayer-${player.id}`);
+        } else {
+          this._createPlayerLayer(player.id);
+        }
+      }
+
       // Update dynamic scavenger hunt items test
-      const worldLayer = this._map?.getLayer('World')?.tilemapLayer;
-      if (worldLayer && this._scavengerHuntItems < 1) {
+      const myLayer = this._map?.getLayer('playerLayer-sdXcmsapjQsO1fd5Th_6E')?.tilemapLayer;
+      if (myLayer && this._scavengerHuntItems < 1) {
         // can make a call to our class that manages items and pass the world layer
         // TO-DO: example item in spawn room, delete later
-        worldLayer.putTileAt(15053, 97, 27);
+        myLayer.putTileAt(3, 97, 27);
         console.log('put tiles', this._scavengerHuntItems++); // iterator still gets called every frame
       }
     }
@@ -328,6 +337,19 @@ export default class TownGameScene extends Phaser.Scene {
   //     return playerLayer;
   //   }
   // }
+
+  private _createPlayerLayer(playerId: string) {
+    const layerName = `playerLayer-${playerId}`;
+    const tileset = ['Food_16x16'].map(v => {
+      const ret = this.map.addTilesetImage(v);
+      assert(ret);
+      return ret;
+    });
+    const playerLayer = this._map?.createBlankLayer(layerName, tileset, 0, 0, 32, 32);
+    assert(playerLayer);
+    playerLayer.setDepth(6);
+    playerLayer.setVisible(true);
+  }
 
   private _map?: Phaser.Tilemaps.Tilemap;
 
@@ -360,7 +382,7 @@ export default class TownGameScene extends Phaser.Scene {
          tileset image in Phaser's cache (i.e. the name you used in preload)
          */
 
-    this._tileset = [
+    const tileset = [
       'Room_Builder_32x32',
       '22_Museum_32x32',
       '5_Classroom_and_library_32x32',
@@ -377,24 +399,24 @@ export default class TownGameScene extends Phaser.Scene {
     });
     this._collidingLayers = [];
     // Parameters: layer name (or index) from Tiled, tileset, x, y
-    const belowLayer = this.map.createLayer('Below Player', this._tileset, 0, 0);
+    const belowLayer = this.map.createLayer('Below Player', tileset, 0, 0);
     assert(belowLayer);
     belowLayer.setDepth(-10);
-    const wallsLayer = this.map.createLayer('Walls', this._tileset, 0, 0);
-    const onTheWallsLayer = this.map.createLayer('On The Walls', this._tileset, 0, 0);
+    const wallsLayer = this.map.createLayer('Walls', tileset, 0, 0);
+    const onTheWallsLayer = this.map.createLayer('On The Walls', tileset, 0, 0);
     assert(wallsLayer);
     assert(onTheWallsLayer);
     wallsLayer.setCollisionByProperty({ collides: true });
     onTheWallsLayer.setCollisionByProperty({ collides: true });
 
-    const worldLayer = this.map.createLayer('World', this._tileset, 0, 0);
+    const worldLayer = this.map.createLayer('World', tileset, 0, 0);
     assert(worldLayer);
     worldLayer.setCollisionByProperty({ collides: true });
-    const aboveLayer = this.map.createLayer('Above Player', this._tileset, 0, 0);
+    const aboveLayer = this.map.createLayer('Above Player', tileset, 0, 0);
     assert(aboveLayer);
     aboveLayer.setCollisionByProperty({ collides: true });
 
-    const veryAboveLayer = this.map.createLayer('Very Above Player', this._tileset, 0, 0);
+    const veryAboveLayer = this.map.createLayer('Very Above Player', tileset, 0, 0);
     assert(veryAboveLayer);
     /* By default, everything gets depth sorted on the screen in the order we created things.
          Here, we want the "Above Player" layer to sit on top of the player, so we explicitly give
