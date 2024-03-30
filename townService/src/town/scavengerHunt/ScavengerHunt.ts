@@ -184,7 +184,7 @@ export default abstract class ScavengerHunt extends Game<
     }
     this.state = {
       ...this.state,
-      status: 'OVER',
+      scavengers: this.state.scavengers?.filter(id => id !== player.id),
     };
   }
 
