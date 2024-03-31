@@ -9,23 +9,16 @@
 import Item from './Item';
 
 export default class Themepack {
-  private _name: string;
+  public name: string;
 
-  // The description of the themepack
   private _items: Item[] = [];
-
-  // The price of the themepack
-  private _price: number;
 
   /**
    * Creates a new themepack for the scavenger hunt game.
    * @param name the name of the themepack
-   * @param description the description of the themepack
-   * @param price the price of the themepack
    */
-  constructor(name: string, price: number) {
-    this._name = name;
-    this._price = price;
+  constructor(name: string) {
+    this.name = name;
   }
 
   /**
@@ -33,7 +26,7 @@ export default class Themepack {
    * @returns the name of the themepack
    */
   getThemepackName() {
-    return this._name;
+    return this.name;
   }
 
   /**
@@ -42,22 +35,6 @@ export default class Themepack {
    */
   getItems() {
     return this._items;
-  }
-
-  /**
-   * Returns the price of the themepack.
-   * @returns the price of the themepack
-   */
-  getPrice() {
-    return this._price;
-  }
-
-  /**
-   * Sets the price of the themepack.
-   * @param price the price of the themepack
-   */
-  setPrice(price: number) {
-    this._price = price;
   }
 
   /**

@@ -17,7 +17,7 @@ export type TownJoinResponse = {
   interactables: TypedInteractable[];
 }
 
-export type InteractableType = 'ConversationArea' | 'ViewingArea' | 'TicTacToeArea' | 'ConnectFourArea';
+export type InteractableType = 'ConversationArea' | 'ViewingArea' | 'TicTacToeArea' | 'ConnectFourArea' | 'ScavengerHuntArea';
 export interface Interactable {
   type: InteractableType;
   id: InteractableID;
@@ -78,7 +78,7 @@ export interface ViewingArea extends Interactable {
  * This type represents the different game modes that the player can play in the Scavenger Hunt game.
  * The game modes are either competitive or leisure.
  */
-export type GameMode = 'competitive' | 'leisure';
+export type GameMode = 'timed' | 'relaxed';
 
 export type GameStatus = 'IN_PROGRESS' | 'WAITING_TO_START' | 'OVER' | 'WAITING_FOR_PLAYERS';
 /**
@@ -120,6 +120,7 @@ export interface ScavengerHuntItem {
   name: string;
   location: XY;
   foundBy?: PlayerID;
+  hint: string;
 }
 
 /**
@@ -134,6 +135,7 @@ export interface TicTacToeGameState extends WinnableGameState {
 }
 
 export interface ScavengerHuntGameState extends WinnableGameState {
+  timeLeft: number;
   scavenger?: PlayerID;
   items: ReadonlyArray<ScavengerHuntItem>;
 }
@@ -234,13 +236,19 @@ interface InteractableCommandBase {
   type: string;
 }
 
-export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | StartGameCommand | LeaveGameCommand;
+export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | JoinRelaxedGameCommand | JoinTimedGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | StartGameCommand | LeaveGameCommand;
 export interface ViewingAreaUpdateCommand  {
   type: 'ViewingAreaUpdate';
   update: ViewingArea;
 }
 export interface JoinGameCommand {
   type: 'JoinGame';
+}
+export interface JoinRelaxedGameCommand {
+  type: 'JoinRelaxedGame';
+}
+export interface JoinTimedGameCommand {
+  type: 'JoinTimedGame';
 }
 export interface LeaveGameCommand {
   type: 'LeaveGame';

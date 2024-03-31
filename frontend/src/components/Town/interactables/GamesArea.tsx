@@ -26,6 +26,7 @@ import ChatChannel from './ChatChannel';
 import ConnectFourArea from './ConnectFour/ConnectFourArea';
 import GameAreaInteractable from './GameArea';
 import Leaderboard from './Leaderboard';
+import ScavengerHuntArea from './ScavengerHunt/ScavengerHuntArea';
 import TicTacToeArea from './TicTacToe/TicTacToeArea';
 
 export const INVALID_GAME_AREA_TYPE_MESSAGE = 'Invalid game area type';
@@ -37,12 +38,13 @@ export const INVALID_GAME_AREA_TYPE_MESSAGE = 'Invalid game area type';
  *
  * It uses the GameAreaController corresponding to the provided interactableID to get the current state of the game. (@see useInteractableAreaController)
  *
- * It renders the following:
+ * It renders the following for ConnectFourArea or TicTacToeArea:
  *  - A leaderboard of the game results
  *  - A list of observers' usernames (in a list with the aria-label 'list of observers in the game')
  *  - The game area component (either ConnectFourArea or TicTacToeArea). If the game area is NOT a ConnectFourArea or TicTacToeArea, then the message INVALID_GAME_AREA_TYPE_MESSAGE appears within the component
  *  - A chat channel for the game area (@see ChatChannel.tsx), with the property interactableID set to the interactableID of the game area
  *
+ * It renders the ScavengerHuntArea component if the game area is a ScavengerHuntArea.
  */
 function GameArea({ interactableID }: { interactableID: InteractableID }): JSX.Element {
   const gameAreaController =
@@ -62,63 +64,69 @@ function GameArea({ interactableID }: { interactableID: InteractableID }): JSX.E
   }, [townController, gameAreaController]);
   return (
     <>
-      <Accordion allowToggle>
-        <AccordionItem>
-          <Heading as='h3'>
-            <AccordionButton>
-              <Box flex='1' textAlign='left'>
-                Leaderboard
-              </Box>
-              <AccordionIcon />
-            </AccordionButton>
-            <AccordionPanel>
-              <Leaderboard results={history} />
-            </AccordionPanel>
-          </Heading>
-        </AccordionItem>
-        <AccordionItem>
-          <Heading as='h3'>
-            <AccordionButton>
-              <Box as='span' flex='1' textAlign='left'>
-                Current Observers
-                <AccordionIcon />
-              </Box>
-            </AccordionButton>
-          </Heading>
-          <AccordionPanel>
-            <List aria-label='list of observers in the game'>
-              {observers.map(player => {
-                return <ListItem key={player.id}>{player.userName}</ListItem>;
-              })}
-            </List>
-          </AccordionPanel>
-        </AccordionItem>
-      </Accordion>
-      <Flex>
-        <Box>
-          {gameAreaController.toInteractableAreaModel().type === 'ConnectFourArea' ? (
-            <ConnectFourArea interactableID={interactableID} />
-          ) : gameAreaController.toInteractableAreaModel().type === 'TicTacToeArea' ? (
-            <TicTacToeArea interactableID={interactableID} />
-          ) : (
-            <>{INVALID_GAME_AREA_TYPE_MESSAGE}</>
-          )}
-        </Box>
-        <Box
-          style={{
-            height: '400px',
-            overflowY: 'scroll',
-          }}>
-          <div
-            style={{
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'column',
-            }}>
-            <ChatChannel interactableID={gameAreaController.id} />
-          </div>
-        </Box>
-      </Flex>
+      {gameAreaController.toInteractableAreaModel().type === 'ScavengerHuntArea' ? (
+        <ScavengerHuntArea interactableID={interactableID} />
+      ) : (
+        <>
+          <Accordion allowToggle>
+            <AccordionItem>
+              <Heading as='h3'>
+                <AccordionButton>
+                  <Box flex='1' textAlign='left'>
+                    Leaderboard
+                  </Box>
+                  <AccordionIcon />
+                </AccordionButton>
+                <AccordionPanel>
+                  <Leaderboard results={history} />
+                </AccordionPanel>
+              </Heading>
+            </AccordionItem>
+            <AccordionItem>
+              <Heading as='h3'>
+                <AccordionButton>
+                  <Box as='span' flex='1' textAlign='left'>
+                    Current Observers
+                    <AccordionIcon />
+                  </Box>
+                </AccordionButton>
+              </Heading>
+              <AccordionPanel>
+                <List aria-label='list of observers in the game'>
+                  {observers.map(player => {
+                    return <ListItem key={player.id}>{player.userName}</ListItem>;
+                  })}
+                </List>
+              </AccordionPanel>
+            </AccordionItem>
+          </Accordion>
+          <Flex>
+            <Box>
+              {gameAreaController.toInteractableAreaModel().type === 'ConnectFourArea' ? (
+                <ConnectFourArea interactableID={interactableID} />
+              ) : gameAreaController.toInteractableAreaModel().type === 'TicTacToeArea' ? (
+                <TicTacToeArea interactableID={interactableID} />
+              ) : (
+                <>{INVALID_GAME_AREA_TYPE_MESSAGE}</>
+              )}
+            </Box>
+            <Box
+              style={{
+                height: '400px',
+                overflowY: 'scroll',
+              }}>
+              <div
+                style={{
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}>
+                <ChatChannel interactableID={gameAreaController.id} />
+              </div>
+            </Box>
+          </Flex>
+        </>
+      )}
     </>
   );
 }

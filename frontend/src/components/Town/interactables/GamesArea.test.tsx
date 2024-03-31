@@ -18,6 +18,7 @@ import GamesArea, { INVALID_GAME_AREA_TYPE_MESSAGE } from './GamesArea';
 import * as Leaderboard from './Leaderboard';
 import * as TicTacToeArea from './TicTacToe/TicTacToeArea';
 import React from 'react';
+import * as ScavengerHuntArea from './ScavengerHunt/ScavengerHuntArea';
 
 const mockToast = jest.fn();
 jest.mock('@chakra-ui/react', () => {
@@ -51,6 +52,10 @@ ticTacToeAreaSpy.mockReturnValue(<div data-testid={TIC_TAC_TOE_AREA_TEST_ID} />)
 const CONNECT_FOUR_AREA_TEST_ID = 'connectFourArea';
 const connectFourAreaSpy = jest.spyOn(ConnectFourArea, 'default');
 connectFourAreaSpy.mockReturnValue(<div data-testid={CONNECT_FOUR_AREA_TEST_ID} />);
+
+const SCAVENGER_HUNT_AREA_TEST_ID = 'scavengerHuntArea';
+const scavengerHuntAreaSpy = jest.spyOn(ScavengerHuntArea, 'default');
+scavengerHuntAreaSpy.mockReturnValue(<div data-testid={SCAVENGER_HUNT_AREA_TEST_ID} />);
 
 const leaderboardComponentSpy = jest.spyOn(Leaderboard, 'default');
 leaderboardComponentSpy.mockReturnValue(<div data-testid='leaderboard' />);
@@ -161,6 +166,11 @@ describe('GamesArea', () => {
       gameAreaController.type = 'TicTacToeArea';
       renderGamesArea();
       expect(screen.getByTestId(TIC_TAC_TOE_AREA_TEST_ID)).toBeInTheDocument();
+    });
+    test('If the interactableID is for a ScavengerHunt game, the ScavengerHuntGameArea should be rendered', () => {
+      gameAreaController.type = 'ScavengerHuntArea';
+      renderGamesArea();
+      expect(screen.getByTestId(SCAVENGER_HUNT_AREA_TEST_ID)).toBeInTheDocument();
     });
     test('If the interactableID is NOT for a ConnectFour or TicTacToe game, an error should be displayed', () => {
       gameAreaController.type = 'ViewingArea'; //Not a game!
