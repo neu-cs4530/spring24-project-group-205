@@ -63,7 +63,7 @@ describe('Scavenger Hunt Area', () => {
     return render(
       <ChakraProvider>
         <TownControllerContext.Provider value={townController}>
-          <ScavengerHuntArea interactableID={nanoid()} />
+          <ScavengerHuntArea interactableID={nanoid()} mode='relaxed' />
         </TownControllerContext.Provider>
       </ChakraProvider>,
     );

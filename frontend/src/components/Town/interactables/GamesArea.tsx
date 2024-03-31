@@ -46,7 +46,13 @@ export const INVALID_GAME_AREA_TYPE_MESSAGE = 'Invalid game area type';
  *
  * It renders the ScavengerHuntArea component if the game area is a ScavengerHuntArea.
  */
-function GameArea({ interactableID }: { interactableID: InteractableID }): JSX.Element {
+function GameArea({
+  interactableID,
+  mode,
+}: {
+  interactableID: InteractableID;
+  mode: string;
+}): JSX.Element {
   const gameAreaController =
     useInteractableAreaController<GenericGameAreaController>(interactableID);
   const townController = useTownController();
@@ -65,7 +71,7 @@ function GameArea({ interactableID }: { interactableID: InteractableID }): JSX.E
   return (
     <>
       {gameAreaController.toInteractableAreaModel().type === 'ScavengerHuntArea' ? (
-        <ScavengerHuntArea interactableID={interactableID} />
+        <ScavengerHuntArea interactableID={interactableID} mode={mode} />
       ) : (
         <>
           <Accordion allowToggle>
@@ -154,7 +160,7 @@ export default function GameAreaWrapper(): JSX.Element {
           <ModalHeader>{gameArea.name}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <GameArea interactableID={gameArea.id} />
+            <GameArea interactableID={gameArea.id} mode={gameArea.mode} />
           </ModalBody>
         </ModalContent>
       </Modal>
