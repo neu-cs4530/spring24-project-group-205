@@ -39,11 +39,11 @@ export default function ScavengerHuntArea({
 
   // Placeholder data for the leaderboard
   const leaderboardData = [
-    { username: 'Player1', time: 100 },
-    { username: 'Player2', time: 90 },
-    { username: 'Player3', time: 80 },
-    { username: 'Player4', time: 70 },
-    { username: 'Player5', time: 60 },
+    { username: 'Player1', count: 10 },
+    { username: 'Player2', count: 9 },
+    { username: 'Player3', count: 8 },
+    { username: 'Player4', count: 7 },
+    { username: 'Player5', count: 6 },
   ];
 
   const [selectedOptionTheme, setSelectedOptionTheme] = useState('');
@@ -69,7 +69,7 @@ export default function ScavengerHuntArea({
           <tr>
             <th style={{ width: '33%' }}>Rank</th>
             <th style={{ width: '33%' }}>Username</th>
-            <th style={{ width: '33%' }}>Time (Seconds)</th>
+            <th style={{ width: '33%' }}>Objects Collected</th>
           </tr>
         </thead>
         <tbody>
@@ -77,7 +77,7 @@ export default function ScavengerHuntArea({
             <tr key={index} style={{ borderBottom: '1px solid #ddd' }}>
               <td style={{ textAlign: 'center' }}>{index + 1}</td>
               <td style={{ textAlign: 'center' }}>{player.username}</td>
-              <td style={{ textAlign: 'center' }}>{player.time}</td>
+              <td style={{ textAlign: 'center' }}>{player.count}</td>
             </tr>
           ))}
         </tbody>
