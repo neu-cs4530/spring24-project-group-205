@@ -160,7 +160,20 @@ export default function ScavengerHuntArea({
         </Heading>
         <Button>Request Hint</Button>
       </Flex>
-      <>Your hints will be here. Please begin the game and request a hint if you would like one.</>
+      <>
+        Your hints will be here. Please begin the game and request a hint if you would like one. All
+        players will be able to see your requested hint and will be notified of the hint.{' '}
+      </>
+      <Flex>
+        <Button style={{ marginRight: '10px', marginTop: '10px' }}>Join Game</Button>
+      </Flex>
+      <Flex>
+        {' '}
+        <Heading as='h1' style={{ marginRight: '10px', fontSize: '25px' }}>
+          Current Players:
+        </Heading>
+        Currently no players have joined the game.
+      </Flex>
       <Flex>
         <Button style={{ marginRight: '10px', marginTop: '10px' }}>Start Game</Button>
         <Button style={{ marginTop: '10px' }}>End Game</Button>
