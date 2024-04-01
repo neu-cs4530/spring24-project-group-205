@@ -295,60 +295,17 @@ export default class TownGameScene extends Phaser.Scene {
           player.gameObjects.label.setY(player.gameObjects.sprite.body.y - 20);
         }
       }
-
-      // Check for and create player layers for scavenger hunt items
-      for (const player of this._players) {
-        if (this.map?.getLayer(`playerLayer-${player.id}`)) {
-          console.log('layer exists: ', `playerLayer-${player.id}`);
-        } else {
-          this._createPlayerLayer(player.id);
-        }
-      }
-
-      // Update dynamic scavenger hunt items test
-      const myLayer = this._map?.getLayer('playerLayer-sdXcmsapjQsO1fd5Th_6E')?.tilemapLayer;
-      if (myLayer && this._scavengerHuntItems < 1) {
-        // can make a call to our class that manages items and pass the world layer
-        // TO-DO: example item in spawn room, delete later
-        myLayer.putTileAt(3, 97, 27);
-        console.log('put tiles', this._scavengerHuntItems++); // iterator still gets called every frame
-      }
     }
   }
 
-  // private _addTileForPlayer(playerId: string, tileId: number, xTile: number, yTile: number) {
-  //   const playerLayer = this._getPlayerLayer(playerId);
-  //   playerLayer?.putTileAt(tileId, xTile, yTile);
-  // }
+  public addTileOnMap(tileId: number, xTile: number, yTile: number): void {
+    const worldLayer = this.map.getLayer('World');
+    worldLayer?.tilemapLayer.putTileAt(tileId, xTile, yTile);
+  }
 
-  // private _getPlayerLayer(playerId: string) {
-  //   const layerName = `playerLayer-${playerId}`;
-  //   const existingLayer = this._map?.getLayer(layerName);
-  //   if (existingLayer) {
-  //     return existingLayer.tilemapLayer;
-  //   } else {
-  //     console.log('layerName:', layerName);
-  //     console.log('map:', this._map);
-  //     const playerLayer = this._map?.createLayer(layerName, this._tileset, 0, 0);
-  //     console.log('playerLayer', playerLayer);
-  //     assert(playerLayer);
-  //     playerLayer.setCollisionByProperty({ collides: true });
-  //     playerLayer.setDepth(5);
-  //     return playerLayer;
-  //   }
-  // }
-
-  private _createPlayerLayer(playerId: string) {
-    const layerName = `playerLayer-${playerId}`;
-    const tileset = ['Food_16x16'].map(v => {
-      const ret = this.map.addTilesetImage(v);
-      assert(ret);
-      return ret;
-    });
-    const playerLayer = this._map?.createBlankLayer(layerName, tileset, 0, 0, 32, 32);
-    assert(playerLayer);
-    playerLayer.setDepth(6);
-    playerLayer.setVisible(true);
+  public removeTileOnMap(xTile: number, yTile: number): void {
+    const worldLayer = this.map.getLayer('World');
+    worldLayer?.tilemapLayer.removeTileAt(xTile, yTile);
   }
 
   private _map?: Phaser.Tilemaps.Tilemap;
