@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Flex, Heading, useToast } from '@chakra-ui/react';
-import { InteractableID, ScavengerHuntItem } from '../../../../types/CoveyTownSocket';
+import { GameStatus, InteractableID, ScavengerHuntItem } from '../../../../types/CoveyTownSocket';
 import ScavengerHuntAreaController from '../../../../classes/interactable/ScavengerHuntAreaController';
 import { useInteractableAreaController } from '../../../../classes/TownController';
 import useTownController from '../../../../hooks/useTownController';
@@ -17,17 +17,29 @@ export default function ScavengerHuntArea({
 
   const [selectedOption, setSelectedOption] = useState('timed');
   const [selectedOptionTheme, setSelectedOptionTheme] = useState('fruit');
+  const [scavenger, setScavenger] = useState(gameAreaController.scavenger);
   const [items, setItems] = useState<ScavengerHuntItem[]>(gameAreaController.items);
+  const [gameStatus, setGameStatus] = useState<GameStatus>(gameAreaController.status);
+  const [joiningGame, setJoiningGame] = useState(false); // Define joiningGame state
 
   useEffect(() => {
     if (gameAreaController) {
-      gameAreaController.addListener('itemsChanged', setItems);
+      const updateGameState = () => {
+        setScavenger(gameAreaController.scavenger);
+        setItems(gameAreaController.items);
+        setGameStatus(gameAreaController.status || 'WAITING_TO_START');
+      };
+      gameAreaController.addListener('gameUpdated', updateGameState);
+      return () => {
+        gameAreaController.removeListener('gameUpdated', updateGameState);
+      };
     }
-
-    return () => {
-      gameAreaController.removeListener('itemsChanged', setItems);
-    };
   }, [gameAreaController]);
+
+  let gameStatusText = <></>;
+  if (gameStatus === 'IN_PROGRESS') {
+    gameStatusText = <>Game in progress, {items} collected</>;
+  }
 
   const handleOptionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedOption(event.target.value);
@@ -37,22 +49,41 @@ export default function ScavengerHuntArea({
     setSelectedOptionTheme(event.target.value);
   };
 
-  const handleStartGame = () => {
-    // Call startGame method on controller
-    gameAreaController?.startGame().catch(error => {
+  const handleStartGame = async () => {
+    setJoiningGame(true);
+    try {
+      await gameAreaController.startGame();
+    } catch (err) {
       toast({
-        title: 'Error',
-        description: error.message,
+        title: 'Error starting game',
+        description: (err as Error).toString(),
         status: 'error',
-        duration: 5000,
-        isClosable: true,
       });
-    });
+    }
+    setJoiningGame(false);
   };
 
   const handleEndGame = () => {
-    // Call endGame method on controller (if available)
-    // gameAreaController?.endGame();
+    const onGameEnd = () => {
+      const winner = gameAreaController.winner;
+      if (winner === townController.ourPlayer) {
+        toast({
+          title: 'Game over',
+          description: 'You won!',
+          status: 'success',
+        });
+      } else {
+        toast({
+          title: 'Game over',
+          description: `You lost :(`,
+          status: 'error',
+        });
+      }
+      gameAreaController.addListener('gameEnd', onGameEnd);
+    };
+    return () => {
+      gameAreaController.removeListener('gameEnd', onGameEnd);
+    };
   };
 
   return (
@@ -149,7 +180,11 @@ export default function ScavengerHuntArea({
       </Flex>
       <>Your hints will be here. Please begin the game and request a hint if you would like one.</>
       <Flex>
-        <Button style={{ marginRight: '10px', marginTop: '10px' }} onClick={handleStartGame}>
+        <Button
+          style={{ marginRight: '10px', marginTop: '10px' }}
+          onClick={handleStartGame}
+          isLoading={joiningGame}
+          disabled={joiningGame}>
           Start Game
         </Button>
         <Button style={{ marginTop: '10px' }} onClick={handleEndGame}>
