@@ -136,7 +136,7 @@ export interface TicTacToeGameState extends WinnableGameState {
 
 export interface ScavengerHuntGameState extends WinnableGameState {
   timeLeft: number;
-  scavenger?: PlayerID;
+  scavengers?: PlayerID[];
   items: ReadonlyArray<ScavengerHuntItem>;
 }
 

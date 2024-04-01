@@ -8,6 +8,7 @@ import Player from '../../lib/Player';
 import {
   GameMode,
   GameMove,
+  PlayerID,
   ScavengerHuntGameState,
   ScavengerHuntItem,
 } from '../../types/CoveyTownSocket';
@@ -17,6 +18,8 @@ import Themepack from './Themepack';
 import { setRandomLocationAndHint } from './Utils';
 
 const TIME_ALLOWED = 120;
+
+const MAX_PLAYERS = 10;
 
 export default abstract class ScavengerHunt extends Game<
   ScavengerHuntGameState,
@@ -36,7 +39,7 @@ export default abstract class ScavengerHunt extends Game<
   private _timeInSeconds = 0;
 
   // number of items found by the player
-  protected _itemsFound = 0;
+  protected _itemsFound = new Map<PlayerID, number>();
 
   protected _gameStartTime?: number;
 
@@ -55,24 +58,32 @@ export default abstract class ScavengerHunt extends Game<
   // Method to start the game
   public startGame(player: Player): void {
     if (!this._themepack) {
-      throw new Error('No themepack selected for the game');
+      throw new InvalidParametersError('No themepack selected for the game');
     }
 
     if (this.state.status !== 'WAITING_TO_START') {
       throw new InvalidParametersError(GAME_NOT_STARTABLE_MESSAGE);
     }
 
-    if (this.state.scavenger !== player.id) {
+    if (!this.state.scavengers?.includes(player.id)) {
       throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
     }
 
     const items = this._themepack.getItems();
+    this._gameStartTime = Date.now();
 
+    this._timerIntervalId = setInterval(() => {
+      this._endGameIfTimesUp();
+    }, 500);
     this.state = {
       ...this.state,
       items,
       status: 'IN_PROGRESS',
     };
+
+    this.state.scavengers?.forEach(playerId => {
+      this._itemsFound.set(playerId, 0);
+    });
 
     this._assignRandomLocations();
   }
@@ -113,8 +124,8 @@ export default abstract class ScavengerHunt extends Game<
    * Gives the total number of items found at this point in the game.
    * @returns number of items found.
    */
-  public getScore(): number {
-    return this._itemsFound;
+  public getScoreForPlayer(player: Player): number {
+    return this._itemsFound.get(player.id) || 0;
   }
 
   public get gameMode(): GameMode | undefined {
@@ -129,22 +140,16 @@ export default abstract class ScavengerHunt extends Game<
     this._themepack = themepack;
   }
 
-  // player joins the game and the game starts immediately, assuming we will have one button anyways
+  // lets up to ten people join, and can be started as soon as the first person joins
   protected _join(player: Player): void {
-    if (this.state.scavenger === player.id) {
+    if (this._players.some(p => p.id === player.id)) {
       throw new InvalidParametersError(PLAYER_ALREADY_IN_GAME_MESSAGE);
-    } else if (!this.state.scavenger) {
+    } else if (this._players.length < MAX_PLAYERS) {
       this.state = {
         ...this.state,
         status: 'WAITING_TO_START',
-        scavenger: player.id,
+        scavengers: [...(this.state.scavengers || []), player.id],
       };
-
-      this._gameStartTime = Date.now();
-
-      this._timerIntervalId = setInterval(() => {
-        this._endGameIfTimesUp();
-      }, 500);
     } else {
       throw new InvalidParametersError(GAME_FULL_MESSAGE);
     }
@@ -174,13 +179,33 @@ export default abstract class ScavengerHunt extends Game<
   protected abstract _isTimeRemaining(currentTime: number): boolean;
 
   protected _leave(player: Player): void {
-    if (this.state.scavenger !== player.id) {
+    if (this.state.status === 'OVER') {
+      return;
+    }
+    if (!this.state.scavengers?.includes(player.id)) {
       throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
     }
     this.state = {
       ...this.state,
-      status: 'OVER',
+      scavengers: this.state.scavengers?.filter(id => id !== player.id),
     };
+    switch (this.state.status) {
+      case 'WAITING_TO_START':
+      case 'WAITING_FOR_PLAYERS':
+        // no-ops: nothing needs to happen here
+        this.state.status = 'WAITING_FOR_PLAYERS';
+        break;
+      case 'IN_PROGRESS':
+        this.state = {
+          ...this.state,
+          status: 'OVER',
+          winner: Array.from(this._itemsFound.entries()).reduce((a, b) => (b[1] > a[1] ? b : a))[0],
+        };
+        break;
+      default:
+        // This behavior can be undefined :)
+        throw new Error(`Unexpected game status: ${this.state.status}`);
+    }
   }
 
   /**
