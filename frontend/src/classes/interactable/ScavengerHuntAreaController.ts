@@ -25,17 +25,6 @@ export default class ScavengerHuntAreaController extends GameAreaController<
   public items: ScavengerHuntItem[] = [];
 
   /**
-   * Returns the scavenger
-   */
-  get scavenger(): PlayerController | undefined {
-    const scavenger = this._model.game?.state.scavenger;
-    if (scavenger) {
-      return this.occupants.find(eachOccupant => eachOccupant.id === scavenger);
-    }
-    return undefined;
-  }
-
-  /**
    * Returns the player who won the game, if there is one, or undefined otherwise
    */
   get winner(): PlayerController | undefined {
@@ -66,14 +55,6 @@ export default class ScavengerHuntAreaController extends GameAreaController<
   }
 
   /**
-   * Returns true if the game is empty - no players AND no occupants in the area
-   *
-   */
-  isEmpty(): boolean {
-    return !this.scavenger && this.occupants.length === 0;
-  }
-
-  /**
    * Returns true if the game is not empty and the game is not waiting for players
    */
   public isActive(): boolean {
@@ -93,7 +74,7 @@ export default class ScavengerHuntAreaController extends GameAreaController<
     super._updateFrom(newModel);
     const newGame = newModel.game;
     if (newGame) {
-      const newItems = Array.from(newGame.state.items); // Create a mutable copy of readonly items
+      const newItems = Array.from(newGame.state.items);
       if (!_.isEqual(newItems, this.items)) {
         this.items = newItems;
         this.emit('itemsChanged', this.items);
