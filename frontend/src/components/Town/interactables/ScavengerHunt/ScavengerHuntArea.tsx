@@ -1,30 +1,10 @@
-import { Button, Flex, Heading, useToast } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
+import { Button, Flex, Heading, useToast } from '@chakra-ui/react';
+import { InteractableID, ScavengerHuntItem } from '../../../../types/CoveyTownSocket';
 import ScavengerHuntAreaController from '../../../../classes/interactable/ScavengerHuntAreaController';
 import { useInteractableAreaController } from '../../../../classes/TownController';
 import useTownController from '../../../../hooks/useTownController';
-import { InteractableID } from '../../../../types/CoveyTownSocket';
 
-/**
- * The ScavengerHuntArea component renders the Scavenger Hunt game area.
- * It renders the current state of the area, optionally allowing the player to join the game.
- *
- * It uses Chakra-UI components (does not use other GUI widgets)
- *
- * It uses the ScavengerHuntAreaController to get the current state of the game.
- * It listens for the 'gameUpdated' and 'gameEnd' events on the controller, and re-renders accordingly.
- * It subscribes to these events when the component mounts, and unsubscribes when the component unmounts. It also unsubscribes when the gameAreaController changes.
- *
- * It renders the following:
- * - A radio button picker for choosing the game mode (timed or relaxed)
- * - A leaderboard of the game results for the selected game mode
- * - A radio button picker for choosing the theme (fruit, dessert, or animals)
- * - A button to request a hint
- * - A list of hints that the player has requested
- * - A button to start the game
- * - A button to end the game
- *
- */
 export default function ScavengerHuntArea({
   interactableID,
 }: {
@@ -35,28 +15,45 @@ export default function ScavengerHuntArea({
   const townController = useTownController();
   const toast = useToast();
 
-  // Placeholder data for the leaderboard
-  const leaderboardData = [
-    { username: 'Player1', time: 100 },
-    { username: 'Player2', time: 90 },
-    { username: 'Player3', time: 80 },
-    { username: 'Player4', time: 70 },
-    { username: 'Player5', time: 60 },
-  ];
-
   const [selectedOption, setSelectedOption] = useState('timed');
+  const [selectedOptionTheme, setSelectedOptionTheme] = useState('fruit');
+  const [items, setItems] = useState<ScavengerHuntItem[]>(gameAreaController.items);
 
-  const handleOptionChange = (event: { target: { value: React.SetStateAction<string> } }) => {
+  useEffect(() => {
+    if (gameAreaController) {
+      gameAreaController.addListener('itemsChanged', setItems);
+    }
+
+    return () => {
+      gameAreaController.removeListener('itemsChanged', setItems);
+    };
+  }, [gameAreaController]);
+
+  const handleOptionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedOption(event.target.value);
   };
 
-  const [selectedOptionTheme, setSelectedOptionTheme] = useState('fruit');
-
-  const handleOptionChangeTheme = (event: { target: { value: React.SetStateAction<string> } }) => {
+  const handleOptionChangeTheme = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedOptionTheme(event.target.value);
   };
 
-  useEffect(() => {}, [townController, gameAreaController, toast]);
+  const handleStartGame = () => {
+    // Call startGame method on controller
+    gameAreaController?.startGame().catch(error => {
+      toast({
+        title: 'Error',
+        description: error.message,
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+    });
+  };
+
+  const handleEndGame = () => {
+    // Call endGame method on controller (if available)
+    // gameAreaController?.endGame();
+  };
 
   return (
     <>
@@ -99,13 +96,12 @@ export default function ScavengerHuntArea({
           </tr>
         </thead>
         <tbody>
-          {leaderboardData.map((player, index) => (
-            <tr key={index} style={{ borderBottom: '1px solid #ddd' }}>
-              <td style={{ textAlign: 'center' }}>{index + 1}</td>
-              <td style={{ textAlign: 'center' }}>{player.username}</td>
-              <td style={{ textAlign: 'center' }}>{player.time}</td>
-            </tr>
-          ))}
+          {/* Placeholder leaderboard data */}
+          <tr>
+            <td style={{ textAlign: 'center' }}>1</td>
+            <td style={{ textAlign: 'center' }}>Player1</td>
+            <td style={{ textAlign: 'center' }}>100</td>
+          </tr>
         </tbody>
       </table>
       <Flex>
@@ -153,8 +149,12 @@ export default function ScavengerHuntArea({
       </Flex>
       <>Your hints will be here. Please begin the game and request a hint if you would like one.</>
       <Flex>
-        <Button style={{ marginRight: '10px', marginTop: '10px' }}>Start Game</Button>
-        <Button style={{ marginTop: '10px' }}>End Game</Button>
+        <Button style={{ marginRight: '10px', marginTop: '10px' }} onClick={handleStartGame}>
+          Start Game
+        </Button>
+        <Button style={{ marginTop: '10px' }} onClick={handleEndGame}>
+          End Game
+        </Button>
       </Flex>
     </>
   );

@@ -22,7 +22,7 @@ export default class ScavengerHuntAreaController extends GameAreaController<
   ScavengerHuntGameState,
   ScavengerHuntEvents
 > {
-  protected _items: ScavengerHuntItem[] = [];
+  public items: ScavengerHuntItem[] = [];
 
   /**
    * Returns the scavenger
@@ -94,9 +94,9 @@ export default class ScavengerHuntAreaController extends GameAreaController<
     const newGame = newModel.game;
     if (newGame) {
       const newItems = Array.from(newGame.state.items); // Create a mutable copy of readonly items
-      if (!_.isEqual(newItems, this._items)) {
-        this._items = newItems;
-        this.emit('itemsChanged', this._items);
+      if (!_.isEqual(newItems, this.items)) {
+        this.items = newItems;
+        this.emit('itemsChanged', this.items);
       }
     }
   }
@@ -110,7 +110,7 @@ export default class ScavengerHuntAreaController extends GameAreaController<
    */
   public async startGame(): Promise<void> {
     const instanceID = this._instanceID;
-    if (!instanceID || this._model.game?.state.status !== 'WAITING_TO_START') {
+    if (!instanceID) {
       throw new Error(NO_GAME_STARTABLE);
     }
     await this._townController.sendInteractableCommand(this.id, {
