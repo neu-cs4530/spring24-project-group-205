@@ -5,11 +5,17 @@
  *
  * Each themepack also has a price that the player needs to pay in order to purchase it.
  */
-
 import Item from './Item';
+
+const FOOD_LOWER_BOUND = 15053;
+const FOOD_UPPER_BOUND = FOOD_LOWER_BOUND + 64;
 
 export default class Themepack {
   public name: string;
+
+  private _lowerBound = 0;
+
+  private _upperBound = 0;
 
   private _items: Item[] = [];
 
@@ -19,6 +25,10 @@ export default class Themepack {
    */
   constructor(name: string) {
     this.name = name;
+    if (name === 'food') {
+      this._lowerBound = FOOD_LOWER_BOUND;
+      this._upperBound = FOOD_UPPER_BOUND;
+    }
   }
 
   /**
@@ -43,5 +53,13 @@ export default class Themepack {
    */
   addItem(item: Item) {
     this._items.push(item);
+  }
+
+  getLowerBound(): number {
+    return this._lowerBound;
+  }
+
+  getUpperBound(): number {
+    return this._upperBound;
   }
 }
