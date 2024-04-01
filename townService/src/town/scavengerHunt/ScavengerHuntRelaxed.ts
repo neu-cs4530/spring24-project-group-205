@@ -7,6 +7,8 @@ import InvalidParametersError, {
 import { GameMove, ScavengerHuntItem } from '../../types/CoveyTownSocket';
 import ScavengerHunt from './ScavengerHunt';
 import Themepack from './Themepack';
+import Leaderboards from './Leaderboards';
+// import { addActiveLeaderboardEntry } from './Leaderboards';
 
 export default class ScavengerHuntRelaxed extends ScavengerHunt {
   public constructor(themePack?: Themepack) {
@@ -53,5 +55,16 @@ export default class ScavengerHuntRelaxed extends ScavengerHunt {
     }
 
     return true;
+  }
+
+  /**
+   * Adds entries of all scores from game to the leaderboard table in the database.
+   */
+  protected _addLeaderboardEntries() {
+    const leaderboards = new Leaderboards();
+    this._players.forEach(player => {
+      const score = this.getScoreForPlayer(player);
+      leaderboards.addRelaxedLeaderboardEntry(player, score);
+    });
   }
 }
