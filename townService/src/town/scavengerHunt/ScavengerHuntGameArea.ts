@@ -58,7 +58,6 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
     if (command.type === 'JoinTimedGame') {
       let game = this._game;
       if (!game || game.state.status === 'OVER') {
-        // No game in progress or game over, create a new one
         game = new ScavengerHuntTimed();
         this._game = game;
       }
@@ -102,7 +101,7 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
       game.startGame(player);
       return undefined as InteractableCommandReturnType<CommandType>;
     }
-    throw new InvalidParametersError(INVALID_COMMAND_MESSAGE);
+    throw new InvalidParametersError('INVALID_COMMAND_MESSAGE');
   }
 
   /**

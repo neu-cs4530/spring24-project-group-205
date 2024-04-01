@@ -99,4 +99,28 @@ export default class ScavengerHuntAreaController extends GameAreaController<
       type: 'StartGame',
     });
   }
+
+  /**
+   * Sends a request to the server to join the current timed game in the game area, or create a new one if there is no game in progress.
+   *
+   * @throws An error if the server rejects the request to join the game.
+   */
+  public async joinTimedGame(): Promise<void> {
+    const { gameID } = await this._townController.sendInteractableCommand(this.id, {
+      type: 'JoinTimedGame',
+    });
+    this._instanceID = gameID;
+  }
+
+  /**
+   * Sends a request to the server to join the current relaxed game in the game area, or create a new one if there is no game in progress.
+   *
+   * @throws An error if the server rejects the request to join the game.
+   */
+  public async joinRelaxedGame(): Promise<void> {
+    const { gameID } = await this._townController.sendInteractableCommand(this.id, {
+      type: 'JoinRelaxedGame',
+    });
+    this._instanceID = gameID;
+  }
 }

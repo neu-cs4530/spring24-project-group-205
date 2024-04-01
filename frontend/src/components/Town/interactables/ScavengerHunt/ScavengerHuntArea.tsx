@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import ScavengerHuntAreaController from '../../../../classes/interactable/ScavengerHuntAreaController';
 import { useInteractableAreaController } from '../../../../classes/TownController';
 import useTownController from '../../../../hooks/useTownController';
-import { InteractableID } from '../../../../types/CoveyTownSocket';
+import { GameMode, InteractableID } from '../../../../types/CoveyTownSocket';
 
 /**
  * The ScavengerHuntArea component renders the Scavenger Hunt game area.
@@ -30,12 +30,62 @@ export default function ScavengerHuntArea({
   mode,
 }: {
   interactableID: InteractableID;
-  mode: string;
+  mode: GameMode;
 }): JSX.Element {
   const gameAreaController =
     useInteractableAreaController<ScavengerHuntAreaController>(interactableID);
   const townController = useTownController();
   const toast = useToast();
+
+  const [joiningGame, setJoiningGame] = useState(false);
+  const [startingGame, setStartingGame] = useState(false);
+  const [joinedPlayers, setJoinedPlayers] = useState<string[]>([]);
+
+  const handleJoinGame = async () => {
+    setJoiningGame(true);
+    try {
+      if (mode === 'timed') {
+        await gameAreaController.joinTimedGame();
+      } else if (mode === 'relaxed') {
+        await gameAreaController.joinRelaxedGame();
+      } else {
+        throw new Error('Invalid game mode');
+      }
+    } catch (err) {
+      toast({
+        title: 'Error joining game',
+        description: (err as Error).toString(),
+        status: 'error',
+      });
+    }
+    setJoiningGame(false);
+  };
+
+  const handleStartGame = async () => {
+    setStartingGame(true);
+    try {
+      await gameAreaController.startGame();
+    } catch (err) {
+      toast({
+        title: 'Error starting game',
+        description: (err as Error).toString(),
+        status: 'error',
+      });
+    }
+    setStartingGame(false);
+  };
+
+  const handleEndGame = async () => {
+    try {
+      await gameAreaController.leaveGame();
+    } catch (err) {
+      toast({
+        title: 'Error ending game',
+        description: (err as Error).toString(),
+        status: 'error',
+      });
+    }
+  };
 
   // Placeholder data for the leaderboard
   const leaderboardData = [
@@ -52,7 +102,12 @@ export default function ScavengerHuntArea({
     setSelectedOptionTheme(event.target.value);
   };
 
-  useEffect(() => {}, [townController, gameAreaController, toast]);
+  useEffect(() => {
+    // Add event listeners or any other necessary setup here
+    return () => {
+      // Clean up event listeners or any other teardown here
+    };
+  }, [gameAreaController]);
 
   return (
     <>
@@ -165,18 +220,36 @@ export default function ScavengerHuntArea({
         players will be able to see your requested hint and will be notified of the hint.{' '}
       </>
       <Flex>
-        <Button style={{ marginRight: '10px', marginTop: '10px' }}>Join Game</Button>
+        <Button
+          style={{ marginRight: '10px', marginTop: '10px' }}
+          onClick={handleJoinGame}
+          isLoading={joiningGame}
+          disabled={joiningGame}>
+          {joiningGame ? 'Joining Game...' : 'Join Game'}{' '}
+        </Button>
       </Flex>
       <Flex>
         {' '}
         <Heading as='h1' style={{ marginRight: '10px', fontSize: '25px' }}>
           Current Players:
         </Heading>
-        Currently no players have joined the game.
+        {joinedPlayers.length > 0 ? (
+          <ul>
+            {joinedPlayers.map(player => (
+              <li key={player}>{player}</li>
+            ))}
+          </ul>
+        ) : (
+          <span>Currently no players have joined the game.</span>
+        )}
       </Flex>
       <Flex>
-        <Button style={{ marginRight: '10px', marginTop: '10px' }}>Start Game</Button>
-        <Button style={{ marginTop: '10px' }}>End Game</Button>
+        <Button style={{ marginTop: '10px' }} onClick={handleStartGame} disabled={startingGame}>
+          {startingGame ? 'Starting Game...' : 'Start Game'}
+        </Button>
+        <Button style={{ marginTop: '10px' }} onClick={handleEndGame}>
+          End Game
+        </Button>
       </Flex>
     </>
   );
