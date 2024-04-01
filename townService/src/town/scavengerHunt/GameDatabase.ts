@@ -5,7 +5,7 @@ import Player from '../../lib/Player';
 /**
  * A leadboard database that holds the times of all players of the scavenger hunt game.
  */
-export default class Leaderboards {
+export default class GameDatabase {
   supabase = createClient<Database>(
     'https://qqvigefwynsoawfxjofh.supabase.co',
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFxdmlnZWZ3eW5zb2F3Znhqb2ZoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDkwNTY1MDQsImV4cCI6MjAyNDYzMjUwNH0.AXtPclHLWNUWT-3pWTf59bP64gTYs4SK7A1F7IKM3dc',
@@ -79,6 +79,26 @@ export default class Leaderboards {
     const { error } = await this.supabase
       .from('relaxed_leaderboard')
       .insert({ username, objects_found });
+
+    if (error) {
+      throw new Error(error.message);
+    }
+  }
+
+  /**
+   * Adds game details to the leaderboard table in the database.
+   * @param player the player who completed the scavenger hunt
+   * @param time_seconds the time it took for the player to complete the scavenger hunt
+   */
+  async addGameDetails(
+    game_mode: string | undefined,
+    themepack: string | undefined,
+    game_start_time: number | undefined,
+    player_count: number,
+  ) {
+    const { error } = await this.supabase
+      .from('game_details')
+      .insert({ game_mode, themepack, game_start_time, player_count });
 
     if (error) {
       throw new Error(error.message);

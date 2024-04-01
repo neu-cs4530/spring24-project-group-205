@@ -207,7 +207,7 @@ export default abstract class ScavengerHunt extends Game<
   /**
    * Adds entries of all scores from game to the leaderboard table in the database.
    */
-  protected abstract _addLeaderboardEntries(): void;
+  protected abstract _addDatabaseEntries(): void;
 
   /**
    * Ends the game and clears the timer
@@ -218,7 +218,7 @@ export default abstract class ScavengerHunt extends Game<
       status: 'OVER',
     };
 
-    this._addLeaderboardEntries();
+    this._addDatabaseEntries();
 
     clearInterval(this._timerIntervalId);
   }
