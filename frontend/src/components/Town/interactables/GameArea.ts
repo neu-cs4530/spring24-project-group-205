@@ -3,6 +3,10 @@ import Interactable, { KnownInteractableTypes } from '../Interactable';
 export default class GameArea extends Interactable {
   private _isInteracting = false;
 
+  public get mode() {
+    return this.getData('mode');
+  }
+
   addedToScene() {
     super.addedToScene();
     this.setTintFill();

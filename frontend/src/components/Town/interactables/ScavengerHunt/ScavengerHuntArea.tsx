@@ -27,8 +27,10 @@ import { InteractableID } from '../../../../types/CoveyTownSocket';
  */
 export default function ScavengerHuntArea({
   interactableID,
+  mode,
 }: {
   interactableID: InteractableID;
+  mode: string;
 }): JSX.Element {
   const gameAreaController =
     useInteractableAreaController<ScavengerHuntAreaController>(interactableID);
@@ -37,20 +39,14 @@ export default function ScavengerHuntArea({
 
   // Placeholder data for the leaderboard
   const leaderboardData = [
-    { username: 'Player1', time: 100 },
-    { username: 'Player2', time: 90 },
-    { username: 'Player3', time: 80 },
-    { username: 'Player4', time: 70 },
-    { username: 'Player5', time: 60 },
+    { username: 'Player1', count: 10 },
+    { username: 'Player2', count: 9 },
+    { username: 'Player3', count: 8 },
+    { username: 'Player4', count: 7 },
+    { username: 'Player5', count: 6 },
   ];
 
-  const [selectedOption, setSelectedOption] = useState('timed');
-
-  const handleOptionChange = (event: { target: { value: React.SetStateAction<string> } }) => {
-    setSelectedOption(event.target.value);
-  };
-
-  const [selectedOptionTheme, setSelectedOptionTheme] = useState('fruit');
+  const [selectedOptionTheme, setSelectedOptionTheme] = useState('');
 
   const handleOptionChangeTheme = (event: { target: { value: React.SetStateAction<string> } }) => {
     setSelectedOptionTheme(event.target.value);
@@ -62,30 +58,8 @@ export default function ScavengerHuntArea({
     <>
       <Flex>
         <Heading as='h1' style={{ marginRight: '10px', fontSize: '25px', marginBottom: '10px' }}>
-          Game Mode:
+          Game Mode: {mode === 'timed' ? 'Timed' : 'Relaxed'}
         </Heading>
-        <div className='radio-group'>
-          <label style={{ marginRight: '10px', fontSize: '20px' }}>
-            <input
-              type='radio'
-              name='gameMode'
-              value='timed'
-              checked={selectedOption === 'timed'}
-              onChange={handleOptionChange}
-            />{' '}
-            Timed
-          </label>
-          <label style={{ marginRight: '10px', fontSize: '20px' }}>
-            <input
-              type='radio'
-              name='gameMode'
-              value='relaxed'
-              checked={selectedOption === 'relaxed'}
-              onChange={handleOptionChange}
-            />{' '}
-            Relaxed
-          </label>
-        </div>
       </Flex>
       <Heading as='h1' style={{ marginRight: '10px', fontSize: '25px' }}>
         Leaderboard:
@@ -95,7 +69,7 @@ export default function ScavengerHuntArea({
           <tr>
             <th style={{ width: '33%' }}>Rank</th>
             <th style={{ width: '33%' }}>Username</th>
-            <th style={{ width: '33%' }}>Time (Seconds)</th>
+            <th style={{ width: '33%' }}>Objects Collected</th>
           </tr>
         </thead>
         <tbody>
@@ -103,7 +77,7 @@ export default function ScavengerHuntArea({
             <tr key={index} style={{ borderBottom: '1px solid #ddd' }}>
               <td style={{ textAlign: 'center' }}>{index + 1}</td>
               <td style={{ textAlign: 'center' }}>{player.username}</td>
-              <td style={{ textAlign: 'center' }}>{player.time}</td>
+              <td style={{ textAlign: 'center' }}>{player.count}</td>
             </tr>
           ))}
         </tbody>
@@ -112,38 +86,73 @@ export default function ScavengerHuntArea({
         <Heading as='h1' style={{ marginRight: '10px', fontSize: '25px', marginBottom: '10px' }}>
           Theme:
         </Heading>
-        <div className='radio-group'>
-          <label style={{ marginRight: '10px', fontSize: '20px' }}>
-            <input
-              type='radio'
-              name='theme'
-              value='fruit'
-              checked={selectedOptionTheme === 'fruit'}
-              onChange={handleOptionChangeTheme}
-            />{' '}
-            Fruit
-          </label>
-          <label style={{ marginRight: '10px', fontSize: '20px' }}>
-            <input
-              type='radio'
-              name='theme'
-              value='dessert'
-              checked={selectedOptionTheme === 'dessert'}
-              onChange={handleOptionChangeTheme}
-            />{' '}
-            Dessert
-          </label>
-          <label style={{ marginRight: '10px', fontSize: '20px' }}>
-            <input
-              type='radio'
-              name='theme'
-              value='animals'
-              checked={selectedOptionTheme === 'animals'}
-              onChange={handleOptionChangeTheme}
-            />{' '}
-            Animals
-          </label>
-        </div>
+        {mode === 'timed' ? (
+          <div className='radio-group'>
+            <label style={{ marginRight: '10px', fontSize: '20px' }}>
+              <input
+                type='radio'
+                name='theme'
+                value='fruit'
+                checked={selectedOptionTheme === 'fruit'}
+                onChange={handleOptionChangeTheme}
+              />{' '}
+              Fruit
+            </label>
+            <label style={{ marginRight: '10px', fontSize: '20px' }}>
+              <input
+                type='radio'
+                name='theme'
+                value='dessert'
+                checked={selectedOptionTheme === 'dessert'}
+                onChange={handleOptionChangeTheme}
+              />{' '}
+              Dessert
+            </label>
+            <label style={{ marginRight: '10px', fontSize: '20px' }}>
+              <input
+                type='radio'
+                name='theme'
+                value='animals'
+                checked={selectedOptionTheme === 'animals'}
+                onChange={handleOptionChangeTheme}
+              />{' '}
+              Animals
+            </label>
+          </div>
+        ) : (
+          <div className='radio-group'>
+            <label style={{ marginRight: '10px', fontSize: '20px' }}>
+              <input
+                type='radio'
+                name='theme'
+                value='sushi'
+                checked={selectedOptionTheme === 'sushi'}
+                onChange={handleOptionChangeTheme}
+              />{' '}
+              Sushi
+            </label>
+            <label style={{ marginRight: '10px', fontSize: '20px' }}>
+              <input
+                type='radio'
+                name='theme'
+                value='vegetables'
+                checked={selectedOptionTheme === 'vegetables'}
+                onChange={handleOptionChangeTheme}
+              />{' '}
+              Vegetables
+            </label>
+            <label style={{ marginRight: '10px', fontSize: '20px' }}>
+              <input
+                type='radio'
+                name='theme'
+                value='fish'
+                checked={selectedOptionTheme === 'fish'}
+                onChange={handleOptionChangeTheme}
+              />{' '}
+              Fish
+            </label>
+          </div>
+        )}
       </Flex>
       <Flex alignItems='center'>
         <Heading as='h1' style={{ marginRight: '10px', fontSize: '25px' }}>
@@ -151,7 +160,20 @@ export default function ScavengerHuntArea({
         </Heading>
         <Button>Request Hint</Button>
       </Flex>
-      <>Your hints will be here. Please begin the game and request a hint if you would like one.</>
+      <>
+        Your hints will be here. Please begin the game and request a hint if you would like one. All
+        players will be able to see your requested hint and will be notified of the hint.{' '}
+      </>
+      <Flex>
+        <Button style={{ marginRight: '10px', marginTop: '10px' }}>Join Game</Button>
+      </Flex>
+      <Flex>
+        {' '}
+        <Heading as='h1' style={{ marginRight: '10px', fontSize: '25px' }}>
+          Current Players:
+        </Heading>
+        Currently no players have joined the game.
+      </Flex>
       <Flex>
         <Button style={{ marginRight: '10px', marginTop: '10px' }}>Start Game</Button>
         <Button style={{ marginTop: '10px' }}>End Game</Button>
