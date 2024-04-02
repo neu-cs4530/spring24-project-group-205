@@ -123,6 +123,11 @@ export interface ScavengerHuntItem {
   hint: string;
 }
 
+export interface ScavengerHuntThemepack {
+  name: string;
+  items: Item[];
+}
+
 /**
  * Type for the state of a TicTacToe game
  * The state of the game is represented as a list of moves, and the playerIDs of the players (x and o)
@@ -246,9 +251,11 @@ export interface JoinGameCommand {
 }
 export interface JoinRelaxedGameCommand {
   type: 'JoinRelaxedGame';
+  themepack: string;
 }
 export interface JoinTimedGameCommand {
   type: 'JoinTimedGame';
+  themepack: string;
 }
 export interface LeaveGameCommand {
   type: 'LeaveGame';

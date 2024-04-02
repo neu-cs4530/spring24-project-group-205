@@ -1,10 +1,10 @@
 import _ from 'lodash';
 import {
-  GameMove,
   ScavengerHuntItem,
   GameArea,
   ScavengerHuntGameState,
   GameStatus,
+  ScavengerHuntThemepack,
 } from '../../types/CoveyTownSocket';
 import PlayerController from '../PlayerController';
 import GameAreaController, {
@@ -105,9 +105,10 @@ export default class ScavengerHuntAreaController extends GameAreaController<
    *
    * @throws An error if the server rejects the request to join the game.
    */
-  public async joinTimedGame(): Promise<void> {
+  public async joinTimedGame(themepack: string): Promise<void> {
     const { gameID } = await this._townController.sendInteractableCommand(this.id, {
       type: 'JoinTimedGame',
+      themepack: themepack,
     });
     this._instanceID = gameID;
   }
@@ -117,9 +118,10 @@ export default class ScavengerHuntAreaController extends GameAreaController<
    *
    * @throws An error if the server rejects the request to join the game.
    */
-  public async joinRelaxedGame(): Promise<void> {
+  public async joinRelaxedGame(themepack: string): Promise<void> {
     const { gameID } = await this._townController.sendInteractableCommand(this.id, {
       type: 'JoinRelaxedGame',
+      themepack: themepack,
     });
     this._instanceID = gameID;
   }

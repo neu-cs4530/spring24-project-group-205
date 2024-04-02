@@ -41,13 +41,26 @@ export default function ScavengerHuntArea({
   const [startingGame, setStartingGame] = useState(false);
   const [joinedPlayers, setJoinedPlayers] = useState<string[]>([]);
 
+  const [selectedOptionTheme, setSelectedOptionTheme] = useState('');
+
+  const handleOptionChangeTheme = (event: { target: { value: React.SetStateAction<string> } }) => {
+    setSelectedOptionTheme(event.target.value);
+  };
+
+  useEffect(() => {
+    // Add event listeners or any other necessary setup here
+    return () => {
+      // Clean up event listeners or any other teardown here
+    };
+  }, [gameAreaController]);
+
   const handleJoinGame = async () => {
     setJoiningGame(true);
     try {
       if (mode === 'timed') {
-        await gameAreaController.joinTimedGame();
+        await gameAreaController.joinTimedGame(selectedOptionTheme);
       } else if (mode === 'relaxed') {
-        await gameAreaController.joinRelaxedGame();
+        await gameAreaController.joinRelaxedGame(selectedOptionTheme);
       } else {
         throw new Error('Invalid game mode');
       }
@@ -95,19 +108,6 @@ export default function ScavengerHuntArea({
     { username: 'Player4', count: 7 },
     { username: 'Player5', count: 6 },
   ];
-
-  const [selectedOptionTheme, setSelectedOptionTheme] = useState('');
-
-  const handleOptionChangeTheme = (event: { target: { value: React.SetStateAction<string> } }) => {
-    setSelectedOptionTheme(event.target.value);
-  };
-
-  useEffect(() => {
-    // Add event listeners or any other necessary setup here
-    return () => {
-      // Clean up event listeners or any other teardown here
-    };
-  }, [gameAreaController]);
 
   return (
     <>
@@ -229,7 +229,6 @@ export default function ScavengerHuntArea({
         </Button>
       </Flex>
       <Flex>
-        {' '}
         <Heading as='h1' style={{ marginRight: '10px', fontSize: '25px' }}>
           Current Players:
         </Heading>
@@ -243,6 +242,7 @@ export default function ScavengerHuntArea({
           <span>Currently no players have joined the game.</span>
         )}
       </Flex>
+
       <Flex>
         <Button style={{ marginTop: '10px' }} onClick={handleStartGame} disabled={startingGame}>
           {startingGame ? 'Starting Game...' : 'Start Game'}
