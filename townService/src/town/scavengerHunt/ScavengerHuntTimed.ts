@@ -5,6 +5,7 @@ import InvalidParametersError, {
   PLAYER_NOT_IN_GAME_MESSAGE,
 } from '../../lib/InvalidParametersError';
 import { GameMove, ScavengerHuntItem } from '../../types/CoveyTownSocket';
+import GameDatabase from './GameDatabase';
 import ScavengerHunt from './ScavengerHunt';
 import Themepack from './Themepack';
 
@@ -70,5 +71,22 @@ export default class ScavengerHuntTimed extends ScavengerHunt {
     }
 
     return (currentTime - this._gameStartTime) / 1000 < TIME_ALLOWED;
+  }
+
+  /**
+   * Adds entries of all scores from game to the leaderboard table in the database.
+   */
+  protected _addDatabaseEntries() {
+    const database = new GameDatabase();
+    database.addGameDetails(
+      this._gameMode,
+      this._themepack?.name,
+      this._gameStartTime,
+      this._players.length,
+    );
+    this._players.forEach(player => {
+      const score = this.getScoreForPlayer(player);
+      database.addTimedLeaderboardEntry(player, score);
+    });
   }
 }
