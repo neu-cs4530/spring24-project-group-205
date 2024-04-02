@@ -1,14 +1,14 @@
 import assert from 'assert';
 import Phaser from 'phaser';
 import PlayerController, { MOVEMENT_SPEED } from '../../classes/PlayerController';
-import TownController, { useInteractable } from '../../classes/TownController';
-import { PlayerID, PlayerLocation } from '../../types/CoveyTownSocket';
+import { PlayerLocation } from '../../types/CoveyTownSocket';
 import { Callback } from '../VideoCall/VideoFrontend/types';
 import Interactable from './Interactable';
 import ConversationArea from './interactables/ConversationArea';
 import GameArea from './interactables/GameArea';
 import Transporter from './interactables/Transporter';
 import ViewingArea from './interactables/ViewingArea';
+import TownController from '../../classes/TownController';
 
 // Still not sure what the right type is here... "Interactable" doesn't do it
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -26,7 +26,7 @@ function interactableTypeForObjectType(type: string): any {
   }
 }
 
-const TIME_ALLOWED = 120;
+const TIME_ALLOWED = 240;
 
 // Original inspiration and code from:
 // https://medium.com/@michaelwesthadley/modular-game-worlds-in-phaser-3-tilemaps-1-958fc7e6bbd6
@@ -65,14 +65,16 @@ export default class TownGameScene extends Phaser.Scene {
   // timer components:
   private _countDownText: Phaser.GameObjects.Text | undefined;
 
-  private _countDown: number = 0;
+  private _countDown = 0;
 
-  private _timerFlag: boolean = false;
+  private _timerFlag = false;
 
   private _timedEvent: Phaser.Time.TimerEvent | undefined;
 
   // item found count components:
   private _itemsFoundText: Phaser.GameObjects.Text | undefined;
+
+  private _itemCount = 0;
 
   /**
    * Layers that the player can collide with.
@@ -216,8 +218,6 @@ export default class TownGameScene extends Phaser.Scene {
     if (this._paused) {
       return;
     }
-    this.startTimer(this.coveyTownController.ourPlayer.id);
-    this.itemsFoundValue(this.coveyTownController.ourPlayer.id, 0);
 
     const gameObjects = this.coveyTownController.ourPlayer.gameObjects;
     if (gameObjects && this._cursors) {
@@ -524,26 +524,31 @@ export default class TownGameScene extends Phaser.Scene {
       .setScrollFactor(0)
       .setDepth(30);
 
-    this._countDownText = this.add.text(600, 16, `Time Left: `, {
-      font: '15px monospace',
-      color: '#000000',
-      padding: {
-        x: 20,
-        y: 10,
-      },
-      backgroundColor: '#ffffff',
-    }).setScrollFactor(0).setDepth(30);
+    this._countDownText = this.add
+      .text(600, 16, `Time Left: `, {
+        font: '15px monospace',
+        color: '#000000',
+        padding: {
+          x: 20,
+          y: 10,
+        },
+        backgroundColor: '#ffffff',
+      })
+      .setScrollFactor(0)
+      .setDepth(30);
 
-    this._itemsFoundText = this.add.text(600, 62, ``, {
-      font: '15px monospace',
-      color: '#000000',
-      padding: {
-        x: 20,
-        y: 10,
-      },
-      backgroundColor: '#ffffff',
-    }).setScrollFactor(0).setDepth(30);
-
+    this._itemsFoundText = this.add
+      .text(600, 62, `Items Found: ` + this._itemCount.toString(), {
+        font: '15px monospace',
+        color: '#000000',
+        padding: {
+          x: 20,
+          y: 10,
+        },
+        backgroundColor: '#ffffff',
+      })
+      .setScrollFactor(0)
+      .setDepth(30);
 
     this._timedEvent = this.time.addEvent({
       delay: 1000, // the amount of time in between ticks
@@ -566,59 +571,8 @@ export default class TownGameScene extends Phaser.Scene {
     this._onGameReadyListeners = [];
     this.coveyTownController.addListener('playersChanged', players => this.updatePlayers(players));
   }
-  
-  /**
-   * Renders the number of items found for this user on the screen.
-   * @param playerID playerID of the player
-   * @param numItems number of items found
-   */
-  itemsFoundValue(playerID: PlayerID, numItems: number): void {
-    if (this.coveyTownController.ourPlayer.id !== playerID) {
-      return;
-    } else {
-      if (this._itemsFoundText) {
-        this._itemsFoundText.setText(`Items Found: ${numItems}`), {
-          font: '18px monospace',
-          color: '#000000',
-          padding: {
-            x: 20,
-            y: 10,
-          },
-          backgroundColor: '#ffffff',
-        };
-      }
-    }
-  }
 
-  /**
-   * Renders the time remaining on the timer for this player
-   * @param playerID playerID of the player
-   * @param timerLength time allowed for the timer
-   */
-  startTimer(playerID: PlayerID): void {
-    if (this.coveyTownController.ourPlayer.id !== playerID) {
-      return;
-    } else {
-      if (this._countDownText && this._timedEvent && !this._timerFlag) {
-        console.log(this._timedEvent);
-
-        this._countDownText.setText('Time Left: ' + this._formatTime(this._timedEvent.getOverallRemainingSeconds())), {
-          font: '18px monospace',
-          color: '#000000',
-          padding: {
-            x: 20,
-            y: 10,
-          },
-          backgroundColor: '#ffffff',
-        };
-
-      }
-    }
-    this._timerFlag = true;
-  }
-  
   timerEnded() {
-    console.log('ended');
     return;
   }
 
@@ -628,9 +582,9 @@ export default class TownGameScene extends Phaser.Scene {
    * @returns string of the formatted time in m:ss
    */
   private _formatTime(seconds: number): string {
-    const minutes = Math.floor(seconds/60);
-    let sec = seconds%60;
-    const partInSeconds = sec.toString().padStart(2,'0');
+    const minutes = Math.floor(seconds / 60);
+    const sec = seconds % 60;
+    const partInSeconds = sec.toString().padStart(2, '0');
     return `${minutes}:${partInSeconds}`;
   }
 
