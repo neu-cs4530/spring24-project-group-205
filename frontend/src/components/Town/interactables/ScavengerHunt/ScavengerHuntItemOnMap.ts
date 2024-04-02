@@ -28,7 +28,8 @@ export default class ScavengerHuntItemOnMap extends Interactable {
   }
 
   public addItemOnScene(): void {
-    this._scene.addTileOnMap(15053, this.x, this.y);
+    const randomNumber = Math.floor(Math.random() * 65) + 15053;
+    this._scene.addTileOnMap(randomNumber, this.x, this.y);
     this._scavengerHunt?.addListener('itemsChanged', this._changeListener);
   }
 

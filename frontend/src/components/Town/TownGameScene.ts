@@ -2,16 +2,14 @@ import assert from 'assert';
 import Phaser from 'phaser';
 import PlayerController, { MOVEMENT_SPEED } from '../../classes/PlayerController';
 import TownController from '../../classes/TownController';
-import { PlayerLocation } from '../../types/CoveyTownSocket';
+import { CoveyTownSocket, PlayerLocation } from '../../types/CoveyTownSocket';
 import { Callback } from '../VideoCall/VideoFrontend/types';
 import Interactable from './Interactable';
 import ConversationArea from './interactables/ConversationArea';
 import GameArea from './interactables/GameArea';
 import Transporter from './interactables/Transporter';
 import ViewingArea from './interactables/ViewingArea';
-import ScavengerHuntItem from './interactables/ScavengerHunt/ScavengerHuntItemOnMap';
 import ScavengerHuntItemOnMap from './interactables/ScavengerHunt/ScavengerHuntItemOnMap';
-import Themepack from '../../../../townService/src/town/scavengerHunt/Themepack';
 
 // Still not sure what the right type is here... "Interactable" doesn't do it
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -24,8 +22,6 @@ function interactableTypeForObjectType(type: string): any {
     return ViewingArea;
   } else if (type === 'GameArea') {
     return GameArea;
-  } else if (type === 'ScavengerHuntItem') {
-    return ScavengerHuntItem;
   } else {
     throw new Error(`Unknown object type: ${type}`);
   }
@@ -295,17 +291,27 @@ export default class TownGameScene extends Phaser.Scene {
           player.gameObjects.label.setY(player.gameObjects.sprite.body.y - 20);
         }
       }
+
+      const worldPoint = this.input.activePointer.positionToCamera(this.cameras.main);
+
+      const mouse = new Phaser.Math.Vector2(worldPoint);
+
+      // Draw tiles (only within the groundLayer)
+      const itemsLayer = this.map.getLayer('Items');
+      if (this.input.manager.activePointer.isDown) {
+        itemsLayer?.tilemapLayer.removeTileAtWorldXY(mouse.x, mouse.y);
+      }
     }
   }
 
   public addTileOnMap(tileId: number, xTile: number, yTile: number): void {
-    const worldLayer = this.map.getLayer('World');
-    worldLayer?.tilemapLayer.putTileAt(tileId, xTile, yTile);
+    const itemsLayer = this.map.getLayer('Items');
+    itemsLayer?.tilemapLayer.putTileAt(tileId, xTile, yTile);
   }
 
   public removeTileOnMap(xTile: number, yTile: number): void {
-    const worldLayer = this.map.getLayer('World');
-    worldLayer?.tilemapLayer.removeTileAt(xTile, yTile);
+    const itemsLayer = this.map.getLayer('Items');
+    itemsLayer?.tilemapLayer.removeTileAt(xTile, yTile);
   }
 
   private _map?: Phaser.Tilemaps.Tilemap;
@@ -369,6 +375,9 @@ export default class TownGameScene extends Phaser.Scene {
     const worldLayer = this.map.createLayer('World', tileset, 0, 0);
     assert(worldLayer);
     worldLayer.setCollisionByProperty({ collides: true });
+    const itemsLayer = this.map.createLayer('Items', tileset, 0, 0);
+    assert(itemsLayer);
+    itemsLayer.setCollisionByProperty({ collides: true });
     const aboveLayer = this.map.createLayer('Above Player', tileset, 0, 0);
     assert(aboveLayer);
     aboveLayer.setCollisionByProperty({ collides: true });
@@ -380,6 +389,7 @@ export default class TownGameScene extends Phaser.Scene {
          it a depth. Higher depths will sit on top of lower depth objects.
          */
     worldLayer.setDepth(5);
+    itemsLayer.setDepth(6);
     aboveLayer.setDepth(10);
     veryAboveLayer.setDepth(15);
 
@@ -448,17 +458,28 @@ export default class TownGameScene extends Phaser.Scene {
     };
 
     this._interactables = this.getInteractables();
-    const testItem = new ScavengerHuntItemOnMap(this);
-    this._interactables.push(testItem);
-    testItem.setX(97);
-    testItem.setY(31);
-    testItem.addItemOnScene();
-    console.log('INTERACTABLES: ', this._interactables);
+    const xyList: { x: number; y: number }[] = [];
+    xyList.push({ x: 58, y: 39 });
+    xyList.push({ x: 41, y: 32 });
+    xyList.push({ x: 26, y: 31 });
+    xyList.push({ x: 34, y: 25 });
+    xyList.push({ x: 68, y: 33 });
+    xyList.push({ x: 55, y: 31 });
+    xyList.push({ x: 58, y: 25 });
+    xyList.push({ x: 77, y: 26 });
+    xyList.push({ x: 44, y: 27 });
+    for (const xy of xyList) {
+      const item = new ScavengerHuntItemOnMap(this);
+      item.setX(xy.x);
+      item.setY(xy.y);
+      item.addItemOnScene();
+    }
 
     this.moveOurPlayerTo({ rotation: 'front', moving: false, x: spawnPoint.x, y: spawnPoint.y });
 
     // Watch the player and worldLayer for collisions, for the duration of the scene:
     this._collidingLayers.push(worldLayer);
+    this._collidingLayers.push(itemsLayer);
     this._collidingLayers.push(wallsLayer);
     this._collidingLayers.push(aboveLayer);
     this._collidingLayers.push(onTheWallsLayer);

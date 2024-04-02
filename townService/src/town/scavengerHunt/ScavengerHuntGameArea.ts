@@ -119,7 +119,7 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
       }
       this._stateUpdated(game.toModel());
       this._startTimer();
-      // game.startGame(player);
+      game.startGame(player);
       return undefined as InteractableCommandReturnType<CommandType>;
     }
     throw new InvalidParametersError('INVALID_COMMAND_MESSAGE');
