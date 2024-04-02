@@ -1,8 +1,8 @@
 import assert from 'assert';
 import Phaser from 'phaser';
 import PlayerController, { MOVEMENT_SPEED } from '../../classes/PlayerController';
-import TownController from '../../classes/TownController';
-import { PlayerLocation } from '../../types/CoveyTownSocket';
+import TownController, { useInteractable } from '../../classes/TownController';
+import { PlayerID, PlayerLocation } from '../../types/CoveyTownSocket';
 import { Callback } from '../VideoCall/VideoFrontend/types';
 import Interactable from './Interactable';
 import ConversationArea from './interactables/ConversationArea';
@@ -59,6 +59,18 @@ export default class TownGameScene extends Phaser.Scene {
   public coveyTownController: TownController;
 
   private _onGameReadyListeners: Callback[] = [];
+
+  // timer components:
+  private _countDownText: Phaser.GameObjects.Text = this.add.text(16, 48, '');
+
+  private _countDown: number = 0;
+
+  private _timerFlag: boolean = false;
+
+  private _timedEvent: Phaser.Time.TimerEvent | undefined;
+
+  // item found count components:
+  private _itemsFoundText: Phaser.GameObjects.Text = this.add.text(16, 32, '');
 
   /**
    * Layers that the player can collide with.
@@ -202,6 +214,11 @@ export default class TownGameScene extends Phaser.Scene {
     if (this._paused) {
       return;
     }
+    if (this._timerFlag) {
+      this.startTimer(this.coveyTownController.ourPlayer.id, this._countDown);
+    }
+    // this.itemsFoundValue(this.coveyTownController.ourPlayer.id, this.coveyTownController.ourPlayer.numItemsFound);
+
     const gameObjects = this.coveyTownController.ourPlayer.gameObjects;
     if (gameObjects && this._cursors) {
       const prevVelocity = gameObjects.sprite.body.velocity.clone();
@@ -507,12 +524,75 @@ export default class TownGameScene extends Phaser.Scene {
       .setScrollFactor(0)
       .setDepth(30);
 
+
     this._ready = true;
     this.updatePlayers(this.coveyTownController.players);
     // Call any listeners that are waiting for the game to be initialized
     this._onGameReadyListeners.forEach(listener => listener());
     this._onGameReadyListeners = [];
     this.coveyTownController.addListener('playersChanged', players => this.updatePlayers(players));
+  }
+  
+  /**
+   * Renders the number of items found for this user on the screen.
+   * @param playerID playerID of the player
+   * @param numItems number of items found
+   */
+  itemsFoundValue(playerID: PlayerID, numItems: number): void {
+    if (this.coveyTownController.ourPlayer.id !== playerID) {
+      return;
+    } else {
+      this._itemsFoundText.setText(`Items Found: ${numItems}`), {
+        font: '18px monospace',
+        color: '#000000',
+        padding: {
+          x: 20,
+          y: 10,
+        },
+        backgroundColor: '#ffffff',
+      };
+    }
+  }
+
+  /**
+   * Renders the time remaining on the timer for this player
+   * @param playerID playerID of the player
+   * @param timerLength time allowed for the timer
+   */
+  startTimer(playerID: PlayerID, timerLength: number): void {
+    if (this.coveyTownController.ourPlayer.id !== playerID) {
+      return;
+    } else {
+      this._timedEvent = this.time.delayedCall(1000, this.timerEnded, [], true);
+      this._countDown = timerLength;
+      this._countDownText.setText(this._formatTime(this._countDown)), {
+        font: '18px monospace',
+        color: '#000000',
+        padding: {
+          x: 20,
+          y: 10,
+        },
+        backgroundColor: '#ffffff',
+      };
+    }
+    this._timerFlag = true;
+  }
+  
+
+  timerEnded() {
+    return;
+  }
+
+  /**
+   * Formats the time to be more readable to the user -- minutes:seconds
+   * @param seconds seconds allowed for the timer
+   * @returns string of the formatted time in m:ss
+   */
+  private _formatTime(seconds: number): string {
+    const minutes = Math.floor(seconds/60);
+    let sec = seconds%60;
+    const partInSeconds = sec.toString().padStart(2,'0');
+    return `${minutes}:${partInSeconds}`;
   }
 
   createPlayerSprites(player: PlayerController) {
