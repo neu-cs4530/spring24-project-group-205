@@ -55,11 +55,7 @@ export default class Themepack {
     this._items.push(item);
   }
 
-  getLowerBound(): number {
-    return this._lowerBound;
-  }
-
-  getUpperBound(): number {
-    return this._upperBound;
+  getRandomItemId(): number {
+    return Math.floor(Math.random() * (this._upperBound - this._lowerBound + 1)) + this._lowerBound;
   }
 }
