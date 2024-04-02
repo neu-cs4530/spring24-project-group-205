@@ -26,6 +26,8 @@ function interactableTypeForObjectType(type: string): any {
   }
 }
 
+const TIME_ALLOWED = 120;
+
 // Original inspiration and code from:
 // https://medium.com/@michaelwesthadley/modular-game-worlds-in-phaser-3-tilemaps-1-958fc7e6bbd6
 export default class TownGameScene extends Phaser.Scene {
@@ -61,7 +63,7 @@ export default class TownGameScene extends Phaser.Scene {
   private _onGameReadyListeners: Callback[] = [];
 
   // timer components:
-  private _countDownText: Phaser.GameObjects.Text = this.add.text(16, 48, '');
+  private _countDownText: Phaser.GameObjects.Text | undefined;
 
   private _countDown: number = 0;
 
@@ -70,7 +72,7 @@ export default class TownGameScene extends Phaser.Scene {
   private _timedEvent: Phaser.Time.TimerEvent | undefined;
 
   // item found count components:
-  private _itemsFoundText: Phaser.GameObjects.Text = this.add.text(16, 32, '');
+  private _itemsFoundText: Phaser.GameObjects.Text | undefined;
 
   /**
    * Layers that the player can collide with.
@@ -214,10 +216,8 @@ export default class TownGameScene extends Phaser.Scene {
     if (this._paused) {
       return;
     }
-    if (this._timerFlag) {
-      this.startTimer(this.coveyTownController.ourPlayer.id, this._countDown);
-    }
-    // this.itemsFoundValue(this.coveyTownController.ourPlayer.id, this.coveyTownController.ourPlayer.numItemsFound);
+    this.startTimer(this.coveyTownController.ourPlayer.id);
+    this.itemsFoundValue(this.coveyTownController.ourPlayer.id, 0);
 
     const gameObjects = this.coveyTownController.ourPlayer.gameObjects;
     if (gameObjects && this._cursors) {
@@ -524,6 +524,40 @@ export default class TownGameScene extends Phaser.Scene {
       .setScrollFactor(0)
       .setDepth(30);
 
+    this._countDownText = this.add.text(600, 16, `Time Left: `, {
+      font: '15px monospace',
+      color: '#000000',
+      padding: {
+        x: 20,
+        y: 10,
+      },
+      backgroundColor: '#ffffff',
+    }).setScrollFactor(0).setDepth(30);
+
+    this._itemsFoundText = this.add.text(600, 62, ``, {
+      font: '15px monospace',
+      color: '#000000',
+      padding: {
+        x: 20,
+        y: 10,
+      },
+      backgroundColor: '#ffffff',
+    }).setScrollFactor(0).setDepth(30);
+
+
+    this._timedEvent = this.time.addEvent({
+      delay: 1000, // the amount of time in between ticks
+      repeat: TIME_ALLOWED, // how many ticks should complete
+      callback: () => {
+        const timeLeft = this._timedEvent?.repeatCount;
+        if (timeLeft) {
+          this._countDownText?.setText('Time: ' + this._formatTime(timeLeft));
+        }
+        if (this._timedEvent?.repeatCount === 0) {
+          this.timerEnded();
+        }
+      },
+    });
 
     this._ready = true;
     this.updatePlayers(this.coveyTownController.players);
@@ -542,15 +576,17 @@ export default class TownGameScene extends Phaser.Scene {
     if (this.coveyTownController.ourPlayer.id !== playerID) {
       return;
     } else {
-      this._itemsFoundText.setText(`Items Found: ${numItems}`), {
-        font: '18px monospace',
-        color: '#000000',
-        padding: {
-          x: 20,
-          y: 10,
-        },
-        backgroundColor: '#ffffff',
-      };
+      if (this._itemsFoundText) {
+        this._itemsFoundText.setText(`Items Found: ${numItems}`), {
+          font: '18px monospace',
+          color: '#000000',
+          padding: {
+            x: 20,
+            y: 10,
+          },
+          backgroundColor: '#ffffff',
+        };
+      }
     }
   }
 
@@ -559,27 +595,30 @@ export default class TownGameScene extends Phaser.Scene {
    * @param playerID playerID of the player
    * @param timerLength time allowed for the timer
    */
-  startTimer(playerID: PlayerID, timerLength: number): void {
+  startTimer(playerID: PlayerID): void {
     if (this.coveyTownController.ourPlayer.id !== playerID) {
       return;
     } else {
-      this._timedEvent = this.time.delayedCall(1000, this.timerEnded, [], true);
-      this._countDown = timerLength;
-      this._countDownText.setText(this._formatTime(this._countDown)), {
-        font: '18px monospace',
-        color: '#000000',
-        padding: {
-          x: 20,
-          y: 10,
-        },
-        backgroundColor: '#ffffff',
-      };
+      if (this._countDownText && this._timedEvent && !this._timerFlag) {
+        console.log(this._timedEvent);
+
+        this._countDownText.setText('Time Left: ' + this._formatTime(this._timedEvent.getOverallRemainingSeconds())), {
+          font: '18px monospace',
+          color: '#000000',
+          padding: {
+            x: 20,
+            y: 10,
+          },
+          backgroundColor: '#ffffff',
+        };
+
+      }
     }
     this._timerFlag = true;
   }
   
-
   timerEnded() {
+    console.log('ended');
     return;
   }
 
