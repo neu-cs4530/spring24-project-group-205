@@ -61,7 +61,6 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
     player: Player,
   ): InteractableCommandReturnType<CommandType> {
     if (command.type === 'JoinTimedGame') {
-      // console.log('HELLO from ScavengerHuntGameArea.ts');
       let game = this._game;
       let selectedThemepack: Themepack | undefined; // Declare themepack variable
       if (!game || game.state.status === 'OVER') {

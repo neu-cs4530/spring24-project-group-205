@@ -69,7 +69,6 @@ export default abstract class Game<StateType extends GameState, MoveType> {
    * @throws InvalidParametersError if the player can not join the game
    */
   public join(player: Player): void {
-    console.log('Joining game');
     this._join(player);
     this._players.push(player);
   }

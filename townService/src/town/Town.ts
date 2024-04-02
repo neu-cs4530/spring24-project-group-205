@@ -175,7 +175,6 @@ export default class Town {
     // Set up a listener to process commands to interactables.
     // Dispatches commands to the appropriate interactable and sends the response back to the client
     socket.on('interactableCommand', (command: InteractableCommand & InteractableCommandBase) => {
-      console.log('PLEASE');
       const interactable = this._interactables.find(
         eachInteractable => eachInteractable.id === command.interactableID,
       );

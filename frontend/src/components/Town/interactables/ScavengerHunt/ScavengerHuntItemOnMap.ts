@@ -37,12 +37,7 @@ export default class ScavengerHuntItemOnMap extends Interactable {
     this._scene.removeTileOnMap(this.x, this.y);
   }
 
-  overlap(): void {
-    console.log('OVERLAP');
-  }
-
   interact(): void {
-    console.log('COOKIE');
     this.removedFromScene();
   }
 }
