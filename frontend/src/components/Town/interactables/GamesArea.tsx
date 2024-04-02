@@ -21,7 +21,7 @@ import { GenericGameAreaController } from '../../../classes/interactable/GameAre
 import PlayerController from '../../../classes/PlayerController';
 import { useInteractable, useInteractableAreaController } from '../../../classes/TownController';
 import useTownController from '../../../hooks/useTownController';
-import { GameResult, InteractableID } from '../../../types/CoveyTownSocket';
+import { GameMode, GameResult, InteractableID } from '../../../types/CoveyTownSocket';
 import ChatChannel from './ChatChannel';
 import ConnectFourArea from './ConnectFour/ConnectFourArea';
 import GameAreaInteractable from './GameArea';
@@ -51,7 +51,7 @@ function GameArea({
   mode,
 }: {
   interactableID: InteractableID;
-  mode: string;
+  mode: GameMode;
 }): JSX.Element {
   const gameAreaController =
     useInteractableAreaController<GenericGameAreaController>(interactableID);
