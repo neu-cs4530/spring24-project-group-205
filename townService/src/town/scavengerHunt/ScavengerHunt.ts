@@ -66,7 +66,7 @@ export default abstract class ScavengerHunt extends Game<
     }
 
     if (!this._players.includes(player)) {
-      throw new Error('HELLO');
+      throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
     }
 
     const items = this._themepack.getItems();

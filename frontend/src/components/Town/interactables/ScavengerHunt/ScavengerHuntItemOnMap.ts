@@ -4,7 +4,7 @@ import ScavengerHuntAreaController, {
 import Interactable, { KnownInteractableTypes } from '../../Interactable';
 import Themepack from '../../../../../../townService/src/town/scavengerHunt/Themepack';
 
-export default class ScavengerHuntItem extends Interactable {
+export default class ScavengerHuntItemOnMap extends Interactable {
   private _scavengerHunt?: ScavengerHuntAreaController;
 
   private _changeListener: ScavengerHuntEvents['itemsChanged'] = () => {};
@@ -27,8 +27,8 @@ export default class ScavengerHuntItem extends Interactable {
     this._scavengerHunt.addListener('itemsChanged', this._changeListener);
   }
 
-  private _addItemOnScene(pack: Themepack): void {
-    this._scene.addTileOnMap(pack.getRandomItemId(), this.x, this.y);
+  public addItemOnScene(): void {
+    this._scene.addTileOnMap(15053, this.x, this.y);
     this._scavengerHunt?.addListener('itemsChanged', this._changeListener);
   }
 
@@ -36,7 +36,12 @@ export default class ScavengerHuntItem extends Interactable {
     this._scene.removeTileOnMap(this.x, this.y);
   }
 
+  overlap(): void {
+    console.log('OVERLAP');
+  }
+
   interact(): void {
+    console.log('COOKIE');
     this.removedFromScene();
   }
 }

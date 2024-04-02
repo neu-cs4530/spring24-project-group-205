@@ -8,13 +8,10 @@
 import { ScavengerHuntThemepack } from '../../types/CoveyTownSocket';
 import Item from './Item';
 
-const FOOD_LOWER_BOUND = 15053;
-const FOOD_UPPER_BOUND = FOOD_LOWER_BOUND + 64;
-
 export default class Themepack implements ScavengerHuntThemepack {
   public name: string;
 
-  public items: Item[] = [];
+  items: Item[] = [];
 
   private _lowerBound = 0;
 
@@ -27,8 +24,8 @@ export default class Themepack implements ScavengerHuntThemepack {
   constructor(name: string) {
     this.name = name;
     if (name === 'food') {
-      this._lowerBound = FOOD_LOWER_BOUND;
-      this._upperBound = FOOD_UPPER_BOUND;
+      this._lowerBound = 15053;
+      this._upperBound = 15053 + 64;
     }
   }
 

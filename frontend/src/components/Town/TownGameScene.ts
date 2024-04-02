@@ -9,7 +9,9 @@ import ConversationArea from './interactables/ConversationArea';
 import GameArea from './interactables/GameArea';
 import Transporter from './interactables/Transporter';
 import ViewingArea from './interactables/ViewingArea';
-import ScavengerHuntItem from './interactables/ScavengerHunt/ScavengerHuntItem';
+import ScavengerHuntItem from './interactables/ScavengerHunt/ScavengerHuntItemOnMap';
+import ScavengerHuntItemOnMap from './interactables/ScavengerHunt/ScavengerHuntItemOnMap';
+import Themepack from '../../../../townService/src/town/scavengerHunt/Themepack';
 
 // Still not sure what the right type is here... "Interactable" doesn't do it
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -446,6 +448,12 @@ export default class TownGameScene extends Phaser.Scene {
     };
 
     this._interactables = this.getInteractables();
+    const testItem = new ScavengerHuntItemOnMap(this);
+    this._interactables.push(testItem);
+    testItem.setX(97);
+    testItem.setY(31);
+    testItem.addItemOnScene();
+    console.log('INTERACTABLES: ', this._interactables);
 
     this.moveOurPlayerTo({ rotation: 'front', moving: false, x: spawnPoint.x, y: spawnPoint.y });
 
