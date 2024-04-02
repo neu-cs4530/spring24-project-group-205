@@ -1,7 +1,6 @@
 import assert from 'assert';
 import Phaser from 'phaser';
 import PlayerController, { MOVEMENT_SPEED } from '../../classes/PlayerController';
-import TownController from '../../classes/TownController';
 import { PlayerLocation } from '../../types/CoveyTownSocket';
 import { Callback } from '../VideoCall/VideoFrontend/types';
 import Interactable from './Interactable';
@@ -9,6 +8,7 @@ import ConversationArea from './interactables/ConversationArea';
 import GameArea from './interactables/GameArea';
 import Transporter from './interactables/Transporter';
 import ViewingArea from './interactables/ViewingArea';
+import TownController from '../../classes/TownController';
 
 // Still not sure what the right type is here... "Interactable" doesn't do it
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -25,6 +25,8 @@ function interactableTypeForObjectType(type: string): any {
     throw new Error(`Unknown object type: ${type}`);
   }
 }
+
+const TIME_ALLOWED = 240;
 
 // Original inspiration and code from:
 // https://medium.com/@michaelwesthadley/modular-game-worlds-in-phaser-3-tilemaps-1-958fc7e6bbd6
@@ -59,6 +61,20 @@ export default class TownGameScene extends Phaser.Scene {
   public coveyTownController: TownController;
 
   private _onGameReadyListeners: Callback[] = [];
+
+  // timer components:
+  private _countDownText: Phaser.GameObjects.Text | undefined;
+
+  private _countDown = 0;
+
+  private _timerFlag = false;
+
+  private _timedEvent: Phaser.Time.TimerEvent | undefined;
+
+  // item found count components:
+  private _itemsFoundText: Phaser.GameObjects.Text | undefined;
+
+  private _itemCount = 0;
 
   /**
    * Layers that the player can collide with.
@@ -202,6 +218,7 @@ export default class TownGameScene extends Phaser.Scene {
     if (this._paused) {
       return;
     }
+
     const gameObjects = this.coveyTownController.ourPlayer.gameObjects;
     if (gameObjects && this._cursors) {
       const prevVelocity = gameObjects.sprite.body.velocity.clone();
@@ -507,12 +524,68 @@ export default class TownGameScene extends Phaser.Scene {
       .setScrollFactor(0)
       .setDepth(30);
 
+    this._countDownText = this.add
+      .text(600, 16, `Time Left: `, {
+        font: '15px monospace',
+        color: '#000000',
+        padding: {
+          x: 20,
+          y: 10,
+        },
+        backgroundColor: '#ffffff',
+      })
+      .setScrollFactor(0)
+      .setDepth(30);
+
+    this._itemsFoundText = this.add
+      .text(600, 62, `Items Found: ` + this._itemCount.toString(), {
+        font: '15px monospace',
+        color: '#000000',
+        padding: {
+          x: 20,
+          y: 10,
+        },
+        backgroundColor: '#ffffff',
+      })
+      .setScrollFactor(0)
+      .setDepth(30);
+
+    this._timedEvent = this.time.addEvent({
+      delay: 1000, // the amount of time in between ticks
+      repeat: TIME_ALLOWED, // how many ticks should complete
+      callback: () => {
+        const timeLeft = this._timedEvent?.repeatCount;
+        if (timeLeft) {
+          this._countDownText?.setText('Time: ' + this._formatTime(timeLeft));
+        }
+        if (this._timedEvent?.repeatCount === 0) {
+          this.timerEnded();
+        }
+      },
+    });
+
     this._ready = true;
     this.updatePlayers(this.coveyTownController.players);
     // Call any listeners that are waiting for the game to be initialized
     this._onGameReadyListeners.forEach(listener => listener());
     this._onGameReadyListeners = [];
     this.coveyTownController.addListener('playersChanged', players => this.updatePlayers(players));
+  }
+
+  timerEnded() {
+    return;
+  }
+
+  /**
+   * Formats the time to be more readable to the user -- minutes:seconds
+   * @param seconds seconds allowed for the timer
+   * @returns string of the formatted time in m:ss
+   */
+  private _formatTime(seconds: number): string {
+    const minutes = Math.floor(seconds / 60);
+    const sec = seconds % 60;
+    const partInSeconds = sec.toString().padStart(2, '0');
+    return `${minutes}:${partInSeconds}`;
   }
 
   createPlayerSprites(player: PlayerController) {
