@@ -106,11 +106,20 @@ export default class ScavengerHuntAreaController extends GameAreaController<
    * @throws An error if the server rejects the request to join the game.
    */
   public async joinTimedGame(themepack: string): Promise<void> {
+    console.log('join timed game in scav hunt controller');
+    console.log('themepack', themepack);
     const { gameID } = await this._townController.sendInteractableCommand(this.id, {
       type: 'JoinTimedGame',
       themepack: themepack,
     });
+    console.log('gameID', gameID);
     this._instanceID = gameID;
+    console.log(
+      'STATE: players: ',
+      this._model.game?.players[0],
+      ' status: ',
+      this._model.game?.state.status,
+    );
   }
 
   /**

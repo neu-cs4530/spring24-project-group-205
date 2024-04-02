@@ -511,6 +511,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     interactableID: InteractableID,
     command: CommandType,
   ): Promise<InteractableCommandResponse<CommandType>['payload']> {
+    console.log('sendInteractableCommand');
     const commandMessage: InteractableCommand & InteractableCommandBase = {
       ...command,
       commandID: nanoid(),
@@ -534,6 +535,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
       };
       this._socket.on('commandResponse', ackListener);
       this._socket.emit('interactableCommand', commandMessage);
+      console.log('emitting interactiable command:', commandMessage);
     });
   }
 
@@ -634,6 +636,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
               new ConnectFourAreaController(eachInteractable.id, eachInteractable, this),
             );
           } else if (isScavengerHuntArea(eachInteractable)) {
+            console.log('creating scavenger hunt area controller with id: ', eachInteractable);
             this._interactableControllers.push(
               new ScavengerHuntAreaController(eachInteractable.id, eachInteractable, this),
             );

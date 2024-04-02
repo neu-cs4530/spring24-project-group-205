@@ -65,8 +65,8 @@ export default abstract class ScavengerHunt extends Game<
       throw new InvalidParametersError(GAME_NOT_STARTABLE_MESSAGE);
     }
 
-    if (!this.state.scavengers?.includes(player.id)) {
-      throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
+    if (!this._players.includes(player)) {
+      throw new Error('HELLO');
     }
 
     const items = this._themepack.getItems();
@@ -81,8 +81,8 @@ export default abstract class ScavengerHunt extends Game<
       status: 'IN_PROGRESS',
     };
 
-    this.state.scavengers?.forEach(playerId => {
-      this._itemsFound.set(playerId, 0);
+    this._players.forEach(p => {
+      this._itemsFound.set(p.id, 0);
     });
 
     this._assignRandomLocations();
@@ -145,10 +145,10 @@ export default abstract class ScavengerHunt extends Game<
     if (this._players.some(p => p.id === player.id)) {
       throw new InvalidParametersError(PLAYER_ALREADY_IN_GAME_MESSAGE);
     } else if (this._players.length < MAX_PLAYERS) {
+      // EDIT
       this.state = {
         ...this.state,
         status: 'WAITING_TO_START',
-        scavengers: [...(this.state.scavengers || []), player.id],
       };
     } else {
       throw new InvalidParametersError(GAME_FULL_MESSAGE);
@@ -182,12 +182,11 @@ export default abstract class ScavengerHunt extends Game<
     if (this.state.status === 'OVER') {
       return;
     }
-    if (!this.state.scavengers?.includes(player.id)) {
+    if (!this._players.includes(player)) {
       throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
     }
     this.state = {
       ...this.state,
-      scavengers: this.state.scavengers?.filter(id => id !== player.id),
     };
     switch (this.state.status) {
       case 'WAITING_TO_START':

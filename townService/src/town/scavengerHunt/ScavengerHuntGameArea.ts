@@ -38,8 +38,8 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
     if (updatedState.state.status === 'OVER') {
       const gameID = this._game?.id;
       if (gameID && !this._history.find(eachResult => eachResult.gameID === gameID)) {
-        const { scavengers } = updatedState.state;
-        if (scavengers && updatedState.state.winner) {
+        const { players } = updatedState;
+        if (players && updatedState.state.winner) {
           const winner = this.occupants.find(player => player.id === updatedState.state.winner);
           if (winner) {
             const winnerUserName = winner.userName;
@@ -61,6 +61,7 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
     player: Player,
   ): InteractableCommandReturnType<CommandType> {
     if (command.type === 'JoinTimedGame') {
+      // console.log('HELLO from ScavengerHuntGameArea.ts');
       let game = this._game;
       let selectedThemepack: Themepack | undefined; // Declare themepack variable
       if (!game || game.state.status === 'OVER') {
@@ -118,7 +119,7 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
       }
       this._stateUpdated(game.toModel());
       this._startTimer();
-      game.startGame(player);
+      // game.startGame(player);
       return undefined as InteractableCommandReturnType<CommandType>;
     }
     throw new InvalidParametersError('INVALID_COMMAND_MESSAGE');
