@@ -42,8 +42,6 @@ export default class TownGameScene extends Phaser.Scene {
 
   private _interactables: Interactable[] = [];
 
-  private _scavengerHuntItems = 0;
-
   private _cursors: Phaser.Types.Input.Keyboard.CursorKeys[] = [];
 
   private _cursorKeys?: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -64,8 +62,6 @@ export default class TownGameScene extends Phaser.Scene {
   public coveyTownController: TownController;
 
   private _onGameReadyListeners: Callback[] = [];
-
-  //private _tileset: Phaser.Tilemaps.Tileset[] = [];
 
   /**
    * Layers that the player can collide with.
@@ -272,7 +268,6 @@ export default class TownGameScene extends Phaser.Scene {
             moving: isMoving,
           };
         }
-        // console.log('Emitting movement', this._lastLocation);
         this._lastLocation.x = x;
         this._lastLocation.y = y;
         this._lastLocation.rotation = primaryDirection || this._lastLocation.rotation || 'front';
