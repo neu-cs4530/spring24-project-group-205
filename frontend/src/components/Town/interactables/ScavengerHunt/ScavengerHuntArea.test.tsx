@@ -101,7 +101,7 @@ describe('Scavenger Hunt Area', () => {
     it('shows themes', () => {
       renderTimedScavengerHuntArea();
       expect(screen.queryByText('Theme:')).toBeInTheDocument();
-      expect(screen.queryByText('Fruit')).toBeInTheDocument();
+      expect(screen.queryByText('Food')).toBeInTheDocument();
       expect(screen.queryByText('Dessert')).toBeInTheDocument();
       expect(screen.queryByText('Animals')).toBeInTheDocument();
     });
