@@ -13,7 +13,6 @@ import {
   ScavengerHuntItem,
 } from '../../types/CoveyTownSocket';
 import Game from '../games/Game';
-import Leaderboard from './Leaderboards';
 import Themepack from './Themepack';
 import { setRandomLocationAndHint } from './Utils';
 
@@ -25,9 +24,6 @@ export default abstract class ScavengerHunt extends Game<
   ScavengerHuntGameState,
   ScavengerHuntItem
 > {
-  // The database that holds the leaderboard for the game
-  private _leaderboard = new Leaderboard();
-
   // INFORMATION THAT IS SPECIFIC TO THE PLAYER:
   // The game mode the player is currently in
   protected _gameMode?: GameMode;
@@ -208,6 +204,11 @@ export default abstract class ScavengerHunt extends Game<
   }
 
   /**
+   * Adds entries of all scores from game to the leaderboard table in the database.
+   */
+  protected abstract _addDatabaseEntries(): void;
+
+  /**
    * Ends the game and clears the timer
    */
   private _endGame(): void {
@@ -215,6 +216,8 @@ export default abstract class ScavengerHunt extends Game<
       ...this.state,
       status: 'OVER',
     };
+
+    this._addDatabaseEntries();
 
     clearInterval(this._timerIntervalId);
   }
