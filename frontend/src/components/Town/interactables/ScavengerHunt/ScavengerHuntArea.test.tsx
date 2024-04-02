@@ -59,15 +59,26 @@ describe('Scavenger Hunt Area', () => {
   Object.defineProperty(townController, 'ourPlayer', { get: () => ourPlayer });
   const gameAreaController = new MockScavengerHuntAreaController();
 
-  function renderScavengerHuntArea() {
+  function renderRelaxedScavengerHuntArea() {
     return render(
       <ChakraProvider>
         <TownControllerContext.Provider value={townController}>
-          <ScavengerHuntArea interactableID={nanoid()} />
+          <ScavengerHuntArea interactableID={nanoid()} mode='relaxed' />
         </TownControllerContext.Provider>
       </ChakraProvider>,
     );
   }
+
+  function renderTimedScavengerHuntArea() {
+    return render(
+      <ChakraProvider>
+        <TownControllerContext.Provider value={townController}>
+          <ScavengerHuntArea interactableID={nanoid()} mode='timed' />
+        </TownControllerContext.Provider>
+      </ChakraProvider>,
+    );
+  }
+
   beforeEach(() => {
     ourPlayer = new PlayerController('player x', 'player x', randomLocation());
     mockGameArea.name = nanoid();
@@ -75,39 +86,82 @@ describe('Scavenger Hunt Area', () => {
     useInteractableAreaControllerSpy.mockReturnValue(gameAreaController);
     mockToast.mockClear();
   });
-  describe('Render UI', () => {
+  describe('Render Timed UI', () => {
     it('shows game modes', () => {
-      renderScavengerHuntArea();
-      expect(screen.queryByText('Game Mode:')).toBeInTheDocument();
-      expect(screen.queryByText('Timed')).toBeInTheDocument();
-      expect(screen.queryByText('Relaxed')).toBeInTheDocument();
+      renderTimedScavengerHuntArea();
+      expect(screen.queryByText('Game Mode: Timed')).toBeInTheDocument();
     });
     it('shows leaderboard', () => {
-      renderScavengerHuntArea();
+      renderTimedScavengerHuntArea();
       expect(screen.queryByText('Leaderboard:')).toBeInTheDocument();
       expect(screen.queryByText('Rank')).toBeInTheDocument();
       expect(screen.queryByText('Username')).toBeInTheDocument();
-      expect(screen.queryByText('Time (Seconds)')).toBeInTheDocument();
+      expect(screen.queryByText('Objects Collected')).toBeInTheDocument();
     });
     it('shows themes', () => {
-      renderScavengerHuntArea();
+      renderTimedScavengerHuntArea();
       expect(screen.queryByText('Theme:')).toBeInTheDocument();
       expect(screen.queryByText('Fruit')).toBeInTheDocument();
       expect(screen.queryByText('Dessert')).toBeInTheDocument();
       expect(screen.queryByText('Animals')).toBeInTheDocument();
     });
     it('shows hints', () => {
-      renderScavengerHuntArea();
+      renderTimedScavengerHuntArea();
       expect(screen.queryByText('Hints:')).toBeInTheDocument();
       expect(screen.queryByText('Request Hint')).toBeInTheDocument();
       expect(
         screen.queryByText(
-          'Your hints will be here. Please begin the game and request a hint if you would like one.',
+          'Your hints will be here. Please begin the game and request a hint if you would like one. All players will be able to see your requested hint and will be notified of the hint.',
         ),
       ).toBeInTheDocument();
     });
+    it('shows players', () => {
+      renderTimedScavengerHuntArea();
+      expect(screen.queryByText('Current Players:')).toBeInTheDocument();
+      expect(screen.queryByText('Currently no players have joined the game.')).toBeInTheDocument();
+    });
     it('shows start and end game buttons', () => {
-      renderScavengerHuntArea();
+      renderTimedScavengerHuntArea();
+      expect(screen.queryByText('Start Game')).toBeInTheDocument();
+      expect(screen.queryByText('End Game')).toBeInTheDocument();
+    });
+  });
+  describe('Render Relaxed UI', () => {
+    it('shows game modes', () => {
+      renderRelaxedScavengerHuntArea();
+      expect(screen.queryByText('Game Mode: Relaxed')).toBeInTheDocument();
+    });
+    it('shows leaderboard', () => {
+      renderRelaxedScavengerHuntArea();
+      expect(screen.queryByText('Leaderboard:')).toBeInTheDocument();
+      expect(screen.queryByText('Rank')).toBeInTheDocument();
+      expect(screen.queryByText('Username')).toBeInTheDocument();
+      expect(screen.queryByText('Objects Collected')).toBeInTheDocument();
+    });
+    it('shows themes', () => {
+      renderRelaxedScavengerHuntArea();
+      expect(screen.queryByText('Theme:')).toBeInTheDocument();
+      expect(screen.queryByText('Sushi')).toBeInTheDocument();
+      expect(screen.queryByText('Vegetables')).toBeInTheDocument();
+      expect(screen.queryByText('Fish')).toBeInTheDocument();
+    });
+    it('shows hints', () => {
+      renderRelaxedScavengerHuntArea();
+      expect(screen.queryByText('Hints:')).toBeInTheDocument();
+      expect(screen.queryByText('Request Hint')).toBeInTheDocument();
+      expect(
+        screen.queryByText(
+          'Your hints will be here. Please begin the game and request a hint if you would like one. All players will be able to see your requested hint and will be notified of the hint.',
+        ),
+      ).toBeInTheDocument();
+    });
+    it('shows players', () => {
+      renderRelaxedScavengerHuntArea();
+      expect(screen.queryByText('Current Players:')).toBeInTheDocument();
+      expect(screen.queryByText('Currently no players have joined the game.')).toBeInTheDocument();
+    });
+    it('shows start and end game buttons', () => {
+      renderRelaxedScavengerHuntArea();
       expect(screen.queryByText('Start Game')).toBeInTheDocument();
       expect(screen.queryByText('End Game')).toBeInTheDocument();
     });

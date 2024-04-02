@@ -123,6 +123,11 @@ export interface ScavengerHuntItem {
   hint: string;
 }
 
+export interface ScavengerHuntThemepack {
+  name: string;
+  items: Item[];
+}
+
 /**
  * Type for the state of a TicTacToe game
  * The state of the game is represented as a list of moves, and the playerIDs of the players (x and o)
@@ -136,7 +141,7 @@ export interface TicTacToeGameState extends WinnableGameState {
 
 export interface ScavengerHuntGameState extends WinnableGameState {
   timeLeft: number;
-  scavenger?: PlayerID;
+  scavengers?: PlayerID[];
   items: ReadonlyArray<ScavengerHuntItem>;
 }
 
@@ -246,9 +251,11 @@ export interface JoinGameCommand {
 }
 export interface JoinRelaxedGameCommand {
   type: 'JoinRelaxedGame';
+  themepack: string;
 }
 export interface JoinTimedGameCommand {
   type: 'JoinTimedGame';
+  themepack: string;
 }
 export interface LeaveGameCommand {
   type: 'LeaveGame';
@@ -265,6 +272,8 @@ export interface GameMoveCommand<MoveType> {
 }
 export type InteractableCommandReturnType<CommandType extends InteractableCommand> = 
   CommandType extends JoinGameCommand ? { gameID: string}:
+  CommandType extends JoinTimedGameCommand ? { gameID: string}:
+  CommandType extends JoinRelaxedGameCommand ? { gameID: string}:
   CommandType extends ViewingAreaUpdateCommand ? undefined :
   CommandType extends GameMoveCommand<TicTacToeMove> ? undefined :
   CommandType extends LeaveGameCommand ? undefined :

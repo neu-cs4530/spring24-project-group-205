@@ -16,6 +16,7 @@ import ScavengerHunt from './ScavengerHunt';
 import InteractableArea from '../InteractableArea';
 import ScavengerHuntTimed from './ScavengerHuntTimed';
 import ScavengerHuntRelaxed from './ScavengerHuntRelaxed';
+import Themepack from './Themepack';
 
 export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
   private _interactables: InteractableArea[] = [];
@@ -23,6 +24,10 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
   // Method to set interactables
   public setInteractables(interactables: InteractableArea[]): void {
     this._interactables = interactables;
+  }
+
+  public getThemepack(): Themepack | undefined {
+    return this._game?.getThemePack();
   }
 
   protected getType(): InteractableType {
@@ -33,16 +38,18 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
     if (updatedState.state.status === 'OVER') {
       const gameID = this._game?.id;
       if (gameID && !this._history.find(eachResult => eachResult.gameID === gameID)) {
-        const { scavenger } = updatedState.state;
-        if (scavenger) {
-          const scavengerName =
-            this._occupants.find(eachPlayer => eachPlayer.id === scavenger)?.userName || scavenger;
-          this._history.push({
-            gameID,
-            scores: {
-              [scavengerName]: 1,
-            },
-          });
+        const { scavengers } = updatedState.state;
+        if (scavengers && updatedState.state.winner) {
+          const winner = this.occupants.find(player => player.id === updatedState.state.winner);
+          if (winner) {
+            const winnerUserName = winner.userName;
+            this._history.push({
+              gameID,
+              scores: {
+                [winnerUserName]: 1,
+              },
+            });
+          }
         }
       }
     }
@@ -55,23 +62,37 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
   ): InteractableCommandReturnType<CommandType> {
     if (command.type === 'JoinTimedGame') {
       let game = this._game;
+      let selectedThemepack: Themepack | undefined; // Declare themepack variable
       if (!game || game.state.status === 'OVER') {
-        // No game in progress or game over, create a new one
-        game = new ScavengerHuntTimed();
+        selectedThemepack = new Themepack(command.themepack); // Assign themepack if not already present
+        if (!selectedThemepack) {
+          throw new InvalidParametersError('No themepack selected for the game');
+        }
+        game = new ScavengerHuntTimed(selectedThemepack);
         this._game = game;
+        if (!this.getThemepack()) {
+          game.setThemePack(selectedThemepack);
+        }
+        game.join(player); // Pass themepack to join method
       }
-      game.join(player);
       this._stateUpdated(game.toModel());
       return { gameID: game.id } as InteractableCommandReturnType<CommandType>;
     }
     if (command.type === 'JoinRelaxedGame') {
       let game = this._game;
+      let selectedThemepack: Themepack | undefined; // Declare themepack variable
       if (!game || game.state.status === 'OVER') {
-        // No game in progress or game over, create a new one
-        game = new ScavengerHuntRelaxed();
+        selectedThemepack = new Themepack(command.themepack); // Assign themepack if not already present
+        if (!selectedThemepack) {
+          throw new InvalidParametersError('No themepack selected for the game');
+        }
+        game = new ScavengerHuntRelaxed(selectedThemepack);
         this._game = game;
+        if (!this.getThemepack()) {
+          game.setThemePack(selectedThemepack);
+        }
+        game.join(player); // Pass themepack to join method
       }
-      game.join(player);
       this._stateUpdated(game.toModel());
       return { gameID: game.id } as InteractableCommandReturnType<CommandType>;
     }
@@ -100,7 +121,7 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
       game.startGame(player);
       return undefined as InteractableCommandReturnType<CommandType>;
     }
-    throw new InvalidParametersError(INVALID_COMMAND_MESSAGE);
+    throw new InvalidParametersError('INVALID_COMMAND_MESSAGE');
   }
 
   /**
