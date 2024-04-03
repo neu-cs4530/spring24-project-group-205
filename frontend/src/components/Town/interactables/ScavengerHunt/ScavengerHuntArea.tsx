@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import ScavengerHuntAreaController from '../../../../classes/interactable/ScavengerHuntAreaController';
 import { useInteractableAreaController } from '../../../../classes/TownController';
 import useTownController from '../../../../hooks/useTownController';
-import { GameMode, InteractableID } from '../../../../types/CoveyTownSocket';
+import { InteractableID } from '../../../../types/CoveyTownSocket';
 
 /**
  * The ScavengerHuntArea component renders the Scavenger Hunt game area.
@@ -27,10 +27,8 @@ import { GameMode, InteractableID } from '../../../../types/CoveyTownSocket';
  */
 export default function ScavengerHuntArea({
   interactableID,
-  mode,
 }: {
   interactableID: InteractableID;
-  mode: GameMode;
 }): JSX.Element {
   const gameAreaController =
     useInteractableAreaController<ScavengerHuntAreaController>(interactableID);
@@ -41,10 +39,16 @@ export default function ScavengerHuntArea({
   const [startingGame, setStartingGame] = useState(false);
   const [joinedPlayers, setJoinedPlayers] = useState<string[]>([]);
 
-  const [selectedOptionTheme, setSelectedOptionTheme] = useState('');
+  const [selectedOptionTheme, setSelectedOptionTheme] = useState('fruit');
 
   const handleOptionChangeTheme = (event: { target: { value: React.SetStateAction<string> } }) => {
     setSelectedOptionTheme(event.target.value);
+  };
+
+  const [selectedOption, setSelectedOption] = useState('timed');
+
+  const handleOptionChange = (event: { target: { value: React.SetStateAction<string> } }) => {
+    setSelectedOption(event.target.value);
   };
 
   useEffect(() => {
@@ -57,13 +61,7 @@ export default function ScavengerHuntArea({
   const handleJoinGame = async () => {
     setJoiningGame(true);
     try {
-      if (mode === 'timed') {
-        await gameAreaController.joinTimedGame(selectedOptionTheme);
-      } else if (mode === 'relaxed') {
-        await gameAreaController.joinRelaxedGame(selectedOptionTheme);
-      } else {
-        throw new Error('Invalid game mode');
-      }
+      await gameAreaController.joinTimedGame(selectedOptionTheme);
     } catch (err) {
       toast({
         title: 'Error joining game',
@@ -113,8 +111,30 @@ export default function ScavengerHuntArea({
     <>
       <Flex>
         <Heading as='h1' style={{ marginRight: '10px', fontSize: '25px', marginBottom: '10px' }}>
-          Game Mode: {mode === 'timed' ? 'Timed' : 'Relaxed'}
+          Game Mode:
         </Heading>
+        <div className='radio-group'>
+          <label style={{ marginRight: '10px', fontSize: '20px' }}>
+            <input
+              type='radio'
+              name='gameMode'
+              value='timed'
+              checked={selectedOption === 'timed'}
+              onChange={handleOptionChange}
+            />{' '}
+            Timed
+          </label>
+          <label style={{ marginRight: '10px', fontSize: '20px' }}>
+            <input
+              type='radio'
+              name='gameMode'
+              value='relaxed'
+              checked={selectedOption === 'relaxed'}
+              onChange={handleOptionChange}
+            />{' '}
+            Relaxed
+          </label>
+        </div>
       </Flex>
       <Heading as='h1' style={{ marginRight: '10px', fontSize: '25px' }}>
         Leaderboard:
@@ -141,73 +161,38 @@ export default function ScavengerHuntArea({
         <Heading as='h1' style={{ marginRight: '10px', fontSize: '25px', marginBottom: '10px' }}>
           Theme:
         </Heading>
-        {mode === 'timed' ? (
-          <div className='radio-group'>
-            <label style={{ marginRight: '10px', fontSize: '20px' }}>
-              <input
-                type='radio'
-                name='theme'
-                value='food'
-                checked={selectedOptionTheme === 'food'}
-                onChange={handleOptionChangeTheme}
-              />{' '}
-              Food
-            </label>
-            <label style={{ marginRight: '10px', fontSize: '20px' }}>
-              <input
-                type='radio'
-                name='theme'
-                value='dessert'
-                checked={selectedOptionTheme === 'dessert'}
-                onChange={handleOptionChangeTheme}
-              />{' '}
-              Dessert
-            </label>
-            <label style={{ marginRight: '10px', fontSize: '20px' }}>
-              <input
-                type='radio'
-                name='theme'
-                value='animals'
-                checked={selectedOptionTheme === 'animals'}
-                onChange={handleOptionChangeTheme}
-              />{' '}
-              Animals
-            </label>
-          </div>
-        ) : (
-          <div className='radio-group'>
-            <label style={{ marginRight: '10px', fontSize: '20px' }}>
-              <input
-                type='radio'
-                name='theme'
-                value='sushi'
-                checked={selectedOptionTheme === 'sushi'}
-                onChange={handleOptionChangeTheme}
-              />{' '}
-              Sushi
-            </label>
-            <label style={{ marginRight: '10px', fontSize: '20px' }}>
-              <input
-                type='radio'
-                name='theme'
-                value='vegetables'
-                checked={selectedOptionTheme === 'vegetables'}
-                onChange={handleOptionChangeTheme}
-              />{' '}
-              Vegetables
-            </label>
-            <label style={{ marginRight: '10px', fontSize: '20px' }}>
-              <input
-                type='radio'
-                name='theme'
-                value='fish'
-                checked={selectedOptionTheme === 'fish'}
-                onChange={handleOptionChangeTheme}
-              />{' '}
-              Fish
-            </label>
-          </div>
-        )}
+        <div className='radio-group'>
+          <label style={{ marginRight: '10px', fontSize: '20px' }}>
+            <input
+              type='radio'
+              name='theme'
+              value='food'
+              checked={selectedOptionTheme === 'food'}
+              onChange={handleOptionChangeTheme}
+            />{' '}
+            Food
+          </label>
+          <label style={{ marginRight: '10px', fontSize: '20px' }}>
+            <input
+              type='radio'
+              name='theme'
+              value='dessert'
+              checked={selectedOptionTheme === 'dessert'}
+              onChange={handleOptionChangeTheme}
+            />{' '}
+            Dessert
+          </label>
+          <label style={{ marginRight: '10px', fontSize: '20px' }}>
+            <input
+              type='radio'
+              name='theme'
+              value='animals'
+              checked={selectedOptionTheme === 'animals'}
+              onChange={handleOptionChangeTheme}
+            />{' '}
+            Animals
+          </label>
+        </div>
       </Flex>
       <Flex alignItems='center'>
         <Heading as='h1' style={{ marginRight: '10px', fontSize: '25px' }}>
