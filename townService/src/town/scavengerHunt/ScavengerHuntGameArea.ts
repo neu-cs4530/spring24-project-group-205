@@ -38,8 +38,8 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
     if (updatedState.state.status === 'OVER') {
       const gameID = this._game?.id;
       if (gameID && !this._history.find(eachResult => eachResult.gameID === gameID)) {
-        const { scavengers } = updatedState.state;
-        if (scavengers && updatedState.state.winner) {
+        const { players } = updatedState;
+        if (players && updatedState.state.winner) {
           const winner = this.occupants.find(player => player.id === updatedState.state.winner);
           if (winner) {
             const winnerUserName = winner.userName;

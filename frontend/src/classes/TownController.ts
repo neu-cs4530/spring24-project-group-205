@@ -44,6 +44,7 @@ import ScavengerHuntAreaController from './interactable/ScavengerHuntAreaControl
 import TicTacToeAreaController from './interactable/TicTacToeAreaController';
 import ViewingAreaController from './interactable/ViewingAreaController';
 import PlayerController from './PlayerController';
+import ScavengerHuntItem from '../components/Town/interactables/ScavengerHunt/ScavengerHuntItemOnMap';
 
 const CALCULATE_NEARBY_PLAYERS_DELAY_MS = 300;
 const SOCKET_COMMAND_TIMEOUT_MS = 5000;
@@ -676,6 +677,19 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
       return existingController;
     } else {
       throw new Error(`No such viewing area controller ${existingController}`);
+    }
+  }
+
+  public getScavengerHuntController(
+    scavengerHuntItem: ScavengerHuntItem,
+  ): ScavengerHuntAreaController {
+    const existingController = this._interactableControllers.find(
+      eachExistingArea => eachExistingArea.id === scavengerHuntItem.name,
+    );
+    if (existingController instanceof ScavengerHuntAreaController) {
+      return existingController;
+    } else {
+      throw new Error(`No such scavenger hunt controller ${existingController}`);
     }
   }
 

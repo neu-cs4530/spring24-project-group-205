@@ -1,3 +1,4 @@
+import React from 'react';
 import _ from 'lodash';
 import {
   ScavengerHuntItem,
@@ -13,9 +14,10 @@ import GameAreaController, {
   NO_GAME_STARTABLE,
   PLAYER_NOT_IN_GAME_ERROR,
 } from './GameAreaController';
+import ScavengerHuntItemOnMap from '../../components/Town/interactables/ScavengerHunt/ScavengerHuntItemOnMap';
 
 export type ScavengerHuntEvents = GameEventTypes & {
-  itemsChanged: (items: ScavengerHuntItem[]) => void;
+  itemsChanged: (items: ScavengerHuntItem[] | undefined) => void;
 };
 
 export default class ScavengerHuntAreaController extends GameAreaController<
@@ -23,6 +25,8 @@ export default class ScavengerHuntAreaController extends GameAreaController<
   ScavengerHuntEvents
 > {
   public items: ScavengerHuntItem[] = [];
+
+  private _itemsOnMap: ScavengerHuntItemOnMap[] = [];
 
   /**
    * Returns the player who won the game, if there is one, or undefined otherwise

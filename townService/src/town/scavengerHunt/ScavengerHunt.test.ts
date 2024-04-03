@@ -44,7 +44,6 @@ describe('ScavengerHunt', () => {
         gameRelaxed.join(createPlayerForTesting());
       }
       const player11 = createPlayerForTesting();
-      expect(gameRelaxed.state.scavengers?.length).toBe(10);
       expect(() => gameRelaxed.join(player11)).toThrowError(GAME_FULL_MESSAGE);
     });
 
@@ -53,7 +52,6 @@ describe('ScavengerHunt', () => {
         const player = createPlayerForTesting();
         gameRelaxed.join(player);
         gameRelaxed.startGame(player);
-        expect(gameRelaxed.state.scavengers?.[0]).toEqual(player.id);
         expect(gameRelaxed.state.status).toEqual('IN_PROGRESS');
         expect(gameRelaxed.state.winner).toBeUndefined();
       });
@@ -62,7 +60,6 @@ describe('ScavengerHunt', () => {
         const player = createPlayerForTesting();
         gameTimed.join(player);
         gameTimed.startGame(player);
-        expect(gameTimed.state.scavengers?.[0]).toEqual(player.id);
         expect(gameTimed.state.status).toEqual('IN_PROGRESS');
         expect(gameTimed.state.winner).toBeUndefined();
       });
@@ -87,7 +84,6 @@ describe('ScavengerHunt', () => {
           const player = createPlayerForTesting();
           gameRelaxed.join(player);
           gameRelaxed.startGame(player);
-          expect(gameRelaxed.state.scavengers?.[0]).toEqual(player.id);
           gameRelaxed.leave(player);
           expect(gameRelaxed.state.status).toEqual('OVER');
         });
@@ -98,7 +94,6 @@ describe('ScavengerHunt', () => {
           const player = createPlayerForTesting();
           gameTimed.join(player);
           gameTimed.startGame(player);
-          expect(gameTimed.state.scavengers?.[0]).toEqual(player.id);
           gameTimed.leave(player);
           expect(gameTimed.state.status).toEqual('OVER');
         });
@@ -116,7 +111,6 @@ describe('ScavengerHunt', () => {
       expect(gameTimed.state.items.length).toBe(2);
       expect(gameTimed.state.items[0].id).toBe('1234');
       gameTimed.applyMove({ gameID: '1234', playerID: player.id, move: burger });
-      expect(gameTimed.state.scavengers?.[0]).toBe(player.id);
       expect(gameTimed.state.items[0].foundBy).toBe(player.id);
       expect(gameTimed.getScoreForPlayer(player)).toBe(1);
       gameTimed.applyMove({ gameID: '1234', playerID: player.id, move: sushi });

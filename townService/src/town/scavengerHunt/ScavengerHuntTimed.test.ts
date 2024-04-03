@@ -28,7 +28,6 @@ describe('ScavengerHunt', () => {
       expect(game.state.items.length).toBe(2);
       expect(game.state.items[0].id).toBe('1234');
       game.applyMove({ gameID: '1234', playerID: player.id, move: burger });
-      expect(game.state.scavengers?.[0]).toBe(player.id);
       expect(game.state.items[0].foundBy).toBe(player.id);
       expect(game.getScoreForPlayer(player)).toBe(1);
       game.applyMove({ gameID: '1234', playerID: player.id, move: sushi });

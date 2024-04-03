@@ -5,14 +5,17 @@
  *
  * Each themepack also has a price that the player needs to pay in order to purchase it.
  */
-
 import { ScavengerHuntThemepack } from '../../types/CoveyTownSocket';
 import Item from './Item';
 
 export default class Themepack implements ScavengerHuntThemepack {
   public name: string;
 
-  public items: Item[] = [];
+  items: Item[] = [];
+
+  private _lowerBound = 0;
+
+  private _upperBound = 0;
 
   /**
    * Creates a new themepack for the scavenger hunt game.
@@ -20,6 +23,10 @@ export default class Themepack implements ScavengerHuntThemepack {
    */
   constructor(name: string) {
     this.name = name;
+    if (name === 'food') {
+      this._lowerBound = 15053;
+      this._upperBound = 15053 + 64;
+    }
   }
 
   /**
@@ -44,5 +51,9 @@ export default class Themepack implements ScavengerHuntThemepack {
    */
   addItem(item: Item) {
     this.items.push(item);
+  }
+
+  getRandomItemId(): number {
+    return Math.floor(Math.random() * (this._upperBound - this._lowerBound + 1)) + this._lowerBound;
   }
 }
