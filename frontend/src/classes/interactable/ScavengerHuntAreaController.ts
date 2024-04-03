@@ -115,6 +115,8 @@ export default class ScavengerHuntAreaController extends GameAreaController<
       themepack: themepack,
     });
     this._instanceID = gameID;
+    const scene = this._townController.globalScene;
+    scene?.addTileOnMap(15053, 96, 32);
   }
 
   /**

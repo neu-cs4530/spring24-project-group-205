@@ -45,6 +45,7 @@ import TicTacToeAreaController from './interactable/TicTacToeAreaController';
 import ViewingAreaController from './interactable/ViewingAreaController';
 import PlayerController from './PlayerController';
 import ScavengerHuntItem from '../components/Town/interactables/ScavengerHunt/ScavengerHuntItemOnMap';
+import TownGameScene from '../components/Town/TownGameScene';
 
 const CALCULATE_NEARBY_PLAYERS_DELAY_MS = 300;
 const SOCKET_COMMAND_TIMEOUT_MS = 5000;
@@ -213,6 +214,8 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    */
   private _interactableEmitter = new EventEmitter();
 
+  private _globalScene?: TownGameScene;
+
   public constructor({ userName, townID, loginController }: ConnectionProperties) {
     super();
     this._townID = townID;
@@ -231,6 +234,14 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     this._socket = io(url, { auth: { userName, townID } });
     this._townsService = new TownsServiceClient({ BASE: url }).towns;
     this.registerSocketListeners();
+  }
+
+  public get globalScene(): TownGameScene | undefined {
+    return this._globalScene;
+  }
+
+  public set globalScene(scene: TownGameScene) {
+    this._globalScene = scene;
   }
 
   public get sessionToken() {
