@@ -121,7 +121,7 @@ export interface ScavengerHuntMove {
 }
 
 export interface ScavengerHuntItem {
-  id: string;
+  id: number;
   name: string;
   location: XY;
   foundBy?: PlayerID;

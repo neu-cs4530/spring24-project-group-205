@@ -25,7 +25,11 @@ export default class Themepack implements ScavengerHuntThemepack {
     this.name = name;
     if (name === 'food') {
       this._lowerBound = 15053;
-      this._upperBound = 15053 + 64;
+      this._upperBound = 15053 + 63;
+    }
+    if (name === 'emojis') {
+      this._lowerBound = 15117;
+      this._upperBound = 15117 + 63;
     }
   }
 
@@ -42,6 +46,13 @@ export default class Themepack implements ScavengerHuntThemepack {
    * @returns the items of the themepack
    */
   getItems() {
+    return this.items;
+  }
+
+  createItems(num: number): Item[] {
+    for (let i = 0; i < num; i += 1) {
+      this.items.push(new Item(this.getRandomItemId(), 'item', { x: 0, y: 0 }, 'hint'));
+    }
     return this.items;
   }
 

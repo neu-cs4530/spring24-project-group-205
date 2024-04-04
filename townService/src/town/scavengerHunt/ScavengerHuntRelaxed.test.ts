@@ -16,8 +16,8 @@ describe('ScavengerHunt', () => {
   describe('_applyMove', () => {
     it('should not change the number of items to collect and not end the game', () => {
       const player = createPlayerForTesting();
-      const burger = new Item('1234', 'burger', { x: 0, y: 0 }, '');
-      const sushi = new Item('5678', 'sushi', { x: 0, y: 0 }, '');
+      const burger = new Item(1234, 'burger', { x: 0, y: 0 }, '');
+      const sushi = new Item(5678, 'sushi', { x: 0, y: 0 }, '');
 
       themepack.addItem(burger);
       themepack.addItem(sushi);

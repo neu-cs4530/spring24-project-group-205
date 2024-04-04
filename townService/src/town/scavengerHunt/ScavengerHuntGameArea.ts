@@ -35,6 +35,7 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
   }
 
   private _stateUpdated(updatedState: GameInstance<ScavengerHuntGameState>) {
+    console.log('state updated');
     if (updatedState.state.status === 'OVER') {
       const gameID = this._game?.id;
       if (gameID && !this._history.find(eachResult => eachResult.gameID === gameID)) {
@@ -53,6 +54,7 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
         }
       }
     }
+    // console.log(this._game);
     this._emitAreaChanged();
   }
 
@@ -116,9 +118,10 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
       if (this._game?.id !== command.gameID) {
         throw new InvalidParametersError(GAME_ID_MISSMATCH_MESSAGE);
       }
-      this._stateUpdated(game.toModel());
+      // console.log('updating state in start game');
       this._startTimer();
       game.startGame(player);
+      this._stateUpdated(game.toModel());
       return undefined as InteractableCommandReturnType<CommandType>;
     }
     if (command.type === 'RequestHint') {
