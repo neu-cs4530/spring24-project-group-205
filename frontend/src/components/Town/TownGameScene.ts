@@ -27,7 +27,7 @@ function interactableTypeForObjectType(type: string): any {
   }
 }
 
-const TIME_ALLOWED = 240;
+const TIME_ALLOWED = 10;
 
 // Original inspiration and code from:
 // https://medium.com/@michaelwesthadley/modular-game-worlds-in-phaser-3-tilemaps-1-958fc7e6bbd6
@@ -315,10 +315,20 @@ export default class TownGameScene extends Phaser.Scene {
 
       // Draw tiles (only within the groundLayer)
       const itemsLayer = this.map.getLayer('Items');
-      if (this.input.manager.activePointer.isDown) {
+      if (this.input.manager.activePointer.isDown 
+        && this._isPointerOnItem(mouse.x, mouse.y)) {
         itemsLayer?.tilemapLayer.removeTileAtWorldXY(mouse.x, mouse.y);
+        this._itemCount++;
       }
+
+      this._itemsFoundText?.setText('Items Found: ' + this._itemCount.toString() + ' / 5');
     }
+  }
+
+  private _isPointerOnItem(x: number, y: number): boolean {
+    const itemsLayer = this.map.getLayer('Items');
+    const tile = itemsLayer?.tilemapLayer.getTileAtWorldXY(x, y);
+    return tile !== null;
   }
 
   public addTileOnMap(tileId: number, xTile: number, yTile: number): void {
@@ -569,7 +579,7 @@ export default class TownGameScene extends Phaser.Scene {
       .setDepth(30);
 
     this._countDownText = this.add
-      .text(600, 16, `Time Left: `, {
+      .text(575, 16, `Time: `, {
         font: '15px monospace',
         color: '#000000',
         padding: {
@@ -582,7 +592,7 @@ export default class TownGameScene extends Phaser.Scene {
       .setDepth(30);
 
     this._itemsFoundText = this.add
-      .text(600, 62, `Items Found: ` + this._itemCount.toString(), {
+      .text(575, 72, `Items Found: ` + this._itemCount.toString(), {
         font: '15px monospace',
         color: '#000000',
         padding: {
@@ -617,6 +627,9 @@ export default class TownGameScene extends Phaser.Scene {
   }
 
   timerEnded() {
+    // make background of countdown text red
+    this._countDownText?.setBackgroundColor('#E55451');
+    this._countDownText?.setText(`Time's up! \nGame over.`);
     return;
   }
 
@@ -682,4 +695,5 @@ export default class TownGameScene extends Phaser.Scene {
       this._previouslyCapturedKeys = [];
     }
   }
+
 }
