@@ -23,7 +23,7 @@ const MAX_PLAYERS = 10;
 
 export default abstract class ScavengerHunt extends Game<
   ScavengerHuntGameState,
-  ScavengerHuntItem
+  ScavengerHuntMove
 > {
   // INFORMATION THAT IS SPECIFIC TO THE PLAYER:
   // The game mode the player is currently in
