@@ -33943,6 +33943,19 @@
          "tilecount":64,
          "tileheight":16,
          "tilewidth":16
+        }, 
+        {
+         "columns":10,
+         "firstgid":15181,
+         "image":"..\/tilesets\/Eggs_16x16.png",
+         "imageheight":80,
+         "imagewidth":160,
+         "margin":0,
+         "name":"Eggs_16x16",
+         "spacing":0,
+         "tilecount":50,
+         "tileheight":16,
+         "tilewidth":16
         }],
  "tilewidth":32,
  "type":"map",
