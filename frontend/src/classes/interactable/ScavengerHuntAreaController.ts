@@ -145,8 +145,9 @@ export default class ScavengerHuntAreaController extends GameAreaController<
     }
 
     const move: ScavengerHuntMove = {
-      name: name,
-      foundBy: this._townController.ourPlayer.id,
+      gamePiece: name,
+      col: 0,
+      row: 0,
     };
     await this._townController.sendInteractableCommand(this.id, {
       type: 'GameMove',

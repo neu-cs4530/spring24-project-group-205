@@ -116,8 +116,9 @@ export interface TicTacToeMove {
 }
 
 export interface ScavengerHuntMove {
-  name: string,
-  foundBy: PlayerID;
+  gamePiece: string,
+  row: number,
+  col: number,
 }
 
 export interface ScavengerHuntItem {

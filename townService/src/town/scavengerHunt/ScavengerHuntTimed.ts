@@ -31,11 +31,8 @@ export default class ScavengerHuntTimed extends ScavengerHunt {
   }
 
   public applyMove(move: GameMove<ScavengerHuntMove>): void {
-    // if (!this.state.scavengers?.includes(move.playerID)) {
-    //   throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
-    // }
-    if (move.move.foundBy) {
-      throw new InvalidParametersError(INVALID_MOVE_MESSAGE);
+    if (!this._players.some(player => player.id === move.playerID)) {
+      throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
     }
     if (this.state.status === 'OVER') {
       throw new InvalidParametersError(GAME_OVER_MESSAGE);
@@ -44,12 +41,11 @@ export default class ScavengerHuntTimed extends ScavengerHunt {
       throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
     }
 
-    const foundItemIndex = this.state.items.findIndex(item => item.name === move.move.name);
+    const foundItemIndex = this.state.items.findIndex(item => item.name === move.move.gamePiece);
     if (foundItemIndex === -1) {
       throw new InvalidParametersError('Not an item');
     }
 
-    move.move.foundBy = move.playerID;
     this._itemsFound.set(move.playerID, (this._itemsFound.get(move.playerID) || 0) + 1);
     const updatedItems = [...this.state.items];
     updatedItems[foundItemIndex] = {
