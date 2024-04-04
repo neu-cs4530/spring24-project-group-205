@@ -4,7 +4,7 @@ import InvalidParametersError, {
   INVALID_MOVE_MESSAGE,
   PLAYER_NOT_IN_GAME_MESSAGE,
 } from '../../lib/InvalidParametersError';
-import { GameMove, ScavengerHuntItem } from '../../types/CoveyTownSocket';
+import { GameMove, ScavengerHuntItem, ScavengerHuntMove } from '../../types/CoveyTownSocket';
 import GameDatabase from './GameDatabase';
 import ScavengerHunt from './ScavengerHunt';
 import Themepack from './Themepack';
@@ -30,7 +30,7 @@ export default class ScavengerHuntTimed extends ScavengerHunt {
     }
   }
 
-  public applyMove(move: GameMove<ScavengerHuntItem>): void {
+  public applyMove(move: GameMove<ScavengerHuntMove>): void {
     // if (!this.state.scavengers?.includes(move.playerID)) {
     //   throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
     // }
@@ -44,13 +44,24 @@ export default class ScavengerHuntTimed extends ScavengerHunt {
       throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
     }
 
+    const foundItemIndex = this.state.items.findIndex(item => item.name === move.move.name);
+    if (foundItemIndex === -1) {
+      throw new InvalidParametersError('Not an item');
+    }
+
     move.move.foundBy = move.playerID;
     this._itemsFound.set(move.playerID, (this._itemsFound.get(move.playerID) || 0) + 1);
+    const updatedItems = [...this.state.items];
+    updatedItems[foundItemIndex] = {
+      ...updatedItems[foundItemIndex],
+      foundBy: move.playerID,
+    };
     this.state = {
       ...this.state,
-      items: this.state.items.map(item => (item.id === move.move.id ? move.move : item)),
+      items: updatedItems,
     };
-    if (this.state.items.every(item => item.foundBy)) {
+
+    if (updatedItems.every(item => item.foundBy)) {
       this.state = {
         ...this.state,
         status: 'OVER',

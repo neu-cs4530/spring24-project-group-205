@@ -6,6 +6,7 @@ import {
   ScavengerHuntGameState,
   GameStatus,
   ScavengerHuntThemepack,
+  ScavengerHuntMove,
 } from '../../types/CoveyTownSocket';
 import PlayerController from '../PlayerController';
 import GameAreaController, {
@@ -114,6 +115,30 @@ export default class ScavengerHuntAreaController extends GameAreaController<
     await this._townController.sendInteractableCommand(this.id, {
       gameID: instanceID,
       type: 'StartGame',
+    });
+  }
+
+  /**
+   * Sends a request to the server to collect an object
+   *
+   * @throws an error with message NO_GAME_IN_PROGRESS_ERROR if there is no game in progress
+   *
+   * @param name name of object collected
+   */
+  public async makeMove(name: string): Promise<void> {
+    const instanceID = this._instanceID;
+    if (!instanceID || this._model.game?.state.status !== 'IN_PROGRESS') {
+      throw new Error(NO_GAME_IN_PROGRESS_ERROR);
+    }
+
+    const move: ScavengerHuntMove = {
+      name: name,
+      foundBy: this._townController.ourPlayer.id,
+    };
+    await this._townController.sendInteractableCommand(this.id, {
+      type: 'GameMove',
+      gameID: instanceID,
+      move,
     });
   }
 

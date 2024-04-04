@@ -11,6 +11,7 @@ import {
   PlayerID,
   ScavengerHuntGameState,
   ScavengerHuntItem,
+  ScavengerHuntMove,
 } from '../../types/CoveyTownSocket';
 import Game from '../games/Game';
 import Themepack from './Themepack';
@@ -46,6 +47,7 @@ export default abstract class ScavengerHunt extends Game<
       timeLeft: TIME_ALLOWED,
       items: [],
       status: 'WAITING_TO_START',
+      moves: [],
     });
 
     this._themepack = themePack;
@@ -128,7 +130,7 @@ export default abstract class ScavengerHunt extends Game<
    * @param move A move to apply to the game.
    * @throws InvalidParametersError if the move is invalid.
    */
-  public abstract applyMove(move: GameMove<ScavengerHuntItem>): void;
+  public abstract applyMove(move: GameMove<ScavengerHuntMove>): void;
 
   /**
    * Gives the total number of items found at this point in the game.

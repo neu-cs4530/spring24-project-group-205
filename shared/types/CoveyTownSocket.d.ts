@@ -115,6 +115,11 @@ export interface TicTacToeMove {
   col: TicTacToeGridPosition;
 }
 
+export interface ScavengerHuntMove {
+  name: string,
+  foundBy: PlayerID;
+}
+
 export interface ScavengerHuntItem {
   id: string;
   name: string;
@@ -142,6 +147,7 @@ export interface TicTacToeGameState extends WinnableGameState {
 export interface ScavengerHuntGameState extends WinnableGameState {
   timeLeft: number;
   items: ReadonlyArray<ScavengerHuntItem>;
+  moves: ReadonlyArray<ScavengerHuntMove>;
 }
 
 /**
@@ -240,7 +246,7 @@ interface InteractableCommandBase {
   type: string;
 }
 
-export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | JoinRelaxedGameCommand | JoinTimedGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | StartGameCommand | LeaveGameCommand | RequestHintCommand;
+export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | JoinRelaxedGameCommand | JoinTimedGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | GameMoveCommand<ScavengerHuntMove> | StartGameCommand | LeaveGameCommand | RequestHintCommand;
 export interface ViewingAreaUpdateCommand  {
   type: 'ViewingAreaUpdate';
   update: ViewingArea;
@@ -248,6 +254,7 @@ export interface ViewingAreaUpdateCommand  {
 export interface JoinGameCommand {
   type: 'JoinGame';
 }
+
 export interface JoinRelaxedGameCommand {
   type: 'JoinRelaxedGame';
   themepack: string;
