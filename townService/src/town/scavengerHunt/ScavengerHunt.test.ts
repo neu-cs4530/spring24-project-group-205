@@ -110,10 +110,18 @@ describe('ScavengerHunt', () => {
       gameTimed.startGame(player);
       expect(gameTimed.state.items.length).toBe(2 + 10);
       expect(gameTimed.state.items[0].id).toBe(1234);
-      gameTimed.applyMove({ gameID: '1234', playerID: player.id, move: burger });
+      gameTimed.applyMove({
+        gameID: '1234',
+        playerID: player.id,
+        move: { gamePiece: 'burger', col: 0, row: 0 },
+      });
       expect(gameTimed.state.items[0].foundBy).toBe(player.id);
       expect(gameTimed.getScoreForPlayer(player)).toBe(1);
-      gameTimed.applyMove({ gameID: '1234', playerID: player.id, move: sushi });
+      gameTimed.applyMove({
+        gameID: '1234',
+        playerID: player.id,
+        move: { gamePiece: 'sushi', col: 0, row: 0 },
+      });
       expect(gameTimed.getScoreForPlayer(player)).toBe(2);
       expect(gameTimed.state.items[1].foundBy).toBe(player.id);
     });

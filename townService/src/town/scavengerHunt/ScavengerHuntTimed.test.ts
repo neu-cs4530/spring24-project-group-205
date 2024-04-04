@@ -27,10 +27,18 @@ describe('ScavengerHunt', () => {
       game.startGame(player);
       expect(game.state.items.length).toBe(2 + 10);
       expect(game.state.items[0].id).toBe(1234);
-      game.applyMove({ gameID: '1234', playerID: player.id, move: burger });
+      game.applyMove({
+        gameID: '1234',
+        playerID: player.id,
+        move: { gamePiece: 'burger', col: 0, row: 0 },
+      });
       expect(game.state.items[0].foundBy).toBe(player.id);
       expect(game.getScoreForPlayer(player)).toBe(1);
-      game.applyMove({ gameID: '1234', playerID: player.id, move: sushi });
+      game.applyMove({
+        gameID: '1234',
+        playerID: player.id,
+        move: { gamePiece: 'sushi', col: 0, row: 0 },
+      });
       expect(game.state.status).toBe('IN_PROGRESS');
       expect(game.getScoreForPlayer(player)).toBe(2);
       expect(game.state.items[1].foundBy).toBe(player.id);
@@ -53,9 +61,21 @@ describe('ScavengerHunt', () => {
       game.join(player2);
       game.startGame(player);
       expect(game.state.items.length).toBe(3 + 20);
-      game.applyMove({ gameID: '1234', playerID: player.id, move: burger });
-      game.applyMove({ gameID: '1234', playerID: player2.id, move: sushi });
-      game.applyMove({ gameID: '1234', playerID: player.id, move: taco });
+      game.applyMove({
+        gameID: '1234',
+        playerID: player.id,
+        move: { gamePiece: 'burger', col: 0, row: 0 },
+      });
+      game.applyMove({
+        gameID: '1234',
+        playerID: player2.id,
+        move: { gamePiece: 'sushi', col: 0, row: 0 },
+      });
+      game.applyMove({
+        gameID: '1234',
+        playerID: player.id,
+        move: { gamePiece: 'taco', col: 0, row: 0 },
+      });
       expect(game.state.status).toBe('IN_PROGRESS');
       expect(game.getScoreForPlayer(player)).toBe(2);
       expect(game.getTimeLeft()).toBe(120);
