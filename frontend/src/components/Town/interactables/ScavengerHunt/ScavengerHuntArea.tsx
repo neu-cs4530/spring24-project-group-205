@@ -23,7 +23,6 @@ import React, { useEffect, useState } from 'react';
 import ScavengerHuntAreaController from '../../../../classes/interactable/ScavengerHuntAreaController';
 import { useInteractableAreaController } from '../../../../classes/TownController';
 import { InteractableID } from '../../../../types/CoveyTownSocket';
-import theme from './theme';
 
 /**
  * The ScavengerHuntArea component renders the Scavenger Hunt game area.
@@ -149,7 +148,7 @@ export default function ScavengerHuntArea({
         </TabList>
         <TabPanels>
           <TabPanel>
-            <Image src='/logo.png' alt='Scavenger Hunt' />
+            <Image src='/logo.png' alt='Scavenge logo' />
             <Box boxSize='20px'> </Box>
             <Text fontSize='lg'>
               Welcome to Scavenge, a scavanger hunt game in covey.town! During this game you will
@@ -179,11 +178,11 @@ export default function ScavengerHuntArea({
                     </Heading>
                     <HStack>
                       <VStack>
-                        <Image src='/timed.png' alt='Scavenger Hunt' boxSize='100px' />
+                        <Image src='/timed.png' alt='timed' boxSize='100px' />
                         <Button onClick={() => handleClickMode('timed')}>Timed</Button>
                       </VStack>
                       <VStack>
-                        <Image src='/relaxed.png' alt='Scavenger Hunt' boxSize='100px' />
+                        <Image src='/relaxed.png' alt='relaxed' boxSize='100px' />
                         <Button onClick={() => handleClickMode('relaxed')}>Relaxed</Button>
                       </VStack>
                     </HStack>
@@ -197,15 +196,15 @@ export default function ScavengerHuntArea({
                     </Heading>
                     <HStack>
                       <VStack>
-                        <Image src='/relaxed.png' alt='Scavenger Hunt' boxSize='100px' />
+                        <Image src='/food.png' alt='food' boxSize='100px' />
                         <Button onClick={() => handleClick('food')}>Food</Button>
                       </VStack>
                       <VStack>
-                        <Image src='/relaxed.png' alt='Scavenger Hunt' boxSize='100px' />
+                        <Image src='/emojis.png' alt='emoji' boxSize='100px' />
                         <Button onClick={() => handleClick('emojis')}>Emojis</Button>
                       </VStack>
                       <VStack>
-                        <Image src='/relaxed.png' alt='Scavenger Hunt' boxSize='100px' />
+                        <Image src='/egg.png' alt='egg' boxSize='100px' />
                         <Button onClick={() => handleClick('egg')}>Egg</Button>
                       </VStack>
                     </HStack>
@@ -218,14 +217,22 @@ export default function ScavengerHuntArea({
             <Center>
               <HStack>
                 <VStack>
-                  <Image src='/relaxed.png' alt='Scavenger Hunt' boxSize='100px' />
+                  {mode ? (
+                    <Image src={`/${mode}.png`} alt='mode image' boxSize='100px' />
+                  ) : (
+                    <Image src={'/blank.png'} alt='Scavenger Hunt' boxSize='100px' />
+                  )}
                   <Heading as='h3' size='md'>
                     {mode} Game
                   </Heading>
                 </VStack>
                 <Box boxSize='20px'> </Box>
                 <VStack>
-                  <Image src='/relaxed.png' alt='Scavenger Hunt' boxSize='100px' />
+                  {themepack ? (
+                    <Image src={`/${themepack}.png`} alt='theme image' boxSize='100px' />
+                  ) : (
+                    <Image src={'/blank.png'} alt='Blank' boxSize='100px' />
+                  )}
                   <Heading as='h3' size='md'>
                     {themepack} Theme
                   </Heading>
