@@ -38,7 +38,7 @@ import theme from './theme';
  * It renders the following:
  * - A radio button picker for choosing the game mode (timed or relaxed)
  * - A leaderboard of the game results for the selected game mode
- * - A radio button picker for choosing the theme (food, dessert, or animals)
+ * - A radio button picker for choosing the theme (food, emojis, or animals)
  * - A button to request a hint
  * - A list of hints that the player has requested
  * - A button to start the game

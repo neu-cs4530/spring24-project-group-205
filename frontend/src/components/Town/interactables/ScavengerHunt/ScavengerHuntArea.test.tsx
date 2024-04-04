@@ -92,7 +92,7 @@ describe('Scavenger Hunt Area', () => {
       renderScavengerHuntArea();
       expect(screen.queryByText('Theme:')).toBeInTheDocument();
       expect(screen.queryByText('Food')).toBeInTheDocument();
-      expect(screen.queryByText('Dessert')).toBeInTheDocument();
+      expect(screen.queryByText('Emojis')).toBeInTheDocument();
       expect(screen.queryByText('Animals')).toBeInTheDocument();
     });
     it('shows hints', () => {
