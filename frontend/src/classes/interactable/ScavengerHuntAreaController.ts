@@ -152,6 +152,9 @@ export default class ScavengerHuntAreaController extends GameAreaController<
     if (!instanceID) {
       throw new Error(NO_GAME_STARTABLE);
     }
+    if (this._model.game?.state.status !== 'IN_PROGRESS') {
+      throw new Error('Game is not in progress');
+    }
     const { hint } = await this._townController.sendInteractableCommand(this.id, {
       type: 'RequestHint',
       gameID: instanceID,
