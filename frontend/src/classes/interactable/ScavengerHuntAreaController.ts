@@ -109,7 +109,7 @@ export default class ScavengerHuntAreaController extends GameAreaController<
   private _renderInitialItems(): void {
     if (this.items) {
       for (const item of this.items) {
-        this._townController.globalScene?.addTileOnMap(item.id, item.location.x, item.location.y);
+        this._townController.globalScene.addTileOnMap(item.id, item.location.x, item.location.y);
         console.log('attempted to put item at location', item.location.x, item.location.y);
       }
     } else {

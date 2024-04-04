@@ -236,7 +236,10 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     this.registerSocketListeners();
   }
 
-  public get globalScene(): TownGameScene | undefined {
+  public get globalScene(): TownGameScene {
+    if (!this._globalScene) {
+      throw new Error('Global scene not set');
+    }
     return this._globalScene;
   }
 
