@@ -84,6 +84,20 @@ export default abstract class ScavengerHunt extends Game<
     this._assignRandomLocations();
   }
 
+  /**
+   *
+   * @returns a string with the hint associated with the next unfound item in the list
+   */
+  public requestHint(): string {
+    const unfoundItems = this.state.items.filter(item => this._itemsFound.get(item.id) === 0);
+    if (unfoundItems.length === 0) {
+      return 'All items found!';
+    }
+
+    const nextItem = unfoundItems[0];
+    return nextItem.hint || 'No hint available';
+  }
+
   private _assignRandomLocations(): void {
     if (this.state.items.length === 0) {
       throw new Error('No items available in the scavenger hunt');

@@ -240,7 +240,7 @@ interface InteractableCommandBase {
   type: string;
 }
 
-export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | JoinRelaxedGameCommand | JoinTimedGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | StartGameCommand | LeaveGameCommand;
+export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | JoinRelaxedGameCommand | JoinTimedGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | StartGameCommand | LeaveGameCommand | RequestHintCommand;
 export interface ViewingAreaUpdateCommand  {
   type: 'ViewingAreaUpdate';
   update: ViewingArea;
@@ -260,6 +260,10 @@ export interface LeaveGameCommand {
   type: 'LeaveGame';
   gameID: GameInstanceID;
 }
+export interface RequestHintCommand {
+  type: 'RequestHint';
+  gameID: GameInstanceID;
+}
 export interface StartGameCommand {
   type: 'StartGame';
   gameID: GameInstanceID;
@@ -274,6 +278,7 @@ export type InteractableCommandReturnType<CommandType extends InteractableComman
   CommandType extends JoinTimedGameCommand ? { gameID: string}:
   CommandType extends JoinRelaxedGameCommand ? { gameID: string}:
   CommandType extends ViewingAreaUpdateCommand ? undefined :
+  CommandType extends ViewingAreaUpdateCommand ? { hint: string} :
   CommandType extends GameMoveCommand<TicTacToeMove> ? undefined :
   CommandType extends LeaveGameCommand ? undefined :
   never;

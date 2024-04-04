@@ -28,6 +28,8 @@ export default class ScavengerHuntAreaController extends GameAreaController<
 
   private _itemsOnMap: ScavengerHuntItemOnMap[] = [];
 
+  public requestedHint?: string;
+
   /**
    * Returns the player who won the game, if there is one, or undefined otherwise
    */
@@ -56,6 +58,17 @@ export default class ScavengerHuntAreaController extends GameAreaController<
       return 'WAITING_FOR_PLAYERS';
     }
     return status;
+  }
+
+  /**
+   * Returns the status of the game
+   * If there is no game, returns 'WAITING_FOR_PLAYERS'
+   */
+  get hint(): string {
+    if (!this.requestedHint) {
+      throw new Error('No hint available');
+    }
+    return this.requestedHint;
   }
 
   /**
@@ -102,6 +115,24 @@ export default class ScavengerHuntAreaController extends GameAreaController<
       gameID: instanceID,
       type: 'StartGame',
     });
+  }
+
+  /**
+   * Sends a request to the server to get a hint for the next unfound item.
+   *
+   * @throws An error if the server rejects the request to join the game.
+   */
+  public async requestHint(): Promise<void> {
+    const instanceID = this._instanceID;
+    if (!instanceID) {
+      throw new Error(NO_GAME_STARTABLE);
+    }
+    const { hint } = await this._townController.sendInteractableCommand(this.id, {
+      type: 'RequestHint',
+      gameID: instanceID,
+    });
+
+    this.requestedHint = hint;
   }
 
   /**

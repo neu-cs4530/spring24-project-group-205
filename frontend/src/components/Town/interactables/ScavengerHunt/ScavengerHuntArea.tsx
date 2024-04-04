@@ -100,6 +100,18 @@ export default function ScavengerHuntArea({
     }
   };
 
+  const handleRequestHint = async () => {
+    try {
+      await gameAreaController.requestHint();
+    } catch (err) {
+      toast({
+        title: 'Error ending game',
+        description: (err as Error).toString(),
+        status: 'error',
+      });
+    }
+  };
+
   // Placeholder data for the leaderboard
   const leaderboardData = [
     { username: 'Player1', count: 10 },
@@ -213,7 +225,11 @@ export default function ScavengerHuntArea({
         <Heading as='h1' style={{ marginRight: '10px', fontSize: '25px' }}>
           Hints:
         </Heading>
-        <Button>Request Hint</Button>
+        {gameAreaController.requestedHint ? (
+          <span>{gameAreaController.requestedHint}</span>
+        ) : (
+          <Button onClick={handleRequestHint}>Request Hint</Button>
+        )}
       </Flex>
       <>
         Your hints will be here. Please begin the game and request a hint if you would like one. All
