@@ -83,26 +83,21 @@ describe('Scavenger Hunt Area', () => {
     });
     it('shows leaderboard', () => {
       renderScavengerHuntArea();
-      expect(screen.queryByText('Leaderboard:')).toBeInTheDocument();
-      expect(screen.queryByText('Rank')).toBeInTheDocument();
-      expect(screen.queryByText('Username')).toBeInTheDocument();
-      expect(screen.queryByText('Objects Collected')).toBeInTheDocument();
+      expect(screen.queryByText('Timed Leaderboard')).toBeInTheDocument();
+      expect(screen.queryByText('Relaxed Leaderboard')).toBeInTheDocument();
     });
     it('shows themes', () => {
       renderScavengerHuntArea();
       expect(screen.queryByText('Theme:')).toBeInTheDocument();
       expect(screen.queryByText('Food')).toBeInTheDocument();
       expect(screen.queryByText('Emojis')).toBeInTheDocument();
-      expect(screen.queryByText('Animals')).toBeInTheDocument();
+      expect(screen.queryByText('Egg')).toBeInTheDocument();
     });
     it('shows hints', () => {
       renderScavengerHuntArea();
-      expect(screen.queryByText('Hints:')).toBeInTheDocument();
       expect(screen.queryByText('Request Hint')).toBeInTheDocument();
       expect(
-        screen.queryByText(
-          'Your hints will be here. Please begin the game and request a hint if you would like one. All players will be able to see your requested hint and will be notified of the hint.',
-        ),
+        screen.queryByText('This is a hint. This box should only appear when a hint is requested.'),
       ).toBeInTheDocument();
     });
     it('shows players', () => {

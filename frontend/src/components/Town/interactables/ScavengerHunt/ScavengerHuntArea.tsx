@@ -54,9 +54,22 @@ export default function ScavengerHuntArea({
     useInteractableAreaController<ScavengerHuntAreaController>(interactableID);
   const toast = useToast();
 
+  const [themepack, setThemepack] = useState('');
+  const [mode, setMode] = useState('');
+
+  const handleClick = (newThemepack: string) => {
+    setThemepack(newThemepack);
+  };
+
+  const handleClickMode = (newMode: string) => {
+    setMode(newMode);
+  };
+
   const [joiningGame, setJoiningGame] = useState(false);
   const [startingGame, setStartingGame] = useState(false);
   const [joinedPlayers, setJoinedPlayers] = useState<string[]>([]);
+
+  let modeSet = false;
 
   useEffect(() => {
     // Add event listeners or any other necessary setup here
@@ -68,7 +81,18 @@ export default function ScavengerHuntArea({
   const handleJoinGame = async () => {
     setJoiningGame(true);
     try {
-      await gameAreaController.joinTimedGame('food');
+      if (mode === '' || themepack === '') {
+        throw new Error('Please select a game mode and theme before joining the game.');
+      }
+      if (mode === 'timed') {
+        await gameAreaController.joinTimedGame(themepack);
+      } else if (mode === 'relaxed') {
+        await gameAreaController.joinRelaxedGame(themepack);
+      } else {
+        throw new Error('Please select a game mode before joining the game.');
+      }
+      modeSet = true;
+      console.log('mode set');
     } catch (err) {
       toast({
         title: 'Error joining game',
@@ -105,8 +129,6 @@ export default function ScavengerHuntArea({
     }
   };
 
-  const modeSet = false;
-
   // Placeholder data for the leaderboard
   const leaderboardData = [
     { username: 'Player1', count: 10 },
@@ -117,7 +139,7 @@ export default function ScavengerHuntArea({
   ];
 
   return (
-    <ChakraProvider theme={theme}>
+    <ChakraProvider>
       <Tabs variant='soft-rounded' colorScheme='orange'>
         <TabList>
           <Tab>Details</Tab>
@@ -153,16 +175,16 @@ export default function ScavengerHuntArea({
                 <Center>
                   <VStack>
                     <Heading as='h2' size='lg'>
-                      Game Mode: ...
+                      Game Mode: {mode}
                     </Heading>
                     <HStack>
                       <VStack>
                         <Image src='/timed.png' alt='Scavenger Hunt' boxSize='100px' />
-                        <Button>Timed</Button>
+                        <Button onClick={() => handleClickMode('timed')}>Timed</Button>
                       </VStack>
                       <VStack>
                         <Image src='/relaxed.png' alt='Scavenger Hunt' boxSize='100px' />
-                        <Button>Relaxed</Button>
+                        <Button onClick={() => handleClickMode('relaxed')}>Relaxed</Button>
                       </VStack>
                     </HStack>
                   </VStack>
@@ -171,20 +193,20 @@ export default function ScavengerHuntArea({
                 <Center>
                   <VStack>
                     <Heading as='h2' size='lg'>
-                      Theme: ...
+                      Theme: {themepack}
                     </Heading>
                     <HStack>
                       <VStack>
                         <Image src='/relaxed.png' alt='Scavenger Hunt' boxSize='100px' />
-                        <Button>Food</Button>
+                        <Button onClick={() => handleClick('food')}>Food</Button>
                       </VStack>
                       <VStack>
                         <Image src='/relaxed.png' alt='Scavenger Hunt' boxSize='100px' />
-                        <Button>Ghosts</Button>
+                        <Button onClick={() => handleClick('emojis')}>Emojis</Button>
                       </VStack>
                       <VStack>
                         <Image src='/relaxed.png' alt='Scavenger Hunt' boxSize='100px' />
-                        <Button>Animals</Button>
+                        <Button onClick={() => handleClick('egg')}>Egg</Button>
                       </VStack>
                     </HStack>
                   </VStack>
@@ -198,14 +220,14 @@ export default function ScavengerHuntArea({
                 <VStack>
                   <Image src='/relaxed.png' alt='Scavenger Hunt' boxSize='100px' />
                   <Heading as='h3' size='md'>
-                    Timed Game
+                    {mode} Game
                   </Heading>
                 </VStack>
                 <Box boxSize='20px'> </Box>
                 <VStack>
                   <Image src='/relaxed.png' alt='Scavenger Hunt' boxSize='100px' />
                   <Heading as='h3' size='md'>
-                    Food Theme
+                    {themepack} Theme
                   </Heading>
                 </VStack>
               </HStack>

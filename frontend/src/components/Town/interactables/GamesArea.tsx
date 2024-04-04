@@ -143,7 +143,9 @@ export default function GameAreaWrapper(): JSX.Element {
     if (gameArea) {
       townController.interactEnd(gameArea);
       const controller = townController.getGameAreaController(gameArea);
-      controller.leaveGame();
+      if (controller.toInteractableAreaModel().type !== 'ScavengerHuntArea') {
+        controller.leaveGame();
+      }
     }
   }, [townController, gameArea]);
   if (gameArea) {
