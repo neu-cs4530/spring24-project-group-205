@@ -33930,6 +33930,19 @@
          "tilecount":64,
          "tileheight":16,
          "tilewidth":16
+        }, 
+        {
+         "columns":8,
+         "firstgid":15117,
+         "image":"..\/tilesets\/16x16_emoji_asset_pack_v1.1.png",
+         "imageheight":128,
+         "imagewidth":128,
+         "margin":0,
+         "name":"16x16_emoji_asset_pack_v1.1",
+         "spacing":0,
+         "tilecount":64,
+         "tileheight":16,
+         "tilewidth":16
         }],
  "tilewidth":32,
  "type":"map",

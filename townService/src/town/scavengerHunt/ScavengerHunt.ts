@@ -65,7 +65,7 @@ export default abstract class ScavengerHunt extends Game<
       throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
     }
 
-    const items = this._themepack.getItems();
+    const items = this._themepack.createItems(this._players.length * 10);
     this._gameStartTime = Date.now();
 
     this._timerIntervalId = setInterval(() => {
@@ -82,6 +82,12 @@ export default abstract class ScavengerHunt extends Game<
     });
 
     this._assignRandomLocations();
+    console.log('Starting game');
+    // console.log('State:', this.state);
+    // console.log(
+    //   'Item locations: ',
+    //   this.state.items.map(item => item.location),
+    // );
   }
 
   private _assignRandomLocations(): void {
@@ -89,7 +95,7 @@ export default abstract class ScavengerHunt extends Game<
       throw new Error('No items available in the scavenger hunt');
     }
     this.state.items.forEach(item => {
-      if (!item.location) {
+      if (item.location.x === 0 && item.location.y === 0) {
         setRandomLocationAndHint(item);
       }
     });
