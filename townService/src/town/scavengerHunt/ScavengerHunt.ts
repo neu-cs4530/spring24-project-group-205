@@ -65,7 +65,7 @@ export default abstract class ScavengerHunt extends Game<
       throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
     }
 
-    const items = this._themepack.createItems(50);
+    const items = this._themepack.createItems(this._players.length * 10);
     this._gameStartTime = Date.now();
 
     this._timerIntervalId = setInterval(() => {

@@ -20,8 +20,8 @@ describe('ScavengerHunt', () => {
     themepack = new Themepack('Food');
     gameRelaxed = new ScavengerHuntRelaxed(themepack);
     gameTimed = new ScavengerHuntTimed(themepack);
-    burger = new Item('1234', 'burger', { x: 0, y: 0 }, '');
-    sushi = new Item('5678', 'sushi', { x: 0, y: 0 }, '');
+    burger = new Item(1234, 'burger', { x: 0, y: 0 }, '');
+    sushi = new Item(5678, 'sushi', { x: 0, y: 0 }, '');
 
     themepack.addItem(burger);
     themepack.addItem(sushi);
@@ -108,13 +108,12 @@ describe('ScavengerHunt', () => {
       gameTimed.join(player);
       expect(gameTimed.state.items.length).toBe(0);
       gameTimed.startGame(player);
-      expect(gameTimed.state.items.length).toBe(2);
-      expect(gameTimed.state.items[0].id).toBe('1234');
+      expect(gameTimed.state.items.length).toBe(2 + 10);
+      expect(gameTimed.state.items[0].id).toBe(1234);
       gameTimed.applyMove({ gameID: '1234', playerID: player.id, move: burger });
       expect(gameTimed.state.items[0].foundBy).toBe(player.id);
       expect(gameTimed.getScoreForPlayer(player)).toBe(1);
       gameTimed.applyMove({ gameID: '1234', playerID: player.id, move: sushi });
-      expect(gameTimed.state.status).toBe('OVER');
       expect(gameTimed.getScoreForPlayer(player)).toBe(2);
       expect(gameTimed.state.items[1].foundBy).toBe(player.id);
     });
