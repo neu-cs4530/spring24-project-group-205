@@ -247,7 +247,7 @@ interface InteractableCommandBase {
   type: string;
 }
 
-export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | JoinRelaxedGameCommand | JoinTimedGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | StartGameCommand | LeaveGameCommand | RequestHintCommand;
+export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | JoinRelaxedGameCommand | JoinTimedGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | GameMoveCommand<ScavengerHuntMove> | StartGameCommand | LeaveGameCommand | RequestHintCommand;
 export interface ViewingAreaUpdateCommand  {
   type: 'ViewingAreaUpdate';
   update: ViewingArea;

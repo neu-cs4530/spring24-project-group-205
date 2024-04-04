@@ -143,7 +143,6 @@ export default class ScavengerHuntAreaController extends GameAreaController<
     if (!instanceID || this._model.game?.state.status !== 'IN_PROGRESS') {
       throw new Error(NO_GAME_IN_PROGRESS_ERROR);
     }
-
     const move: ScavengerHuntMove = {
       gamePiece: name,
       col: 0,
