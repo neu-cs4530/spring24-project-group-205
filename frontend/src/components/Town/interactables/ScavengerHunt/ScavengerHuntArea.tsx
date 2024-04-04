@@ -131,9 +131,15 @@ export default function ScavengerHuntArea({
             <Box boxSize='20px'> </Box>
             <Text fontSize='lg'>
               Welcome to Scavenge, a scavanger hunt game in covey.town! During this game you will
-              walk around the town picking up items. ... explain what a scavnegr hunt is. Describe
-              tabs, modes, themes, how only first player to join can select the mode and theme, and
-              how to start and join the game.
+              walk be able to explore the town by competing against players to see who can pick up
+              the most items. There are two different game modes to choose from: Timed and Relaxed.
+              In the timed mode, you have four minutes to pick up as many items as you can. In the
+              relaxed mode, you can take your time and pick up as many items as you can before
+              someone ends the game. You can also choose from different themes, such as food,
+              animals. Only the first player to join the game can choose the game mode and theme. If
+              you are the first player, please select a game mode and theme and then join the game.
+              As many as 10 players can join the game, but you can also play by yourself. Once all
+              players have joined the game, the first player can start the game. Good luck!
             </Text>
           </TabPanel>
           <TabPanel>
