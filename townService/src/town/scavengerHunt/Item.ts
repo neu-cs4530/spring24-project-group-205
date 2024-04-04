@@ -1,7 +1,7 @@
 import { ScavengerHuntItem, XY } from '../../types/CoveyTownSocket';
 
 export default class Item implements ScavengerHuntItem {
-  id: string;
+  id: number;
 
   name: string;
 
@@ -11,14 +11,14 @@ export default class Item implements ScavengerHuntItem {
 
   hint: string;
 
-  constructor(id: string, name: string, location: XY, hint: string) {
+  constructor(id: number, name: string, location: XY, hint: string) {
     this.id = id;
     this.name = name;
     this.location = location;
     this.hint = hint;
   }
 
-  public setID(id: string): void {
+  public setID(id: number): void {
     this.id = id;
   }
 

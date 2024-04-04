@@ -96,8 +96,8 @@ export function setRandomLocationAndHint(item: ScavengerHuntItem): XY {
   const minY = Math.min(box.topLeft[1], box.topRight[1]);
   const maxY = Math.max(box.bottomLeft[1], box.bottomRight[1]);
 
-  const randomX = Math.random() * (maxX - minX) + minX;
-  const randomY = Math.random() * (maxY - minY) + minY;
+  const randomX = Math.round(Math.random() * (maxX - minX) + minX);
+  const randomY = Math.round(Math.random() * (maxY - minY) + minY);
 
   item.hint = box.hint;
   item.location = { x: randomX, y: randomY };
