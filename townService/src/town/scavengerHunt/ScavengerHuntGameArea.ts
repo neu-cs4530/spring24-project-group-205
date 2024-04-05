@@ -65,18 +65,17 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
     if (command.type === 'JoinTimedGame') {
       let game = this._game;
       const selectedThemepack = this.getThemepack() || new Themepack(command.themepack); // Declare themepack variable
-      if (!game || game.state.status === 'OVER') {
-        // selectedThemepack = new Themepack(command.themepack); // Assign themepack if not already present
-        if (!selectedThemepack) {
-          throw new InvalidParametersError('No themepack selected for the game');
-        }
+      // selectedThemepack = new Themepack(command.themepack); // Assign themepack if not already present
+      if (!selectedThemepack) {
+        throw new InvalidParametersError('No themepack selected for the game');
+      }
+      if (!game) {
         game = new ScavengerHuntTimed(selectedThemepack);
         this._game = game;
         game.setThemePack(selectedThemepack);
-        game.join(player); // Pass themepack to join method
       }
+      game.join(player); // Pass themepack to join method
       this._stateUpdated(game.toModel());
-      console.log('join in scavenger hunt game area');
       return { gameID: game.id } as InteractableCommandReturnType<CommandType>;
     }
     if (command.type === 'JoinRelaxedGame') {

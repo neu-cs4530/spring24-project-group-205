@@ -23,6 +23,8 @@ import React, { useEffect, useState } from 'react';
 import ScavengerHuntAreaController from '../../../../classes/interactable/ScavengerHuntAreaController';
 import { useInteractableAreaController } from '../../../../classes/TownController';
 import { InteractableID } from '../../../../types/CoveyTownSocket';
+import { forEach } from 'lodash';
+import TownGameScene from '../../TownGameScene';
 
 /**
  * The ScavengerHuntArea component renders the Scavenger Hunt game area.
@@ -56,6 +58,20 @@ export default function ScavengerHuntArea({
   const [themepack, setThemepack] = useState('');
   const [mode, setMode] = useState('');
 
+  useEffect(() => {
+    const selectedGameMode = gameAreaController.gamemode;
+    if (selectedGameMode) {
+      setMode(selectedGameMode);
+    }
+  }, [gameAreaController.gamemode]);
+
+  useEffect(() => {
+    const selectedThemepack = gameAreaController.themepack;
+    if (selectedThemepack) {
+      setThemepack(selectedThemepack.name);
+    }
+  }, [gameAreaController.themepack]);
+
   const handleClick = (newThemepack: string) => {
     setThemepack(newThemepack);
   };
@@ -68,7 +84,12 @@ export default function ScavengerHuntArea({
   const [startingGame, setStartingGame] = useState(false);
   const [joinedPlayers, setJoinedPlayers] = useState<string[]>([]);
 
-  let modeSet = false;
+  useEffect(() => {
+    const playersJoined = gameAreaController.players.map(player => player.userName);
+    if (playersJoined) {
+      setJoinedPlayers(playersJoined);
+    }
+  }, [gameAreaController.players]);
 
   useEffect(() => {
     // Add event listeners or any other necessary setup here
@@ -90,7 +111,6 @@ export default function ScavengerHuntArea({
       } else {
         throw new Error('Please select a game mode before joining the game.');
       }
-      modeSet = true;
       console.log('mode set');
     } catch (err) {
       toast({
@@ -106,6 +126,7 @@ export default function ScavengerHuntArea({
     setStartingGame(true);
     try {
       await gameAreaController.startGame();
+      await gameAreaController._renderInitialItems();
     } catch (err) {
       toast({
         title: 'Error starting game',
@@ -164,7 +185,7 @@ export default function ScavengerHuntArea({
             </Text>
           </TabPanel>
           <TabPanel>
-            {modeSet ? (
+            {joinedPlayers.length > 0 ? (
               <Text>
                 Another player has already picked the game mode and theme. Please proceed to the
                 next tab to join the game!

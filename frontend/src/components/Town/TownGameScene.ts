@@ -497,12 +497,12 @@ export default class TownGameScene extends Phaser.Scene {
     xyList.push({ x: 58, y: 25 });
     xyList.push({ x: 77, y: 26 });
     xyList.push({ x: 44, y: 27 });
-    // for (const xy of xyList) {
-    //   const item = new ScavengerHuntItemOnMap(this);
-    //   item.setX(xy.x);
-    //   item.setY(xy.y);
-    //   item.addItemOnScene();
-    // }
+    for (const xy of xyList) {
+      const item = new ScavengerHuntItemOnMap(this);
+      item.setX(xy.x);
+      item.setY(xy.y);
+      item.addItemOnScene();
+    }
 
     this.moveOurPlayerTo({ rotation: 'front', moving: false, x: spawnPoint.x, y: spawnPoint.y });
 
