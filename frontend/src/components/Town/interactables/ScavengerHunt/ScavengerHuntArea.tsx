@@ -1,9 +1,28 @@
-import { Button, Flex, Heading, useToast } from '@chakra-ui/react';
+import {
+  Alert,
+  AlertIcon,
+  Text,
+  Image,
+  Button,
+  VStack,
+  Center,
+  HStack,
+  Heading,
+  ChakraProvider,
+  TabPanel,
+  TabPanels,
+  Tabs,
+  TabList,
+  Tab,
+  TableContainer,
+  Table,
+  Box,
+  useToast,
+} from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 import ScavengerHuntAreaController from '../../../../classes/interactable/ScavengerHuntAreaController';
 import { useInteractableAreaController } from '../../../../classes/TownController';
-import useTownController from '../../../../hooks/useTownController';
-import { GameMode, InteractableID } from '../../../../types/CoveyTownSocket';
+import { InteractableID } from '../../../../types/CoveyTownSocket';
 
 /**
  * The ScavengerHuntArea component renders the Scavenger Hunt game area.
@@ -27,25 +46,29 @@ import { GameMode, InteractableID } from '../../../../types/CoveyTownSocket';
  */
 export default function ScavengerHuntArea({
   interactableID,
-  mode,
 }: {
   interactableID: InteractableID;
-  mode: GameMode;
 }): JSX.Element {
   const gameAreaController =
     useInteractableAreaController<ScavengerHuntAreaController>(interactableID);
-  const townController = useTownController();
   const toast = useToast();
+
+  const [themepack, setThemepack] = useState('');
+  const [mode, setMode] = useState('');
+
+  const handleClick = (newThemepack: string) => {
+    setThemepack(newThemepack);
+  };
+
+  const handleClickMode = (newMode: string) => {
+    setMode(newMode);
+  };
 
   const [joiningGame, setJoiningGame] = useState(false);
   const [startingGame, setStartingGame] = useState(false);
   const [joinedPlayers, setJoinedPlayers] = useState<string[]>([]);
 
-  const [selectedOptionTheme, setSelectedOptionTheme] = useState('');
-
-  const handleOptionChangeTheme = (event: { target: { value: React.SetStateAction<string> } }) => {
-    setSelectedOptionTheme(event.target.value);
-  };
+  let modeSet = false;
 
   useEffect(() => {
     // Add event listeners or any other necessary setup here
@@ -57,13 +80,18 @@ export default function ScavengerHuntArea({
   const handleJoinGame = async () => {
     setJoiningGame(true);
     try {
-      if (mode === 'timed') {
-        await gameAreaController.joinTimedGame(selectedOptionTheme);
-      } else if (mode === 'relaxed') {
-        await gameAreaController.joinRelaxedGame(selectedOptionTheme);
-      } else {
-        throw new Error('Invalid game mode');
+      if (mode === '' || themepack === '') {
+        throw new Error('Please select a game mode and theme before joining the game.');
       }
+      if (mode === 'timed') {
+        await gameAreaController.joinTimedGame(themepack);
+      } else if (mode === 'relaxed') {
+        await gameAreaController.joinRelaxedGame(themepack);
+      } else {
+        throw new Error('Please select a game mode before joining the game.');
+      }
+      modeSet = true;
+      console.log('mode set');
     } catch (err) {
       toast({
         title: 'Error joining game',
@@ -110,147 +138,196 @@ export default function ScavengerHuntArea({
   ];
 
   return (
-    <>
-      <Flex>
-        <Heading as='h1' style={{ marginRight: '10px', fontSize: '25px', marginBottom: '10px' }}>
-          Game Mode: {mode === 'timed' ? 'Timed' : 'Relaxed'}
-        </Heading>
-      </Flex>
-      <Heading as='h1' style={{ marginRight: '10px', fontSize: '25px' }}>
-        Leaderboard:
-      </Heading>
-      <table style={{ borderCollapse: 'collapse', width: '100%', marginBottom: '10px' }}>
-        <thead>
-          <tr>
-            <th style={{ width: '33%' }}>Rank</th>
-            <th style={{ width: '33%' }}>Username</th>
-            <th style={{ width: '33%' }}>Objects Collected</th>
-          </tr>
-        </thead>
-        <tbody>
-          {leaderboardData.map((player, index) => (
-            <tr key={index} style={{ borderBottom: '1px solid #ddd' }}>
-              <td style={{ textAlign: 'center' }}>{index + 1}</td>
-              <td style={{ textAlign: 'center' }}>{player.username}</td>
-              <td style={{ textAlign: 'center' }}>{player.count}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <Flex>
-        <Heading as='h1' style={{ marginRight: '10px', fontSize: '25px', marginBottom: '10px' }}>
-          Theme:
-        </Heading>
-        {mode === 'timed' ? (
-          <div className='radio-group'>
-            <label style={{ marginRight: '10px', fontSize: '20px' }}>
-              <input
-                type='radio'
-                name='theme'
-                value='food'
-                checked={selectedOptionTheme === 'food'}
-                onChange={handleOptionChangeTheme}
-              />{' '}
-              Food
-            </label>
-            <label style={{ marginRight: '10px', fontSize: '20px' }}>
-              <input
-                type='radio'
-                name='theme'
-                value='emojis'
-                checked={selectedOptionTheme === 'emojis'}
-                onChange={handleOptionChangeTheme}
-              />{' '}
-              Emojis
-            </label>
-            <label style={{ marginRight: '10px', fontSize: '20px' }}>
-              <input
-                type='radio'
-                name='theme'
-                value='animals'
-                checked={selectedOptionTheme === 'animals'}
-                onChange={handleOptionChangeTheme}
-              />{' '}
-              Animals
-            </label>
-          </div>
-        ) : (
-          <div className='radio-group'>
-            <label style={{ marginRight: '10px', fontSize: '20px' }}>
-              <input
-                type='radio'
-                name='theme'
-                value='sushi'
-                checked={selectedOptionTheme === 'sushi'}
-                onChange={handleOptionChangeTheme}
-              />{' '}
-              Sushi
-            </label>
-            <label style={{ marginRight: '10px', fontSize: '20px' }}>
-              <input
-                type='radio'
-                name='theme'
-                value='vegetables'
-                checked={selectedOptionTheme === 'vegetables'}
-                onChange={handleOptionChangeTheme}
-              />{' '}
-              Vegetables
-            </label>
-            <label style={{ marginRight: '10px', fontSize: '20px' }}>
-              <input
-                type='radio'
-                name='theme'
-                value='fish'
-                checked={selectedOptionTheme === 'fish'}
-                onChange={handleOptionChangeTheme}
-              />{' '}
-              Fish
-            </label>
-          </div>
-        )}
-      </Flex>
-      <Flex alignItems='center'>
-        <Heading as='h1' style={{ marginRight: '10px', fontSize: '25px' }}>
-          Hints:
-        </Heading>
-        <Button>Request Hint</Button>
-      </Flex>
-      <>
-        Your hints will be here. Please begin the game and request a hint if you would like one. All
-        players will be able to see your requested hint and will be notified of the hint.{' '}
-      </>
-      <Flex>
-        <Button
-          style={{ marginRight: '10px', marginTop: '10px' }}
-          onClick={handleJoinGame}
-          isLoading={joiningGame}
-          disabled={joiningGame}>
-          {joiningGame ? 'Joining Game...' : 'Join Game'}{' '}
-        </Button>
-      </Flex>
-      <Flex>
-        <Heading as='h1' style={{ marginRight: '10px', fontSize: '25px' }}>
-          Current Players:
-        </Heading>
-        {joinedPlayers.length > 0 ? (
-          <ul>
-            {joinedPlayers.map(player => (
-              <li key={player}>{player}</li>
-            ))}
-          </ul>
-        ) : (
-          <span>Currently no players have joined the game.</span>
-        )}
-      </Flex>
-
-      <Flex>
-        <Button style={{ marginTop: '10px' }} onClick={handleStartGame} disabled={startingGame}>
-          {startingGame ? 'Starting Game...' : 'Start Game'}
-        </Button>
-        <Button style={{ marginTop: '10px' }} onClick={handleEndGame}>
-          End Game
-        </Button>
-      </Flex>
-    </>
+    <ChakraProvider>
+      <Tabs variant='soft-rounded' colorScheme='orange'>
+        <TabList>
+          <Tab>Details</Tab>
+          <Tab>Mode & Theme</Tab>
+          <Tab>Game</Tab>
+          <Tab>Leaderboards</Tab>
+        </TabList>
+        <TabPanels>
+          <TabPanel>
+            <Image src='/logo.png' alt='Scavenge logo' />
+            <Box boxSize='20px'> </Box>
+            <Text fontSize='lg'>
+              Welcome to Scavenge, a scavanger hunt game in covey.town! During this game you will
+              walk be able to explore the town by competing against players to see who can pick up
+              the most items. There are two different game modes to choose from: Timed and Relaxed.
+              In the timed mode, you have four minutes to pick up as many items as you can. In the
+              relaxed mode, you can take your time and pick up as many items as you can before
+              someone ends the game. You can also choose from different themes, such as food,
+              animals. Only the first player to join the game can choose the game mode and theme. If
+              you are the first player, please select a game mode and theme and then join the game.
+              As many as 10 players can join the game, but you can also play by yourself. Once all
+              players have joined the game, the first player can start the game. Good luck!
+            </Text>
+          </TabPanel>
+          <TabPanel>
+            {modeSet ? (
+              <Text>
+                Another player has already picked the game mode and theme. Please proceed to the
+                next tab to join the game!
+              </Text>
+            ) : (
+              <>
+                <Center>
+                  <VStack>
+                    <Heading as='h2' size='lg'>
+                      Game Mode: {mode}
+                    </Heading>
+                    <HStack>
+                      <VStack>
+                        <Image src='/timed.png' alt='timed' boxSize='100px' />
+                        <Button onClick={() => handleClickMode('timed')}>Timed</Button>
+                      </VStack>
+                      <VStack>
+                        <Image src='/relaxed.png' alt='relaxed' boxSize='100px' />
+                        <Button onClick={() => handleClickMode('relaxed')}>Relaxed</Button>
+                      </VStack>
+                    </HStack>
+                  </VStack>
+                </Center>
+                <Box boxSize='20px'> </Box>
+                <Center>
+                  <VStack>
+                    <Heading as='h2' size='lg'>
+                      Theme: {themepack}
+                    </Heading>
+                    <HStack>
+                      <VStack>
+                        <Image src='/food.png' alt='food' boxSize='100px' />
+                        <Button onClick={() => handleClick('food')}>Food</Button>
+                      </VStack>
+                      <VStack>
+                        <Image src='/emojis.png' alt='emoji' boxSize='100px' />
+                        <Button onClick={() => handleClick('emojis')}>Emojis</Button>
+                      </VStack>
+                      <VStack>
+                        <Image src='/egg.png' alt='egg' boxSize='100px' />
+                        <Button onClick={() => handleClick('egg')}>Egg</Button>
+                      </VStack>
+                    </HStack>
+                  </VStack>
+                </Center>
+              </>
+            )}
+          </TabPanel>
+          <TabPanel>
+            <Center>
+              <HStack>
+                <VStack>
+                  {mode ? (
+                    <Image src={`/${mode}.png`} alt='mode image' boxSize='100px' />
+                  ) : (
+                    <Image src={'/blank.png'} alt='Scavenger Hunt' boxSize='100px' />
+                  )}
+                  <Heading as='h3' size='md'>
+                    {mode} Game
+                  </Heading>
+                </VStack>
+                <Box boxSize='20px'> </Box>
+                <VStack>
+                  {themepack ? (
+                    <Image src={`/${themepack}.png`} alt='theme image' boxSize='100px' />
+                  ) : (
+                    <Image src={'/blank.png'} alt='Blank' boxSize='100px' />
+                  )}
+                  <Heading as='h3' size='md'>
+                    {themepack} Theme
+                  </Heading>
+                </VStack>
+              </HStack>
+            </Center>
+            <Box boxSize='20px'> </Box>
+            <HStack>
+              <Button onClick={handleJoinGame} isLoading={joiningGame} disabled={joiningGame}>
+                {joiningGame ? 'Joining Game...' : 'Join Game'}{' '}
+              </Button>
+              <Button onClick={handleStartGame} disabled={startingGame}>
+                {startingGame ? 'Starting Game...' : 'Start Game'}
+              </Button>
+              <Button>Leave Game</Button>
+              <Button onClick={handleEndGame}>End Game</Button>
+              <Button>Request Hint</Button>
+            </HStack>
+            <Box boxSize='20px'> </Box>
+            <VStack>
+              <Heading as='h1' style={{ marginRight: '10px', fontSize: '25px' }}>
+                Current Players:
+              </Heading>
+              {joinedPlayers.length > 0 ? (
+                <ul>
+                  {joinedPlayers.map(player => (
+                    <li key={player}>{player}</li>
+                  ))}
+                </ul>
+              ) : (
+                <span>Currently no players have joined the game.</span>
+              )}
+            </VStack>
+            <Box boxSize='20px'> </Box>
+            <Alert status='info'>
+              <AlertIcon />
+              This is a hint. This box should only appear when a hint is requested.
+            </Alert>
+          </TabPanel>
+          <TabPanel>
+            <Tabs isFitted variant='enclosed'>
+              <TabList mb='1em'>
+                <Tab>Timed Leaderboard</Tab>
+                <Tab>Relaxed Leaderboard</Tab>
+              </TabList>
+              <TabPanels>
+                <TabPanel>
+                  <TableContainer>
+                    <Table variant='simple'>
+                      <thead>
+                        <tr>
+                          <th style={{ width: '33%' }}>Rank</th>
+                          <th style={{ width: '33%' }}>Username</th>
+                          <th style={{ width: '33%' }}>Objects Collected</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {leaderboardData.map((player, index) => (
+                          <tr key={index} style={{ borderBottom: '1px solid #ddd' }}>
+                            <td style={{ textAlign: 'center' }}>{index + 1}</td>
+                            <td style={{ textAlign: 'center' }}>{player.username}</td>
+                            <td style={{ textAlign: 'center' }}>{player.count}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </Table>
+                  </TableContainer>
+                </TabPanel>
+                <TabPanel>
+                  <TableContainer>
+                    <Table variant='simple'>
+                      <thead>
+                        <tr>
+                          <th style={{ width: '33%' }}>Rank</th>
+                          <th style={{ width: '33%' }}>Username</th>
+                          <th style={{ width: '33%' }}>Objects Collected</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {leaderboardData.map((player, index) => (
+                          <tr key={index} style={{ borderBottom: '1px solid #ddd' }}>
+                            <td style={{ textAlign: 'center' }}>{index + 1}</td>
+                            <td style={{ textAlign: 'center' }}>{player.username}</td>
+                            <td style={{ textAlign: 'center' }}>{player.count}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </Table>
+                  </TableContainer>
+                </TabPanel>
+              </TabPanels>
+            </Tabs>
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
+    </ChakraProvider>
   );
 }

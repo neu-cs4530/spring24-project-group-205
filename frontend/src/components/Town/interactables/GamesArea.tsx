@@ -21,7 +21,7 @@ import { GenericGameAreaController } from '../../../classes/interactable/GameAre
 import PlayerController from '../../../classes/PlayerController';
 import { useInteractable, useInteractableAreaController } from '../../../classes/TownController';
 import useTownController from '../../../hooks/useTownController';
-import { GameMode, GameResult, InteractableID } from '../../../types/CoveyTownSocket';
+import { GameResult, InteractableID } from '../../../types/CoveyTownSocket';
 import ChatChannel from './ChatChannel';
 import ConnectFourArea from './ConnectFour/ConnectFourArea';
 import GameAreaInteractable from './GameArea';
@@ -46,13 +46,7 @@ export const INVALID_GAME_AREA_TYPE_MESSAGE = 'Invalid game area type';
  *
  * It renders the ScavengerHuntArea component if the game area is a ScavengerHuntArea.
  */
-function GameArea({
-  interactableID,
-  mode,
-}: {
-  interactableID: InteractableID;
-  mode: GameMode;
-}): JSX.Element {
+function GameArea({ interactableID }: { interactableID: InteractableID }): JSX.Element {
   const gameAreaController =
     useInteractableAreaController<GenericGameAreaController>(interactableID);
   const townController = useTownController();
@@ -71,7 +65,7 @@ function GameArea({
   return (
     <>
       {gameAreaController.toInteractableAreaModel().type === 'ScavengerHuntArea' ? (
-        <ScavengerHuntArea interactableID={interactableID} mode={mode} />
+        <ScavengerHuntArea interactableID={interactableID} />
       ) : (
         <>
           <Accordion allowToggle>
@@ -149,7 +143,9 @@ export default function GameAreaWrapper(): JSX.Element {
     if (gameArea) {
       townController.interactEnd(gameArea);
       const controller = townController.getGameAreaController(gameArea);
-      controller.leaveGame();
+      if (controller.toInteractableAreaModel().type !== 'ScavengerHuntArea') {
+        controller.leaveGame();
+      }
     }
   }, [townController, gameArea]);
   if (gameArea) {
@@ -160,7 +156,7 @@ export default function GameAreaWrapper(): JSX.Element {
           <ModalHeader>{gameArea.name}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <GameArea interactableID={gameArea.id} mode={gameArea.mode} />
+            <GameArea interactableID={gameArea.id} />
           </ModalBody>
         </ModalContent>
       </Modal>
