@@ -282,8 +282,8 @@ export default function ScavengerHuntArea({
             <Alert status='info'>
               <AlertIcon />
               {gameAreaController.requestedHint ? (
-          <span>{gameAreaController.requestedHint}</span>
-        ) : (
+                <span>{gameAreaController.requestedHint}</span>
+              ) : null}
             </Alert>
           </TabPanel>
           <TabPanel>
