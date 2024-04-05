@@ -283,7 +283,9 @@ export default function ScavengerHuntArea({
               <AlertIcon />
               {gameAreaController.requestedHint ? (
                 <span>{gameAreaController.requestedHint}</span>
-              ) : null}
+              ) : (
+                'This is a hint. This box should only appear when a hint is requested.'
+              )}
             </Alert>
           </TabPanel>
           <TabPanel>
