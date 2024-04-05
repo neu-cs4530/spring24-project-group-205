@@ -27,7 +27,7 @@ function interactableTypeForObjectType(type: string): any {
   }
 }
 
-const TIME_ALLOWED = 10;
+const TIME_ALLOWED = 120;
 
 // Original inspiration and code from:
 // https://medium.com/@michaelwesthadley/modular-game-worlds-in-phaser-3-tilemaps-1-958fc7e6bbd6
@@ -76,6 +76,8 @@ export default class TownGameScene extends Phaser.Scene {
   private _itemsFoundText: Phaser.GameObjects.Text | undefined;
 
   private _itemCount = 0;
+
+  private _totalItemCount = 0;
 
   /**
    * Layers that the player can collide with.
@@ -323,9 +325,8 @@ export default class TownGameScene extends Phaser.Scene {
         && this._isPointerOnItem(mouse.x, mouse.y)) {
         itemsLayer?.tilemapLayer.removeTileAtWorldXY(mouse.x, mouse.y);
         this._itemCount++;
+        this._itemsFoundText?.setText(`Items Found: ` + this._itemCount.toString() + ' / ' + this._totalItemCount.toString());
       }
-
-      this._itemsFoundText?.setText('Items Found: ' + this._itemCount.toString() + ' / 5');
     }
   }
 
@@ -588,45 +589,7 @@ export default class TownGameScene extends Phaser.Scene {
       .setScrollFactor(0)
       .setDepth(30);
 
-    this._countDownText = this.add
-      .text(575, 16, `Time: `, {
-        font: '15px monospace',
-        color: '#000000',
-        padding: {
-          x: 20,
-          y: 10,
-        },
-        backgroundColor: '#ffffff',
-      })
-      .setScrollFactor(0)
-      .setDepth(30);
 
-    this._itemsFoundText = this.add
-      .text(575, 72, `Items Found: ` + this._itemCount.toString(), {
-        font: '15px monospace',
-        color: '#000000',
-        padding: {
-          x: 20,
-          y: 10,
-        },
-        backgroundColor: '#ffffff',
-      })
-      .setScrollFactor(0)
-      .setDepth(30);
-
-    this._timedEvent = this.time.addEvent({
-      delay: 1000, // the amount of time in between ticks
-      repeat: TIME_ALLOWED, // how many ticks should complete
-      callback: () => {
-        const timeLeft = this._timedEvent?.repeatCount;
-        if (timeLeft) {
-          this._countDownText?.setText('Time: ' + this._formatTime(timeLeft));
-        }
-        if (this._timedEvent?.repeatCount === 0) {
-          this.timerEnded();
-        }
-      },
-    });
 
     this._ready = true;
     this.updatePlayers(this.coveyTownController.players);
@@ -704,6 +667,54 @@ export default class TownGameScene extends Phaser.Scene {
       }
       this._previouslyCapturedKeys = [];
     }
+  }
+
+  startTimer() {
+    this._countDownText = this.add
+      .text(575, 16, `Time Left:`, {
+        font: '15px monospace',
+        color: '#000000',
+        padding: {
+          x: 20,
+          y: 10,
+        },
+        backgroundColor: '#ffffff',
+      })
+      .setScrollFactor(0)
+      .setDepth(30);
+
+    this._timedEvent = this.time.addEvent({
+      delay: 1000, // the amount of time in between ticks
+      repeat: TIME_ALLOWED, // how many ticks should complete
+      callback: () => {
+        const timeLeft = this._timedEvent?.repeatCount;
+        if (timeLeft) {
+          this._countDownText?.setText('Time Left: ' + this._formatTime(timeLeft));
+        }
+        if (this._timedEvent?.repeatCount === 0) {
+          this.timerEnded();
+        }
+      },
+    });
+  }
+
+  showItemText() {
+    this._itemsFoundText = this.add
+    .text(575, 72, `Items Found: ` + this._itemCount.toString() + ' / ' + this._totalItemCount.toString(), {
+      font: '15px monospace',
+      color: '#000000',
+      padding: {
+        x: 20,
+        y: 10,
+      },
+      backgroundColor: '#ffffff',
+    })
+    .setScrollFactor(0)
+    .setDepth(30);
+  }
+
+  setTotalItemCount(count: number) {
+    this._totalItemCount = count;
   }
 
 }

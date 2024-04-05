@@ -104,6 +104,10 @@ export default class ScavengerHuntAreaController extends GameAreaController<
     });
     console.log(this.items);
     this._renderInitialItems();
+    this._townController.globalScene.startTimer();
+    this._townController.globalScene.setTotalItemCount(this.items.length);
+    this._townController.globalScene.showItemText();
+
   }
 
   private _renderInitialItems(): void {
