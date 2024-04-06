@@ -145,6 +145,7 @@ export default class TownGameScene extends Phaser.Scene {
       this._resourcePathPrefix + '/assets/tilesets/16_Grocery_store_32x32.png',
     );
     this.load.image('Food_16x16', this._resourcePathPrefix + '/assets/tilesets/Food_16x16.png');
+    this.load.image('Eggs_16x16', this._resourcePathPrefix + '/assets/tilesets/Eggs_16x16.png');
     this.load.image(
       '16x16_emoji_asset_pack_v1.1',
       this._resourcePathPrefix + '/assets/tilesets/16x16_emoji_asset_pack_v1.1.png',
@@ -382,6 +383,7 @@ export default class TownGameScene extends Phaser.Scene {
       '16_Grocery_store_32x32',
       'Food_16x16',
       '16x16_emoji_asset_pack_v1.1',
+      'Eggs_16x16',
     ].map(v => {
       const ret = this.map.addTilesetImage(v);
       assert(ret);
@@ -495,12 +497,12 @@ export default class TownGameScene extends Phaser.Scene {
     xyList.push({ x: 58, y: 25 });
     xyList.push({ x: 77, y: 26 });
     xyList.push({ x: 44, y: 27 });
-    // for (const xy of xyList) {
-    //   const item = new ScavengerHuntItemOnMap(this);
-    //   item.setX(xy.x);
-    //   item.setY(xy.y);
-    //   item.addItemOnScene();
-    // }
+    for (const xy of xyList) {
+      const item = new ScavengerHuntItemOnMap(this);
+      item.setX(xy.x);
+      item.setY(xy.y);
+      item.addItemOnScene();
+    }
 
     this.moveOurPlayerTo({ rotation: 'front', moving: false, x: spawnPoint.x, y: spawnPoint.y });
 

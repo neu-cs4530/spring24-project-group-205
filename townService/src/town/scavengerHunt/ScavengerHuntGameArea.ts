@@ -64,19 +64,17 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
   ): InteractableCommandReturnType<CommandType> {
     if (command.type === 'JoinTimedGame') {
       let game = this._game;
-      let selectedThemepack: Themepack | undefined; // Declare themepack variable
-      if (!game || game.state.status === 'OVER') {
-        selectedThemepack = new Themepack(command.themepack); // Assign themepack if not already present
-        if (!selectedThemepack) {
-          throw new InvalidParametersError('No themepack selected for the game');
-        }
+      const selectedThemepack = this.getThemepack() || new Themepack(command.themepack); // Declare themepack variable
+      // selectedThemepack = new Themepack(command.themepack); // Assign themepack if not already present
+      if (!selectedThemepack) {
+        throw new InvalidParametersError('No themepack selected for the game');
+      }
+      if (!game) {
         game = new ScavengerHuntTimed(selectedThemepack);
         this._game = game;
-        if (!this.getThemepack()) {
-          game.setThemePack(selectedThemepack);
-        }
-        game.join(player); // Pass themepack to join method
+        game.setThemePack(selectedThemepack);
       }
+      game.join(player); // Pass themepack to join method
       this._stateUpdated(game.toModel());
       return { gameID: game.id } as InteractableCommandReturnType<CommandType>;
     }
@@ -160,6 +158,7 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
    * @throws an error if the game is not in progress
    */
   private _incrementTimer(): void {
+    console.log('incrementing timer');
     const game = this._game;
 
     if (!game) {
@@ -176,12 +175,18 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
    * @throws an error if there is no game in progress
    */
   private _startTimer() {
+    console.log('starting timer');
     const intervalId = setInterval(() => {
+      console.log('this.game: ', this.game);
+      console.log('this.game.state.status: ', this.game?.state.status);
+      console.log('this.game.state.timeLeft: ', this.game?.state.timeLeft);
       if (this.game && this.game.state.status === 'IN_PROGRESS' && this.game.state.timeLeft > 0) {
+        console.log('incrementing timer INNER');
         this._incrementTimer();
       } else if (!this.game) {
         throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
       } else {
+        console.log('clearing interval');
         clearInterval(intervalId);
       }
     }, 1000);

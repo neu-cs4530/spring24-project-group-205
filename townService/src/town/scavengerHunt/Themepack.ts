@@ -31,6 +31,10 @@ export default class Themepack implements ScavengerHuntThemepack {
       this._lowerBound = 15117;
       this._upperBound = 15117 + 63;
     }
+    if (name === 'egg') {
+      this._lowerBound = 15181;
+      this._upperBound = 15181 + 49;
+    }
   }
 
   /**

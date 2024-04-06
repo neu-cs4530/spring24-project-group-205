@@ -149,6 +149,8 @@ export interface ScavengerHuntGameState extends WinnableGameState {
   timeLeft: number;
   items: ReadonlyArray<ScavengerHuntItem>;
   moves: ReadonlyArray<ScavengerHuntMove>;
+  gameMode?: GameMode;
+  themepack?: Themepack;
 }
 
 /**
