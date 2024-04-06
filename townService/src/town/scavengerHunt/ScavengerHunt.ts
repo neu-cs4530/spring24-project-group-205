@@ -26,10 +26,10 @@ export default abstract class ScavengerHunt extends Game<
 > {
   // INFORMATION THAT IS SPECIFIC TO THE PLAYER:
   // The game mode the player is currently in
-  protected _gameMode?: GameMode;
+  // protected _gameMode?: GameMode;
 
   // The themepack the player is currently using; the default is the "nature" themepack
-  protected _themepack?: Themepack;
+  // protected _themepack?: Themepack;
 
   // the time it took for the player to complete the scavenger hunt -- this is only applicable if the game mode is competitive
   private _timeInSeconds = 0;
@@ -48,14 +48,13 @@ export default abstract class ScavengerHunt extends Game<
       timeLeft: TIME_ALLOWED,
       items: [],
       status: 'WAITING_TO_START',
+      themepack: themePack,
     });
-
-    this._themepack = themePack;
   }
 
   // Method to start the game
   public startGame(player: Player): void {
-    if (!this._themepack) {
+    if (!this.state.themepack) {
       throw new InvalidParametersError('No themepack selected for the game');
     }
 
@@ -67,7 +66,7 @@ export default abstract class ScavengerHunt extends Game<
       throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
     }
 
-    const items = this._themepack.createItems(this._players.length * 10);
+    const items = this.state.themepack.createItems(this._players.length * 20);
     this._gameStartTime = Date.now();
 
     this._timerIntervalId = setInterval(() => {
@@ -85,11 +84,8 @@ export default abstract class ScavengerHunt extends Game<
 
     this._assignRandomLocations();
     console.log('Starting game');
-    // console.log('State:', this.state);
-    // console.log(
-    //   'Item locations: ',
-    //   this.state.items.map(item => item.location),
-    // );
+    console.log('Players count:', this._players.length);
+    console.log('[DEBUG] Items: ', this.state.items);
   }
 
   private _assignRandomLocations(): void {
@@ -133,19 +129,20 @@ export default abstract class ScavengerHunt extends Game<
   }
 
   public get gameMode(): GameMode | undefined {
-    return this._gameMode;
+    return this.state.gameMode;
   }
 
   public getThemePack(): Themepack | undefined {
-    return this._themepack;
+    return this.state.themepack;
   }
 
   public setThemePack(themepack: Themepack): void {
-    this._themepack = themepack;
+    this.state.themepack = themepack;
   }
 
   // lets up to ten people join, and can be started as soon as the first person joins
   protected _join(player: Player): void {
+    console.log('Joining game in scavenger hunt');
     if (this._players.some(p => p.id === player.id)) {
       throw new InvalidParametersError(PLAYER_ALREADY_IN_GAME_MESSAGE);
     } else if (this._players.length < MAX_PLAYERS) {

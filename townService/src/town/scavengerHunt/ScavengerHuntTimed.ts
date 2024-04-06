@@ -14,7 +14,7 @@ const TIME_ALLOWED = 120;
 export default class ScavengerHuntTimed extends ScavengerHunt {
   public constructor(themePack?: Themepack) {
     super(themePack);
-    this._gameMode = 'timed';
+    this.state.gameMode = 'timed';
   }
 
   /**
@@ -79,8 +79,8 @@ export default class ScavengerHuntTimed extends ScavengerHunt {
   protected _addDatabaseEntries() {
     const database = new GameDatabase();
     database.addGameDetails(
-      this._gameMode,
-      this._themepack?.name,
+      this.state.gameMode,
+      this.state.themepack.name,
       this._gameStartTime,
       this._players.length,
     );

@@ -12,7 +12,7 @@ import GameDatabase from './GameDatabase';
 export default class ScavengerHuntRelaxed extends ScavengerHunt {
   public constructor(themePack?: Themepack) {
     super(themePack);
-    this._gameMode = 'relaxed';
+    this.state.gameMode = 'relaxed';
   }
 
   public iterateClock(): void {
@@ -62,8 +62,8 @@ export default class ScavengerHuntRelaxed extends ScavengerHunt {
   protected _addDatabaseEntries() {
     const database = new GameDatabase();
     database.addGameDetails(
-      this._gameMode,
-      this._themepack?.name,
+      this.state.gameMode,
+      this.state.themepack.name,
       this._gameStartTime,
       this._players.length,
     );
