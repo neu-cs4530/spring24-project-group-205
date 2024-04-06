@@ -73,9 +73,9 @@ export default class TownGameScene extends Phaser.Scene {
   private _timedEvent: Phaser.Time.TimerEvent | undefined;
 
   // item found count components:
-  private _itemsFoundText: Phaser.GameObjects.Text | undefined;
+  public _itemsFoundText: Phaser.GameObjects.Text | undefined;
 
-  private _itemCount = 0;
+  public _itemsFound = 0;
 
   /**
    * Layers that the player can collide with.
@@ -335,10 +335,10 @@ export default class TownGameScene extends Phaser.Scene {
     }
   }
 
-  public removeTileOnMap(xTile: number, yTile: number): void {
-    const itemsLayer = this.map.getLayer('Items');
-    itemsLayer?.tilemapLayer.removeTileAt(xTile, yTile);
-  }
+  // public removeTileOnMap(xTile: number, yTile: number): void {
+  //   const itemsLayer = this.map.getLayer('Items');
+  //   itemsLayer?.tilemapLayer.removeTileAt(xTile, yTile);
+  // }
 
   private _map?: Phaser.Tilemaps.Tilemap;
 
@@ -578,6 +578,48 @@ export default class TownGameScene extends Phaser.Scene {
       .setScrollFactor(0)
       .setDepth(30);
 
+    this._initializeTimer();
+    this._countDownText?.setVisible(false);
+
+    this._initializeItemsFound();
+    this._itemsFoundText?.setVisible(false);
+
+    this._ready = true;
+    this.updatePlayers(this.coveyTownController.players);
+    // Call any listeners that are waiting for the game to be initialized
+    this._onGameReadyListeners.forEach(listener => listener());
+    this._onGameReadyListeners = [];
+    this.coveyTownController.addListener('playersChanged', players => this.updatePlayers(players));
+  }
+
+  _initializeItemsFound() {
+    this._itemsFoundText = this.add
+      .text(600, 56, `Items Found: ${this._itemsFound}`, {
+        // Adjusted Y position to appear below the timer
+        font: '15px monospace',
+        color: '#000000',
+        padding: {
+          x: 20,
+          y: 10,
+        },
+        backgroundColor: '#ffffff',
+      })
+      .setScrollFactor(0)
+      .setDepth(30);
+  }
+
+  public updateItemsFound(gameStarted: boolean) {
+    // Show the items found text component when the game is started
+    if (gameStarted) {
+      this._itemsFoundText?.setVisible(true);
+    } else {
+      // Hide the items found text component if the game is not started
+      this._itemsFoundText?.setVisible(false);
+    }
+  }
+
+  _initializeTimer() {
+    // Create the timer component
     this._countDownText = this.add
       .text(600, 16, `Time Left: `, {
         font: '15px monospace',
@@ -590,44 +632,46 @@ export default class TownGameScene extends Phaser.Scene {
       })
       .setScrollFactor(0)
       .setDepth(30);
-
-    this._itemsFoundText = this.add
-      .text(600, 62, `Items Found: ` + this._itemCount.toString(), {
-        font: '15px monospace',
-        color: '#000000',
-        padding: {
-          x: 20,
-          y: 10,
-        },
-        backgroundColor: '#ffffff',
-      })
-      .setScrollFactor(0)
-      .setDepth(30);
-
-    this._timedEvent = this.time.addEvent({
-      delay: 1000, // the amount of time in between ticks
-      repeat: TIME_ALLOWED, // how many ticks should complete
-      callback: () => {
-        const timeLeft = this._timedEvent?.repeatCount;
-        if (timeLeft) {
-          this._countDownText?.setText('Time: ' + this._formatTime(timeLeft));
-        }
-        if (this._timedEvent?.repeatCount === 0) {
-          this.timerEnded();
-        }
-      },
-    });
-
-    this._ready = true;
-    this.updatePlayers(this.coveyTownController.players);
-    // Call any listeners that are waiting for the game to be initialized
-    this._onGameReadyListeners.forEach(listener => listener());
-    this._onGameReadyListeners = [];
-    this.coveyTownController.addListener('playersChanged', players => this.updatePlayers(players));
   }
 
+  // Method to update timer component visibility when the game state changes
+  public updateTimer(gameStarted: boolean, gameMode: string) {
+    if (gameStarted && gameMode === 'Timed') {
+      // Show the timer component only when the game is started and the mode is timed
+      this._countDownText?.setVisible(true);
+
+      // Start the timer event only when the game is started and the mode is timed
+      if (!this._timerFlag) {
+        this._timerFlag = true;
+        this._timedEvent = this.time.addEvent({
+          delay: 1000, // the amount of time in between ticks
+          repeat: TIME_ALLOWED, // how many ticks should complete
+          callback: () => {
+            const timeLeft = this._timedEvent?.repeatCount;
+            if (timeLeft) {
+              this._countDownText?.setText('Time: ' + this._formatTime(timeLeft));
+            }
+            if (this._timedEvent?.repeatCount === 0) {
+              this.timerEnded();
+            }
+          },
+        });
+      }
+    } else {
+      // Hide the timer component if the game is not started or the mode is not timed
+      this._countDownText?.setVisible(false);
+
+      // Stop the timer event
+      this._timerFlag = false;
+      this._timedEvent?.remove(false);
+    }
+  }
+
+  // Method to handle timer end
   timerEnded() {
-    return;
+    // Hide the timer component
+    this._countDownText?.setVisible(false);
+    // Handle other game over logic
   }
 
   /**

@@ -7,6 +7,7 @@ import {
   GameStatus,
   ScavengerHuntThemepack,
   ScavengerHuntMove,
+  XY,
 } from '../../types/CoveyTownSocket';
 import PlayerController from '../PlayerController';
 import GameAreaController, {
@@ -16,6 +17,7 @@ import GameAreaController, {
   PLAYER_NOT_IN_GAME_ERROR,
 } from './GameAreaController';
 import ScavengerHuntItemOnMap from '../../components/Town/interactables/ScavengerHunt/ScavengerHuntItemOnMap';
+import TownController from '../TownController';
 
 export type ScavengerHuntEvents = GameEventTypes & {
   itemsChanged: (items: ScavengerHuntItem[] | undefined) => void;
@@ -117,10 +119,10 @@ export default class ScavengerHuntAreaController extends GameAreaController<
       type: 'StartGame',
     });
     console.log(this.items);
-    this._renderInitialItems();
+    this._townController.globalScene.updateItemsFound(true);
   }
 
-  private _renderInitialItems(): void {
+  public renderInitialItems(): void {
     if (this.items) {
       for (const item of this.items) {
         this._townController.globalScene.addTileOnMap(item.id, item.location.x, item.location.y);
@@ -131,6 +133,31 @@ export default class ScavengerHuntAreaController extends GameAreaController<
     }
   }
 
+  public removeTileOnMap(xTile: number, yTile: number): void {
+    const itemsLayer = this._townController.globalScene.map.getLayer('Items');
+    itemsLayer?.tilemapLayer.removeTileAt(xTile, yTile);
+    this._townController.globalScene._itemsFound++;
+    const xy = { x: xTile, y: yTile };
+    this.makeMove(xy);
+    console.log(this._model.game?.state.items);
+    console.log(this._model.game?.state.moves);
+  }
+
+  /**
+   * Sends a request to the server to leave the current game in the game area.
+   */
+  public async leaveGameScavenger() {
+    const instanceID = this._instanceID;
+    if (instanceID) {
+      await this._townController.sendInteractableCommand(this.id, {
+        type: 'LeaveGame',
+        gameID: instanceID,
+      });
+      this._townController.globalScene.updateTimer(false, 'Timed');
+      this._townController.globalScene.updateItemsFound(false);
+    }
+  }
+
   /**
    * Sends a request to the server to collect an object
    *
@@ -138,15 +165,15 @@ export default class ScavengerHuntAreaController extends GameAreaController<
    *
    * @param name name of object collected
    */
-  public async makeMove(name: string): Promise<void> {
+  public async makeMove(location: XY): Promise<void> {
     const instanceID = this._instanceID;
     if (!instanceID || this._model.game?.state.status !== 'IN_PROGRESS') {
       throw new Error(NO_GAME_IN_PROGRESS_ERROR);
     }
     const move: ScavengerHuntMove = {
-      gamePiece: name,
-      col: 0,
-      row: 0,
+      gamePiece: 'item',
+      col: location.x,
+      row: location.y,
     };
     await this._townController.sendInteractableCommand(this.id, {
       type: 'GameMove',
@@ -187,6 +214,7 @@ export default class ScavengerHuntAreaController extends GameAreaController<
       themepack: themepack,
     });
     this._instanceID = gameID;
+    this._townController.globalScene.updateTimer(true, 'Timed');
     //const scene = this._townController.globalScene;
     //scene?.addTileOnMap(15053, 96, 32);
   }
@@ -202,5 +230,6 @@ export default class ScavengerHuntAreaController extends GameAreaController<
       themepack: themepack,
     });
     this._instanceID = gameID;
+    this._townController.globalScene.updateTimer(true, 'relaxed');
   }
 }

@@ -86,12 +86,6 @@ export default abstract class ScavengerHunt extends Game<
     });
 
     this._assignRandomLocations();
-    console.log('Starting game');
-    // console.log('State:', this.state);
-    // console.log(
-    //   'Item locations: ',
-    //   this.state.items.map(item => item.location),
-    // );
   }
 
   /**
@@ -99,7 +93,7 @@ export default abstract class ScavengerHunt extends Game<
    * @returns a string with the hint associated with the next unfound item in the list
    */
   public requestHint(): string {
-    const unfoundItems = this.state.items.filter(item => this._itemsFound.get(item.name) === 0);
+    const unfoundItems = this.state.items.filter(item => item.foundBy === undefined);
     if (unfoundItems.length === 0) {
       return 'All items found!';
     }
@@ -165,7 +159,7 @@ export default abstract class ScavengerHunt extends Game<
     if (this._players.some(p => p.id === player.id)) {
       throw new InvalidParametersError(PLAYER_ALREADY_IN_GAME_MESSAGE);
     } else if (this._players.length < MAX_PLAYERS) {
-      // EDIT
+      this._players.push(player);
       this.state = {
         ...this.state,
         status: 'WAITING_TO_START',
@@ -211,7 +205,6 @@ export default abstract class ScavengerHunt extends Game<
     switch (this.state.status) {
       case 'WAITING_TO_START':
       case 'WAITING_FOR_PLAYERS':
-        // no-ops: nothing needs to happen here
         this.state.status = 'WAITING_FOR_PLAYERS';
         break;
       case 'IN_PROGRESS':

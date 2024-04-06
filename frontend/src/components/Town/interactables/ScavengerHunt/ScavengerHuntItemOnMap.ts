@@ -2,7 +2,6 @@ import ScavengerHuntAreaController, {
   ScavengerHuntEvents,
 } from '../../../../classes/interactable/ScavengerHuntAreaController';
 import Interactable, { KnownInteractableTypes } from '../../Interactable';
-import Themepack from '../../../../../../townService/src/town/scavengerHunt/Themepack';
 
 export default class ScavengerHuntItemOnMap extends Interactable {
   private _scavengerHunt?: ScavengerHuntAreaController;
@@ -34,7 +33,10 @@ export default class ScavengerHuntItemOnMap extends Interactable {
   }
 
   private _removeItemOnScene(): void {
-    this._scene.removeTileOnMap(this.x, this.y);
+    if (!this._scavengerHunt) {
+      return;
+    }
+    this._scavengerHunt.removeTileOnMap(this.x, this.y);
   }
 
   interact(): void {

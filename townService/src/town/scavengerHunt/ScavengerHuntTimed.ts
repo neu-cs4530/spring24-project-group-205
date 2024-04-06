@@ -41,7 +41,9 @@ export default class ScavengerHuntTimed extends ScavengerHunt {
       throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
     }
 
-    const foundItemIndex = this.state.items.findIndex(item => item.name === move.move.gamePiece);
+    const foundItemIndex = this.state.items.findIndex(
+      item => item.location.x === move.move.col && item.location.y === move.move.row,
+    );
     if (foundItemIndex === -1) {
       throw new InvalidParametersError('Not an item');
     }
@@ -54,6 +56,7 @@ export default class ScavengerHuntTimed extends ScavengerHunt {
     };
     this.state = {
       ...this.state,
+      moves: [...this.state.moves, move.move],
       items: updatedItems,
     };
 

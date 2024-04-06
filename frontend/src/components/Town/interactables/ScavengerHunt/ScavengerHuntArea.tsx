@@ -57,11 +57,15 @@ export default function ScavengerHuntArea({
   const [mode, setMode] = useState('');
 
   const handleClick = (newThemepack: string) => {
-    setThemepack(newThemepack);
+    if (!themepack) {
+      setThemepack(newThemepack);
+    }
   };
 
   const handleClickMode = (newMode: string) => {
-    setMode(newMode);
+    if (!mode) {
+      setMode(newMode);
+    }
   };
 
   const [joiningGame, setJoiningGame] = useState(false);
@@ -106,6 +110,7 @@ export default function ScavengerHuntArea({
     setStartingGame(true);
     try {
       await gameAreaController.startGame();
+      gameAreaController.renderInitialItems();
     } catch (err) {
       toast({
         title: 'Error starting game',
@@ -116,9 +121,9 @@ export default function ScavengerHuntArea({
     setStartingGame(false);
   };
 
-  const handleEndGame = async () => {
+  const handleLeaveGame = async () => {
     try {
-      await gameAreaController.leaveGame();
+      await gameAreaController.leaveGameScavenger();
     } catch (err) {
       toast({
         title: 'Error ending game',
@@ -133,7 +138,7 @@ export default function ScavengerHuntArea({
       await gameAreaController.requestHint();
     } catch (err) {
       toast({
-        title: 'Error ending game',
+        title: 'Error requesting hint',
         description: (err as Error).toString(),
         status: 'error',
       });
@@ -191,11 +196,19 @@ export default function ScavengerHuntArea({
                     <HStack>
                       <VStack>
                         <Image src='/timed.png' alt='timed' boxSize='100px' />
-                        <Button onClick={() => handleClickMode('timed')}>Timed</Button>
+                        <Button
+                          onClick={() => handleClickMode('timed')}
+                          colorScheme={mode === 'timed' ? 'orange' : 'gray'}>
+                          Timed
+                        </Button>
                       </VStack>
                       <VStack>
                         <Image src='/relaxed.png' alt='relaxed' boxSize='100px' />
-                        <Button onClick={() => handleClickMode('relaxed')}>Relaxed</Button>
+                        <Button
+                          onClick={() => handleClickMode('relaxed')}
+                          colorScheme={mode === 'relaxed' ? 'orange' : 'gray'}>
+                          Relaxed
+                        </Button>
                       </VStack>
                     </HStack>
                   </VStack>
@@ -259,8 +272,8 @@ export default function ScavengerHuntArea({
               <Button onClick={handleStartGame} disabled={startingGame}>
                 {startingGame ? 'Starting Game...' : 'Start Game'}
               </Button>
-              <Button>Leave Game</Button>
-              <Button onClick={handleEndGame}>End Game</Button>
+              <Button onClick={handleLeaveGame}>Leave Game</Button>
+              {mode === 'relaxed' && <Button> End Game</Button>}
               <Button onClick={handleRequestHint}>Request Hint</Button>
             </HStack>
             <Box boxSize='20px'> </Box>
@@ -279,14 +292,12 @@ export default function ScavengerHuntArea({
               )}
             </VStack>
             <Box boxSize='20px'> </Box>
-            <Alert status='info'>
-              <AlertIcon />
-              {gameAreaController.requestedHint ? (
+            {gameAreaController.requestedHint && (
+              <Alert status='info'>
+                <AlertIcon />
                 <span>{gameAreaController.requestedHint}</span>
-              ) : (
-                'This is a hint. This box should only appear when a hint is requested.'
-              )}
-            </Alert>
+              </Alert>
+            )}
           </TabPanel>
           <TabPanel>
             <Tabs isFitted variant='enclosed'>
