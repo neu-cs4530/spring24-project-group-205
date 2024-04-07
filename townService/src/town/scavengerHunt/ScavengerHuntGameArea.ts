@@ -106,6 +106,19 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
       this._stateUpdated(game.toModel());
       return undefined as InteractableCommandReturnType<CommandType>;
     }
+    if (command.type === 'EndGame') {
+      const game = this._game;
+      if (!game) {
+        throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
+      }
+      if (this._game?.id !== command.gameID) {
+        throw new InvalidParametersError(GAME_ID_MISSMATCH_MESSAGE);
+      }
+      game._endGame(player);
+      this._stateUpdated(game.toModel());
+      return undefined as InteractableCommandReturnType<CommandType>;
+    }
+
     if (command.type === 'StartGame') {
       const game = this._game;
       if (!game) {
@@ -117,8 +130,10 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
       this._startTimer();
       game.startGame(player);
       this._stateUpdated(game.toModel());
+      this._startTimer();
       return undefined as InteractableCommandReturnType<CommandType>;
     }
+
     if (command.type === 'RequestHint') {
       const game = this._game;
       if (!game) {

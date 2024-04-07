@@ -158,16 +158,28 @@ export default class ScavengerHuntAreaController extends GameAreaController<
   /**
    * Sends a request to the server to leave the current game in the game area.
    */
-  public async leaveGameScavenger() {
+  public async leaveGame(): Promise<void> {
     const instanceID = this._instanceID;
     if (instanceID) {
       await this._townController.sendInteractableCommand(this.id, {
         type: 'LeaveGame',
         gameID: instanceID,
       });
-      this._townController.ourPlayer.scene?.updateTimer(false, 'Timed');
-      this._townController.ourPlayer.scene?.updateItemsFound(false);
     }
+    this._townController.ourPlayer.scene?.updateTimer(false, 'Null');
+    this._townController.ourPlayer.scene?.updateItemsFound(false);
+  }
+
+  public async endGame(): Promise<void> {
+    const instanceID = this._instanceID;
+    if (instanceID) {
+      await this._townController.sendInteractableCommand(this.id, {
+        type: 'EndGame',
+        gameID: instanceID,
+      });
+    }
+    this._townController.ourPlayer.scene?.updateTimer(false, 'Null');
+    this._townController.ourPlayer.scene?.updateItemsFound(false);
   }
 
   /**

@@ -173,9 +173,15 @@ export default abstract class ScavengerHunt extends Game<
    */
   private _endGameIfTimesUp() {
     if (!this._isTimeRemaining(Date.now())) {
-      this._endGame();
+      this._endGameForAllPlayers();
     }
   }
+  /**
+   * Determines if the current time (within milliseconds) is within the allotted time given
+   * @param currentTime the current time in milliseconds
+   * @returns true if the time is within the allotted time, false otherwise
+   */
+  protected abstract _isTimeRemaining(currentTime: number): boolean;
 
   /**
    *  Method to clear the interval for testing purposes
@@ -185,37 +191,50 @@ export default abstract class ScavengerHunt extends Game<
   }
 
   /**
-   * Determines if the current time (within milliseconds) is within the allotted time given
-   * @param currentTime the current time in milliseconds
-   * @returns true if the time is within the allotted time, false otherwise
+   * Removes the given player from the game, and reflects the game's state accordingly.
+   *
+   * If the game state is 'IN_PROGRESS' and there is only one player left, the game ends.
+   *
+   * If the game state is 'IN_PROGRESS' and there are more than one player left, the game continues.
+   * but removes the given player from the game.
+   *
+   * If the game state is 'WAITING_TO_START', and the only player leaves, the game state changes to 'WAITING_FOR_PLAYERS'.
+   * If the game state is 'WAITING_TO_START', and there are more than one player left, the game continues.
+   *
+   * @param player The player to remove from the game
+   * @throws InvalidParametersError if the player is not in the game (PLAYER_NOT_IN_GAME_MESSAGE)
    */
-  protected abstract _isTimeRemaining(currentTime: number): boolean;
-
   protected _leave(player: Player): void {
-    if (this.state.status === 'OVER') {
-      return;
-    }
+    // 1: if player not in the game, throw error
     if (!this._players.includes(player)) {
       throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
     }
-    this.state = {
-      ...this.state,
-    };
-    switch (this.state.status) {
-      case 'WAITING_TO_START':
-      case 'WAITING_FOR_PLAYERS':
-        this.state.status = 'WAITING_FOR_PLAYERS';
-        break;
-      case 'IN_PROGRESS':
+
+    if (this.state.status === 'IN_PROGRESS') {
+      if (this._players.length > 1) {
+        // remove the given player fron list of players, but status can stay the same
+        this._players = this._players.filter(p => p.id !== player.id);
+      } else if (this._players.length === 1) {
+        // if there is only one player left, end the game
+        this._players = this._players.filter(p => p.id !== player.id);
         this.state = {
           ...this.state,
           status: 'OVER',
-          winner: Array.from(this._itemsFound.entries()).reduce((a, b) => (b[1] > a[1] ? b : a))[0],
         };
-        break;
-      default:
-        // This behavior can be undefined :)
-        throw new Error(`Unexpected game status: ${this.state.status}`);
+
+        clearInterval(this._timerIntervalId);
+      }
+    }
+
+    if (this.state.status === 'WAITING_TO_START') {
+      if (this._players.length > 1) {
+        // remove the given player fron list of players, but status can stay the same
+        this._players = this._players.filter(p => p.id !== player.id);
+      } else if (this._players.length === 1) {
+        // if given player was the only one:
+        this._players = this._players.filter(p => p.id !== player.id);
+        this.state.status = 'WAITING_FOR_PLAYERS';
+      }
     }
   }
 
@@ -232,7 +251,10 @@ export default abstract class ScavengerHunt extends Game<
   /**
    * Ends the game and clears the timer
    */
-  private _endGame(): void {
+  public _endGame(player: Player): void {
+    if (!this._players.includes(player)) {
+      throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
+    }
     this.state = {
       ...this.state,
       status: 'OVER',
@@ -242,6 +264,12 @@ export default abstract class ScavengerHunt extends Game<
     this.leaderboardData = this.leaderboard();
 
     clearInterval(this._timerIntervalId);
+  }
+
+  private _endGameForAllPlayers(): void {
+    this._players.forEach(p => {
+      this._endGame(p);
+    });
   }
 
   public getItemByLocation(x: number, y: number): ScavengerHuntItem {
