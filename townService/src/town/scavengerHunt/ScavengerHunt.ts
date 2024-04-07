@@ -177,12 +177,6 @@ export default abstract class ScavengerHunt extends Game<
       this._endGameForAllPlayers();
     }
   }
-  /**
-   * Determines if the current time (within milliseconds) is within the allotted time given
-   * @param currentTime the current time in milliseconds
-   * @returns true if the time is within the allotted time, false otherwise
-   */
-  protected abstract _isTimeRemaining(currentTime: number): boolean;
 
   /**
    *  Method to clear the interval for testing purposes
@@ -190,6 +184,13 @@ export default abstract class ScavengerHunt extends Game<
   clearTimerInterval() {
     clearInterval(this._timerIntervalId);
   }
+
+  /**
+   * Determines if the current time (within milliseconds) is within the allotted time given
+   * @param currentTime the current time in milliseconds
+   * @returns true if the time is within the allotted time, false otherwise
+   */
+  protected abstract _isTimeRemaining(currentTime: number): boolean;
 
   /**
    * Determines if the current time (within milliseconds) is within the allotted time given
