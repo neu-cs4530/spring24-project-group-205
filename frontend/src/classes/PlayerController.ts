@@ -35,7 +35,10 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
     this._scene = scene;
   }
 
-  get scene(): TownGameScene | undefined {
+  get scene(): TownGameScene {
+    if (!this._scene) {
+      throw new Error('Scene not found.');
+    }
     return this._scene;
   }
 

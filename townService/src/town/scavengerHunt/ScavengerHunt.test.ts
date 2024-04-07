@@ -8,7 +8,6 @@ import ScavengerHuntRelaxed from './ScavengerHuntRelaxed';
 import ScavengerHuntTimed from './ScavengerHuntTimed';
 import Themepack from './Themepack';
 import Item from './Item';
-import exp from 'constants';
 
 describe('ScavengerHunt', () => {
   let gameRelaxed: ScavengerHuntRelaxed;
@@ -99,7 +98,9 @@ describe('ScavengerHunt', () => {
             gameTimed.leave(player1);
             expect(gameTimed.state.status).toEqual('IN_PROGRESS');
             expect(gameTimed.numPlayers()).toBe(1);
-            expect(() => gameTimed.applyMove({ gameID: '1234', playerID: player1.id, move: burger })).toThrowError(PLAYER_NOT_IN_GAME_MESSAGE);
+            expect(() =>
+              gameTimed.applyMove({ gameID: '1234', playerID: player1.id, move: burger }),
+            ).toThrowError(PLAYER_NOT_IN_GAME_MESSAGE);
             expect(gameTimed.state.winner).toBeUndefined();
           });
         });
@@ -119,12 +120,13 @@ describe('ScavengerHunt', () => {
             gameTimed.leave(player1);
             expect(gameTimed.state.status).toEqual('WAITING_TO_START');
             expect(gameTimed.numPlayers()).toBe(1);
-            expect(() => gameTimed.applyMove({ gameID: '1234', playerID: player1.id, move: burger })).toThrowError(PLAYER_NOT_IN_GAME_MESSAGE);
+            expect(() =>
+              gameTimed.applyMove({ gameID: '1234', playerID: player1.id, move: burger }),
+            ).toThrowError(PLAYER_NOT_IN_GAME_MESSAGE);
             expect(gameTimed.state.winner).toBeUndefined();
           });
         });
       });
-
     });
 
     describe('relaxed mode', () => {
@@ -158,7 +160,9 @@ describe('ScavengerHunt', () => {
             gameRelaxed.leave(player1);
             expect(gameRelaxed.state.status).toEqual('IN_PROGRESS');
             expect(gameRelaxed.numPlayers()).toBe(1);
-            expect(() => gameRelaxed.applyMove({ gameID: '1234', playerID: player1.id, move: burger })).toThrowError(PLAYER_NOT_IN_GAME_MESSAGE);
+            expect(() =>
+              gameRelaxed.applyMove({ gameID: '1234', playerID: player1.id, move: burger }),
+            ).toThrowError(PLAYER_NOT_IN_GAME_MESSAGE);
             expect(gameRelaxed.state.winner).toBeUndefined();
           });
         });
@@ -178,7 +182,9 @@ describe('ScavengerHunt', () => {
             gameRelaxed.leave(player1);
             expect(gameRelaxed.state.status).toEqual('WAITING_TO_START');
             expect(gameRelaxed.numPlayers()).toBe(1);
-            expect(() => gameRelaxed.applyMove({ gameID: '1234', playerID: player1.id, move: burger })).toThrowError(PLAYER_NOT_IN_GAME_MESSAGE);
+            expect(() =>
+              gameRelaxed.applyMove({ gameID: '1234', playerID: player1.id, move: burger }),
+            ).toThrowError(PLAYER_NOT_IN_GAME_MESSAGE);
             expect(gameRelaxed.state.winner).toBeUndefined();
           });
         });
@@ -193,7 +199,7 @@ describe('ScavengerHunt', () => {
       expect(() => gameRelaxed.leave(createPlayerForTesting())).toThrowError(
         PLAYER_NOT_IN_GAME_MESSAGE,
       );
-    });  
+    });
   });
 
   describe('endGame', () => {
@@ -203,9 +209,7 @@ describe('ScavengerHunt', () => {
           PLAYER_NOT_IN_GAME_MESSAGE,
         );
         const player = createPlayerForTesting();
-        expect(() => gameTimed.endGame(player)).toThrowError(
-          PLAYER_NOT_IN_GAME_MESSAGE,
-        );
+        expect(() => gameTimed.endGame(player)).toThrowError(PLAYER_NOT_IN_GAME_MESSAGE);
       });
       it('should end the game for all players if a present player ends the game', () => {
         const player1 = createPlayerForTesting();
@@ -217,7 +221,6 @@ describe('ScavengerHunt', () => {
         gameTimed.endGame(player1);
         expect(gameTimed.state.status).toEqual('OVER');
       });
-
     });
     describe('relaxed mode', () => {
       it('should throw an error if a non-present player tries to end the game', () => {
@@ -225,9 +228,7 @@ describe('ScavengerHunt', () => {
           PLAYER_NOT_IN_GAME_MESSAGE,
         );
         const player = createPlayerForTesting();
-        expect(() => gameRelaxed.endGame(player)).toThrowError(
-          PLAYER_NOT_IN_GAME_MESSAGE,
-        );
+        expect(() => gameRelaxed.endGame(player)).toThrowError(PLAYER_NOT_IN_GAME_MESSAGE);
       });
       it('should end the game for all players if a present player ends the game', () => {
         const player1 = createPlayerForTesting();
@@ -248,8 +249,12 @@ describe('ScavengerHunt', () => {
       gameRelaxed.join(player2);
       gameRelaxed.startGame(player1);
       gameRelaxed.endGame(player1);
-      expect(() => gameRelaxed.applyMove({ gameID: '1234', playerID: player1.id, move: burger })).toThrowError('Game is over');
-      expect(() => gameRelaxed.applyMove({ gameID: '1234', playerID: player2.id, move: sushi })).toThrowError('Game is over');
+      expect(() =>
+        gameRelaxed.applyMove({ gameID: '1234', playerID: player1.id, move: burger }),
+      ).toThrowError('Game is over');
+      expect(() =>
+        gameRelaxed.applyMove({ gameID: '1234', playerID: player2.id, move: sushi }),
+      ).toThrowError('Game is over');
     });
   });
 
@@ -260,7 +265,7 @@ describe('ScavengerHunt', () => {
       gameTimed.join(player);
       expect(gameTimed.state.items.length).toBe(0);
       gameTimed.startGame(player);
-      expect(gameTimed.state.items.length).toBe(2 + 10);
+      expect(gameTimed.state.items.length).toBe(2 + 20);
       expect(gameTimed.state.items[0].id).toBe(1234);
       gameTimed.applyMove({ gameID: '1234', playerID: player.id, move: burger });
       expect(gameTimed.state.items[0].foundBy).toBe(player.id);

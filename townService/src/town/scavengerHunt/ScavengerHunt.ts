@@ -131,11 +131,11 @@ export default abstract class ScavengerHunt extends Game<
   }
 
   public get themePack(): Themepack | undefined {
-    return this._themepack;
+    return this.state.themepack;
   }
 
   public set themePack(themepack: Themepack | undefined) {
-    this._themepack = themepack;
+    this.state.themepack = themepack;
   }
 
   // lets up to ten people join, and can be started as soon as the first person joins
@@ -178,15 +178,15 @@ export default abstract class ScavengerHunt extends Game<
 
   /**
    * Removes the given player from the game, and reflects the game's state accordingly.
-   * 
+   *
    * If the game state is 'IN_PROGRESS' and there is only one player left, the game ends.
-   * 
-   * If the game state is 'IN_PROGRESS' and there are more than one player left, the game continues. 
+   *
+   * If the game state is 'IN_PROGRESS' and there are more than one player left, the game continues.
    * but removes the given player from the game.
-   * 
+   *
    * If the game state is 'WAITING_TO_START', and the only player leaves, the game state changes to 'WAITING_FOR_PLAYERS'.
    * If the game state is 'WAITING_TO_START', and there are more than one player left, the game continues.
-   * 
+   *
    * @param player The player to remove from the game
    * @throws InvalidParametersError if the player is not in the game (PLAYER_NOT_IN_GAME_MESSAGE)
    */
@@ -195,7 +195,7 @@ export default abstract class ScavengerHunt extends Game<
     if (!this._players.includes(player)) {
       throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
     }
-    
+
     if (this.state.status === 'IN_PROGRESS') {
       if (this._players.length > 1) {
         // remove the given player fron list of players, but status can stay the same
@@ -207,7 +207,6 @@ export default abstract class ScavengerHunt extends Game<
           ...this.state,
           status: 'OVER',
         };
-    
         clearInterval(this._timerIntervalId);
       }
     }
@@ -221,11 +220,7 @@ export default abstract class ScavengerHunt extends Game<
         this._players = this._players.filter(p => p.id !== player.id);
         this.state.status = 'WAITING_FOR_PLAYERS';
       }
-
     }
-
-    
-
   }
 
   /**
@@ -260,6 +255,7 @@ export default abstract class ScavengerHunt extends Game<
     this._players.forEach(p => {
       this.endGame(p);
     });
+  }
 
   public getItemByLocation(x: number, y: number): ScavengerHuntItem {
     return this.state.items.find(
