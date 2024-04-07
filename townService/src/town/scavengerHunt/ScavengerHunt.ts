@@ -50,6 +50,7 @@ export default abstract class ScavengerHunt extends Game<
       items: [],
       moves: [],
       themepack: themePack,
+      status: 'WAITING_TO_START',
     });
   }
 

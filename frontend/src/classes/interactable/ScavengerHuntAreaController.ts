@@ -125,7 +125,6 @@ export default class ScavengerHuntAreaController extends GameAreaController<
       gameID: instanceID,
       type: 'StartGame',
     });
-    console.log(this.items);
     this._townController.globalScene.updateItemsFound(true);
   }
 
@@ -137,7 +136,6 @@ export default class ScavengerHuntAreaController extends GameAreaController<
           item.location.x,
           item.location.y,
         );
-        // console.log('attempted to put item at location', item.location.x, item.location.y);
       }
     } else {
       throw new Error('Start Game could not find items');
@@ -147,11 +145,6 @@ export default class ScavengerHuntAreaController extends GameAreaController<
   public removeTileOnMap(xTile: number, yTile: number): void {
     const itemsLayer = this._townController.globalScene.map.getLayer('Items');
     itemsLayer?.tilemapLayer.removeTileAt(xTile, yTile);
-    this._townController.globalScene._itemsFound++;
-    const xy = { x: xTile, y: yTile };
-    this.makeMove(xy);
-    console.log(this._model.game?.state.items);
-    console.log(this._model.game?.state.moves);
   }
 
   /**
@@ -212,6 +205,7 @@ export default class ScavengerHuntAreaController extends GameAreaController<
     });
 
     this.requestedHint = hint;
+  }
 
   public getSceneForPlayer(): TownGameScene {
     return this._townController.globalScene;

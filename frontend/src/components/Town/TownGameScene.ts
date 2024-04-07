@@ -314,14 +314,20 @@ export default class TownGameScene extends Phaser.Scene {
         }
       }
 
-      const worldPoint = this.input.activePointer.positionToCamera(this.cameras.main);
-
-      const mouse = new Phaser.Math.Vector2(worldPoint);
-
-      // Draw tiles (only within the groundLayer)
       const itemsLayer = this.map.getLayer('Items');
-      if (this.input.manager.activePointer.isDown) {
-        itemsLayer?.tilemapLayer.removeTileAtWorldXY(mouse.x, mouse.y);
+      if (itemsLayer) {
+        this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+          const worldPoint = pointer.positionToCamera(this.cameras.main);
+          const mouse = new Phaser.Math.Vector2(worldPoint);
+
+          const clickedTile = itemsLayer.tilemapLayer.getTileAtWorldXY(mouse.x, mouse.y);
+          if (clickedTile) {
+            const removedTile = itemsLayer.tilemapLayer.removeTileAtWorldXY(mouse.x, mouse.y);
+            if (removedTile !== null) {
+              this.updateItemsFoundCount();
+            }
+          }
+        });
       }
     }
   }
@@ -592,6 +598,7 @@ export default class TownGameScene extends Phaser.Scene {
     this._onGameReadyListeners.forEach(listener => listener());
     this._onGameReadyListeners = [];
     this.coveyTownController.addListener('playersChanged', players => this.updatePlayers(players));
+    this.events.on('itemFound', this.updateItemsFoundCount, this);
   }
 
   _initializeItemsFound() {
@@ -620,6 +627,11 @@ export default class TownGameScene extends Phaser.Scene {
     }
   }
 
+  public updateItemsFoundCount() {
+    this._itemsFound = this._itemsFound + 1;
+    this._itemsFoundText?.setText(`Items Found: ${this._itemsFound}`);
+  }
+
   _initializeTimer() {
     // Create the timer component
     this._countDownText = this.add
@@ -639,7 +651,6 @@ export default class TownGameScene extends Phaser.Scene {
   // Method to update timer component visibility when the game state changes
   public updateTimer(gameStarted: boolean, gameMode: string) {
     if (gameStarted && gameMode === 'Timed') {
-      // Show the timer component only when the game is started and the mode is timed
       this._countDownText?.setVisible(true);
 
       // Start the timer event only when the game is started and the mode is timed
