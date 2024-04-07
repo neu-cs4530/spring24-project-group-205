@@ -116,9 +116,21 @@ export default function ScavengerHuntArea({
     setStartingGame(false);
   };
 
-  const handleEndGame = async () => {
+  const handleLeaveGame = async () => {
     try {
       await gameAreaController.leaveGame();
+    } catch (err) {
+      toast({
+        title: 'Error leaving game',
+        description: (err as Error).toString(),
+        status: 'error',
+      });
+    }
+  }
+
+  const handleEndGame = async () => {
+    try {
+      await gameAreaController.endGame();
     } catch (err) {
       toast({
         title: 'Error ending game',
@@ -247,7 +259,7 @@ export default function ScavengerHuntArea({
               <Button onClick={handleStartGame} disabled={startingGame}>
                 {startingGame ? 'Starting Game...' : 'Start Game'}
               </Button>
-              <Button>Leave Game</Button>
+              <Button onClick={handleLeaveGame}>Leave Game</Button>
               <Button onClick={handleEndGame}>End Game</Button>
               <Button>Request Hint</Button>
             </HStack>

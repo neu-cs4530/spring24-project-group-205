@@ -140,6 +140,7 @@ export interface TicTacToeGameState extends WinnableGameState {
 }
 
 export interface ScavengerHuntGameState extends WinnableGameState {
+  mode?: GameMode;
   timeLeft: number;
   items: ReadonlyArray<ScavengerHuntItem>;
 }
@@ -240,7 +241,7 @@ interface InteractableCommandBase {
   type: string;
 }
 
-export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | JoinRelaxedGameCommand | JoinTimedGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | StartGameCommand | LeaveGameCommand;
+export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | JoinRelaxedGameCommand | JoinTimedGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | StartGameCommand | LeaveGameCommand | EndGameCommand;
 export interface ViewingAreaUpdateCommand  {
   type: 'ViewingAreaUpdate';
   update: ViewingArea;
@@ -260,6 +261,10 @@ export interface LeaveGameCommand {
   type: 'LeaveGame';
   gameID: GameInstanceID;
 }
+export interface EndGameCommand {
+  type: 'EndGame';
+  gameID: GameInstanceID;
+}
 export interface StartGameCommand {
   type: 'StartGame';
   gameID: GameInstanceID;
@@ -276,6 +281,7 @@ export type InteractableCommandReturnType<CommandType extends InteractableComman
   CommandType extends ViewingAreaUpdateCommand ? undefined :
   CommandType extends GameMoveCommand<TicTacToeMove> ? undefined :
   CommandType extends LeaveGameCommand ? undefined :
+  CommandType extends EndGameCommand ? undefined :
   never;
 
 export type InteractableCommandResponse<MessageType> = {

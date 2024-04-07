@@ -45,6 +45,7 @@ export default abstract class ScavengerHunt extends Game<
 
   public constructor(themePack?: Themepack) {
     super({
+      mode: undefined,
       timeLeft: TIME_ALLOWED,
       items: [],
       status: 'WAITING_TO_START',
@@ -164,7 +165,7 @@ export default abstract class ScavengerHunt extends Game<
    */
   private _endGameIfTimesUp() {
     if (!this._isTimeRemaining(Date.now())) {
-      this._endGame();
+      this._endGameForAllPlayers();
     }
   }
 
@@ -182,7 +183,7 @@ export default abstract class ScavengerHunt extends Game<
    */
   protected abstract _isTimeRemaining(currentTime: number): boolean;
 
-  protected _leave(player: Player): void {
+  protected _leave1(player: Player): void {
     if (this.state.status === 'OVER') {
       return;
     }
@@ -212,6 +213,61 @@ export default abstract class ScavengerHunt extends Game<
   }
 
   /**
+   * Removes the given player from the game, and reflects the game's state accordingly.
+   * 
+   * If the game state is 'IN_PROGRESS' and there is only one player left, the game ends.
+   * 
+   * If the game state is 'IN_PROGRESS' and there are more than one player left, the game continues. 
+   * but removes the given player from the game.
+   * 
+   * If the game state is 'WAITING_TO_START', and the only player leaves, the game state changes to 'WAITING_FOR_PLAYERS'.
+   * If the game state is 'WAITING_TO_START', and there are more than one player left, the game continues.
+   * 
+   * @param player The player to remove from the game
+   * @throws InvalidParametersError if the player is not in the game (PLAYER_NOT_IN_GAME_MESSAGE)
+   */
+  protected _leave(player: Player): void {
+    // 1: if player not in the game, throw error
+    if (!this._players.includes(player)) {
+      throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
+    }
+    
+    if (this.state.status === 'IN_PROGRESS') {
+      if (this._players.length > 1) {
+        // remove the given player fron list of players, but status can stay the same
+        this._players = this._players.filter(p => p.id !== player.id);
+      } else if (this._players.length === 1) {
+        // if there is only one player left, end the game
+        this._players = this._players.filter(p => p.id !== player.id);
+        this.state = {
+          ...this.state,
+          status: 'OVER',
+        };
+    
+        this._addDatabaseEntries();
+        this.leaderboardData = this.leaderboard();
+    
+        clearInterval(this._timerIntervalId);
+      }
+    }
+
+    if (this.state.status === 'WAITING_TO_START') {
+      if (this._players.length > 1) {
+        // remove the given player fron list of players, but status can stay the same
+        this._players = this._players.filter(p => p.id !== player.id);
+      } else if (this._players.length === 1) {
+        // if given player was the only one:
+        this._players = this._players.filter(p => p.id !== player.id);
+        this.state.status = 'WAITING_FOR_PLAYERS';
+      }
+
+    }
+
+    
+
+  }
+
+  /**
    * Adds entries of all scores from game to the leaderboard table in the database.
    */
   protected abstract _addDatabaseEntries(): void;
@@ -224,7 +280,10 @@ export default abstract class ScavengerHunt extends Game<
   /**
    * Ends the game and clears the timer
    */
-  private _endGame(): void {
+  public endGame(player: Player): void {
+    if (!this._players.includes(player)) {
+      throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
+    }
     this.state = {
       ...this.state,
       status: 'OVER',
@@ -234,5 +293,11 @@ export default abstract class ScavengerHunt extends Game<
     this.leaderboardData = this.leaderboard();
 
     clearInterval(this._timerIntervalId);
+  }
+
+  private _endGameForAllPlayers(): void {
+    this._players.forEach(p => {
+      this.endGame(p);
+    });
   }
 }

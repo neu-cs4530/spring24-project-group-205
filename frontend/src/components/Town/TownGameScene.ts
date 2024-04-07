@@ -603,7 +603,6 @@ export default class TownGameScene extends Phaser.Scene {
     // make background of countdown text red
     this._countDownText?.setBackgroundColor('#E55451');
     this._countDownText?.setText(`Time's up! \nGame over.`);
-    return;
   }
 
   /**
@@ -671,7 +670,7 @@ export default class TownGameScene extends Phaser.Scene {
 
   startTimer() {
     this._countDownText = this.add
-      .text(575, 16, `Time Left:`, {
+      .text(575, 32, `Time Left:`, {
         font: '15px monospace',
         color: '#000000',
         padding: {
@@ -700,7 +699,7 @@ export default class TownGameScene extends Phaser.Scene {
 
   showItemText() {
     this._itemsFoundText = this.add
-    .text(575, 72, `Items Found: ` + this._itemCount.toString() + ' / ' + this._totalItemCount.toString(), {
+    .text(575, 16, `Items Found: ` + this._itemCount.toString() + ' / ' + this._totalItemCount.toString(), {
       font: '15px monospace',
       color: '#000000',
       padding: {
@@ -713,8 +712,21 @@ export default class TownGameScene extends Phaser.Scene {
     .setDepth(30);
   }
 
+  hideItemText() {
+    this._itemCount = 0;
+    this._itemsFoundText?.destroy(true);
+  }
+
   setTotalItemCount(count: number) {
     this._totalItemCount = count;
+  }
+
+  resetTotalItemCount() {
+    this._totalItemCount = 0;
+  }
+
+  resetTimer() {
+    this._timedEvent?.remove();
   }
 
 }

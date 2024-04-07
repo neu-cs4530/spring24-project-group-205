@@ -104,7 +104,12 @@ export default class ScavengerHuntAreaController extends GameAreaController<
     });
     console.log(this.items);
     this._renderInitialItems();
-    this._townController.globalScene.startTimer();
+
+    // if the started game is timed, start the timer
+    if (this._model.game?.state.mode === 'timed') {
+      this._townController.globalScene.startTimer();
+      console.log('timer started');
+    }
     this._townController.globalScene.setTotalItemCount(this.items.length);
     this._townController.globalScene.showItemText();
 
@@ -147,5 +152,33 @@ export default class ScavengerHuntAreaController extends GameAreaController<
       themepack: themepack,
     });
     this._instanceID = gameID;
+  }
+
+  /**
+   * Sends a request to the server to leave the current game in the game area.
+   */
+  public async leaveGame(): Promise<void> {
+    const instanceID = this._instanceID;
+    if (instanceID) {
+      await this._townController.sendInteractableCommand(this.id, {
+        type: 'LeaveGame',
+        gameID: instanceID,
+      });
+    }
+  }
+
+  public async endGame(): Promise<void> {
+    const instanceID = this._instanceID;
+    if (instanceID) {
+      await this._townController.sendInteractableCommand(this.id, {
+        type: 'EndGame',
+        gameID: instanceID,
+      });
+    }
+
+    console.log('left game')
+    this._townController.globalScene.resetTotalItemCount();
+    console.log('reset total item count');
+    this._townController.globalScene.hideItemText();
   }
 }
