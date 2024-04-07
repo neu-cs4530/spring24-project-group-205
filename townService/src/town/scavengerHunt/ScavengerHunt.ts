@@ -176,32 +176,32 @@ export default abstract class ScavengerHunt extends Game<
   protected abstract _isTimeRemaining(currentTime: number): boolean;
 
   protected _leave(player: Player): void {
-    if (this.state.status === 'OVER') {
-      return;
-    }
-    if (!this._players.includes(player)) {
-      throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
-    }
-    this.state = {
-      ...this.state,
-    };
-    switch (this.state.status) {
-      case 'WAITING_TO_START':
-      case 'WAITING_FOR_PLAYERS':
-        // no-ops: nothing needs to happen here
-        this.state.status = 'WAITING_FOR_PLAYERS';
-        break;
-      case 'IN_PROGRESS':
-        this.state = {
-          ...this.state,
-          status: 'OVER',
-          winner: Array.from(this._itemsFound.entries()).reduce((a, b) => (b[1] > a[1] ? b : a))[0],
-        };
-        break;
-      default:
-        // This behavior can be undefined :)
-        throw new Error(`Unexpected game status: ${this.state.status}`);
-    }
+    // if (this.state.status === 'OVER') {
+    //   return;
+    // }
+    // if (!this._players.includes(player)) {
+    //   throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
+    // }
+    // this.state = {
+    //   ...this.state,
+    // };
+    // switch (this.state.status) {
+    //   case 'WAITING_TO_START':
+    //   case 'WAITING_FOR_PLAYERS':
+    //     // no-ops: nothing needs to happen here
+    //     this.state.status = 'WAITING_FOR_PLAYERS';
+    //     break;
+    //   case 'IN_PROGRESS':
+    //     this.state = {
+    //       ...this.state,
+    //       status: 'OVER',
+    //       winner: Array.from(this._itemsFound.entries()).reduce((a, b) => (b[1] > a[1] ? b : a))[0],
+    //     };
+    //     break;
+    //   default:
+    //     // This behavior can be undefined :)
+    //     throw new Error(`Unexpected game status: ${this.state.status}`);
+    // }
   }
 
   /**
@@ -227,5 +227,11 @@ export default abstract class ScavengerHunt extends Game<
     this.leaderboardData = this.leaderboard();
 
     clearInterval(this._timerIntervalId);
+  }
+
+  public getItemByLocation(x: number, y: number): ScavengerHuntItem {
+    return this.state.items.find(
+      item => item.location.x === x && item.location.y === y,
+    ) as ScavengerHuntItem;
   }
 }

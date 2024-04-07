@@ -320,7 +320,7 @@ export default class TownGameScene extends Phaser.Scene {
       const itemsLayer = this.map.getLayer('Items');
       if (this.input.manager.activePointer.isDown) {
         const tile = itemsLayer?.tilemapLayer.removeTileAtWorldXY(mouse.x, mouse.y);
-        if (tile?.index) {
+        if (tile && tile.index > 15053) {
           this.coveyTownController.emitItemFound({ x: tile.x, y: tile.y });
         }
       }
@@ -487,6 +487,7 @@ export default class TownGameScene extends Phaser.Scene {
     };
 
     this._interactables = this.getInteractables();
+    console.log(this._interactables);
     const xyList: { x: number; y: number }[] = [];
     xyList.push({ x: 58, y: 39 });
     xyList.push({ x: 41, y: 32 });

@@ -180,6 +180,10 @@ export default class Town {
 
     socket.on('itemFound', (location: XY) => {
       newPlayer.townEmitter.emit('itemFound', location);
+      const scavengerHuntArea = this._interactables.find(
+        eachInteractable => eachInteractable.id === 'Scavenger Hunt',
+      );
+      scavengerHuntArea?.handleCommand({ type: 'ItemFound', location }, newPlayer);
     });
 
     // Set up a listener to process commands to interactables.
