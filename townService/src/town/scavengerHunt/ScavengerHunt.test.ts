@@ -1,286 +1,266 @@
-import { createPlayerForTesting } from '../../TestUtils';
-import {
+import InvalidParametersError, {
   GAME_FULL_MESSAGE,
+  GAME_NOT_STARTABLE_MESSAGE,
   PLAYER_ALREADY_IN_GAME_MESSAGE,
   PLAYER_NOT_IN_GAME_MESSAGE,
 } from '../../lib/InvalidParametersError';
-import ScavengerHuntRelaxed from './ScavengerHuntRelaxed';
-import ScavengerHuntTimed from './ScavengerHuntTimed';
+import Player from '../../lib/Player';
+import {
+  GameMode,
+  GameMove,
+  PlayerID,
+  ScavengerHuntGameState,
+  ScavengerHuntItem,
+} from '../../types/CoveyTownSocket';
+import Game from '../games/Game';
 import Themepack from './Themepack';
-import Item from './Item';
+import { setRandomLocationAndHint } from './Utils';
 
-describe('ScavengerHunt', () => {
-  let gameRelaxed: ScavengerHuntRelaxed;
-  let gameTimed: ScavengerHuntTimed;
-  let themepack: Themepack;
-  let burger: Item;
-  let sushi: Item;
+const TIME_ALLOWED = 120;
 
-  beforeEach(() => {
-    themepack = new Themepack('Food');
-    gameRelaxed = new ScavengerHuntRelaxed(themepack);
-    gameTimed = new ScavengerHuntTimed(themepack);
-    burger = new Item(1234, 'burger', { x: 0, y: 0 }, '');
-    sushi = new Item(5678, 'sushi', { x: 0, y: 0 }, '');
+const MAX_PLAYERS = 10;
 
-    themepack.addItem(burger);
-    themepack.addItem(sushi);
-  });
+export default abstract class ScavengerHunt extends Game<
+  ScavengerHuntGameState,
+  ScavengerHuntItem
+> {
+  // INFORMATION THAT IS SPECIFIC TO THE PLAYER:
+  // The game mode the player is currently in
+  // protected _gameMode?: GameMode;
 
-  afterEach(() => {
-    gameRelaxed.clearTimerInterval();
-    gameTimed.clearTimerInterval();
-  });
+  // The themepack the player is currently using; the default is the "nature" themepack
+  // protected _themepack?: Themepack;
 
-  describe('_join', () => {
-    it('should throw an error if the player is already in the game', () => {
-      const player = createPlayerForTesting();
-      gameRelaxed.join(player);
-      expect(() => gameRelaxed.join(player)).toThrowError(PLAYER_ALREADY_IN_GAME_MESSAGE);
+  // the time it took for the player to complete the scavenger hunt -- this is only applicable if the game mode is competitive
+  private _timeInSeconds = 0;
+
+  // number of items found by the player
+  protected _itemsFound = new Map<PlayerID, number>();
+
+  protected _gameStartTime?: number;
+
+  private _timerIntervalId?: NodeJS.Timeout;
+
+  protected leaderboardData = this.leaderboard();
+
+  public constructor(themePack?: Themepack) {
+    super({
+      mode: undefined,
+      timeLeft: TIME_ALLOWED,
+      items: [],
+      status: 'WAITING_TO_START',
+      themepack: themePack,
+      moves: [],
+    });
+  }
+
+  // Method to start the game
+  public startGame(player: Player): void {
+    if (!this.state.themepack) {
+      throw new InvalidParametersError('No themepack selected for the game');
+    }
+
+    if (this.state.status !== 'WAITING_TO_START') {
+      throw new InvalidParametersError(GAME_NOT_STARTABLE_MESSAGE);
+    }
+
+    if (!this._players.includes(player)) {
+      throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
+    }
+
+    const items = this.state.themepack.createItems(this._players.length * 20);
+    this._gameStartTime = Date.now();
+
+    this._timerIntervalId = setInterval(() => {
+      this._endGameIfTimesUp();
+    }, 500);
+    this.state = {
+      ...this.state,
+      items,
+      status: 'IN_PROGRESS',
+    };
+
+    this._players.forEach(p => {
+      this._itemsFound.set(p.id, 0);
     });
 
-    it('should throw an error if the game is full', () => {
-      for (let i = 0; i < 10; i += 1) {
-        gameRelaxed.join(createPlayerForTesting());
+    this._assignRandomLocations();
+  }
+
+  private _assignRandomLocations(): void {
+    if (this.state.items.length === 0) {
+      throw new Error('No items available in the scavenger hunt');
+    }
+    this.state.items.forEach(item => {
+      if (item.location.x === 0 && item.location.y === 0) {
+        setRandomLocationAndHint(item);
       }
-      const player11 = createPlayerForTesting();
-      expect(() => gameRelaxed.join(player11)).toThrowError(GAME_FULL_MESSAGE);
     });
+  }
 
-    describe('When the player can be added', () => {
-      it('makes the player the current scavenger and starts the game in relaxed mode', () => {
-        const player = createPlayerForTesting();
-        gameRelaxed.join(player);
-        gameRelaxed.startGame(player);
-        expect(gameRelaxed.state.status).toEqual('IN_PROGRESS');
-        expect(gameRelaxed.state.winner).toBeUndefined();
-      });
+  /**
+   * Updates the time left in the game
+   */
+  public abstract iterateClock(): void;
 
-      it('makes the player the current scavenger and starts the game in timed mode', () => {
-        const player = createPlayerForTesting();
-        gameTimed.join(player);
-        gameTimed.startGame(player);
-        expect(gameTimed.state.status).toEqual('IN_PROGRESS');
-        expect(gameTimed.state.winner).toBeUndefined();
-      });
+  /**
+   * gets the time left in the game
+   * @returns the time left in the game
+   */
+  public getTimeLeft(): number {
+    return this.state.timeLeft;
+  }
+
+  /**
+   * Apply a move to the game.
+   * This method should be implemented by subclasses.
+   * @param move A move to apply to the game.
+   * @throws InvalidParametersError if the move is invalid.
+   */
+  public abstract applyMove(move: GameMove<ScavengerHuntItem>): void;
+
+  /**
+   * Gives the total number of items found at this point in the game.
+   * @returns number of items found.
+   */
+  public getScoreForPlayer(player: Player): number {
+    return this._itemsFound.get(player.id) || 0;
+  }
+
+  public get gameMode(): GameMode | undefined {
+    return this.state.gameMode;
+  }
+
+  public get themePack(): Themepack | undefined {
+    return this.state.themepack;
+  }
+
+  public set themePack(themepack: Themepack | undefined) {
+    this.state.themepack = themepack;
+  }
+
+  // lets up to ten people join, and can be started as soon as the first person joins
+  protected _join(player: Player): void {
+    if (this._players.some(p => p.id === player.id)) {
+      throw new InvalidParametersError(PLAYER_ALREADY_IN_GAME_MESSAGE);
+    } else if (this._players.length < MAX_PLAYERS) {
+      // EDIT
+      this.state = {
+        ...this.state,
+        status: 'WAITING_TO_START',
+      };
+    } else {
+      throw new InvalidParametersError(GAME_FULL_MESSAGE);
+    }
+  }
+
+  /**
+   * Ends the game if the time is up
+   */
+  private _endGameIfTimesUp() {
+    if (!this._isTimeRemaining(Date.now())) {
+      this._endGameForAllPlayers();
+    }
+  }
+
+  /**
+   *  Method to clear the interval for testing purposes
+   */
+  clearTimerInterval() {
+    clearInterval(this._timerIntervalId);
+  }
+
+  /**
+   * Determines if the current time (within milliseconds) is within the allotted time given
+   * @param currentTime the current time in milliseconds
+   * @returns true if the time is within the allotted time, false otherwise
+   */
+  protected abstract _isTimeRemaining(currentTime: number): boolean;
+
+  /**
+   * Removes the given player from the game, and reflects the game's state accordingly.
+   *
+   * If the game state is 'IN_PROGRESS' and there is only one player left, the game ends.
+   *
+   * If the game state is 'IN_PROGRESS' and there are more than one player left, the game continues.
+   * but removes the given player from the game.
+   *
+   * If the game state is 'WAITING_TO_START', and the only player leaves, the game state changes to 'WAITING_FOR_PLAYERS'.
+   * If the game state is 'WAITING_TO_START', and there are more than one player left, the game continues.
+   *
+   * @param player The player to remove from the game
+   * @throws InvalidParametersError if the player is not in the game (PLAYER_NOT_IN_GAME_MESSAGE)
+   */
+  protected _leave(player: Player): void {
+    // 1: if player not in the game, throw error
+    if (!this._players.includes(player)) {
+      throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
+    }
+
+    if (this.state.status === 'IN_PROGRESS') {
+      if (this._players.length > 1) {
+        // remove the given player fron list of players, but status can stay the same
+        this._players = this._players.filter(p => p.id !== player.id);
+      } else if (this._players.length === 1) {
+        // if there is only one player left, end the game
+        this._players = this._players.filter(p => p.id !== player.id);
+        this.state = {
+          ...this.state,
+          status: 'OVER',
+        };
+        clearInterval(this._timerIntervalId);
+      }
+    }
+
+    if (this.state.status === 'WAITING_TO_START') {
+      if (this._players.length > 1) {
+        // remove the given player fron list of players, but status can stay the same
+        this._players = this._players.filter(p => p.id !== player.id);
+      } else if (this._players.length === 1) {
+        // if given player was the only one:
+        this._players = this._players.filter(p => p.id !== player.id);
+        this.state.status = 'WAITING_FOR_PLAYERS';
+      }
+    }
+  }
+
+  /**
+   * Adds entries of all scores from game to the leaderboard table in the database.
+   */
+  protected abstract _addDatabaseEntries(): void;
+
+  /**
+   * Gets entries of top 5 users the leaderboard.
+   */
+  protected abstract leaderboard(): Promise<{ username: string; objects_found: number }[]>;
+
+  /**
+   * Ends the game and clears the timer
+   */
+  public endGame(player: Player): void {
+    if (!this._players.includes(player)) {
+      throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
+    }
+    this.state = {
+      ...this.state,
+      status: 'OVER',
+    };
+
+    this._addDatabaseEntries();
+    this.leaderboardData = this.leaderboard();
+
+    clearInterval(this._timerIntervalId);
+  }
+
+  private _endGameForAllPlayers(): void {
+    this._players.forEach(p => {
+      this.endGame(p);
     });
-  });
+  }
 
-  describe('_leave', () => {
-    describe('timed mode', () => {
-      it('should throw an error if the player is not in the game', () => {
-        expect(() => gameTimed.leave(createPlayerForTesting())).toThrowError(
-          PLAYER_NOT_IN_GAME_MESSAGE,
-        );
-        const player = createPlayerForTesting();
-        gameTimed.join(player);
-        expect(() => gameTimed.leave(createPlayerForTesting())).toThrowError(
-          PLAYER_NOT_IN_GAME_MESSAGE,
-        );
-      });
-
-      describe('when the player is in the game', () => {
-        describe('IN_PROGRESS', () => {
-          it('should set the game status to OVER if they were the only player', () => {
-            const player = createPlayerForTesting();
-            gameTimed.join(player);
-            gameTimed.startGame(player);
-            gameTimed.leave(player);
-            expect(gameTimed.state.status).toEqual('OVER');
-          });
-          it('should keep the game in IN_PROGRESS and just remove the player if there are other players', () => {
-            const player1 = createPlayerForTesting();
-            gameTimed.join(player1);
-            const player2 = createPlayerForTesting();
-            gameTimed.join(player2);
-            gameTimed.startGame(player1);
-            expect(gameTimed.numPlayers()).toBe(2);
-            gameTimed.leave(player1);
-            expect(gameTimed.state.status).toEqual('IN_PROGRESS');
-            expect(gameTimed.numPlayers()).toBe(1);
-            expect(() =>
-              gameTimed.applyMove({ gameID: '1234', playerID: player1.id, move: burger }),
-            ).toThrowError(PLAYER_NOT_IN_GAME_MESSAGE);
-            expect(gameTimed.state.winner).toBeUndefined();
-          });
-        });
-        describe('WAITING_TO_START', () => {
-          it('should set the game status to WAITING_FOR_PLAYERS if they were the only player', () => {
-            const player = createPlayerForTesting();
-            gameTimed.join(player);
-            gameTimed.leave(player);
-            expect(gameTimed.state.status).toEqual('WAITING_FOR_PLAYERS');
-          });
-          it('should keep the game in WAITING_TO_START and just remove the player if there are other players', () => {
-            const player1 = createPlayerForTesting();
-            gameTimed.join(player1);
-            const player2 = createPlayerForTesting();
-            gameTimed.join(player2);
-            expect(gameTimed.numPlayers()).toBe(2);
-            gameTimed.leave(player1);
-            expect(gameTimed.state.status).toEqual('WAITING_TO_START');
-            expect(gameTimed.numPlayers()).toBe(1);
-            expect(() =>
-              gameTimed.applyMove({ gameID: '1234', playerID: player1.id, move: burger }),
-            ).toThrowError(PLAYER_NOT_IN_GAME_MESSAGE);
-            expect(gameTimed.state.winner).toBeUndefined();
-          });
-        });
-      });
-    });
-
-    describe('relaxed mode', () => {
-      it('should throw an error if the player is not in the game', () => {
-        expect(() => gameRelaxed.leave(createPlayerForTesting())).toThrowError(
-          PLAYER_NOT_IN_GAME_MESSAGE,
-        );
-        const player = createPlayerForTesting();
-        gameRelaxed.join(player);
-        expect(() => gameRelaxed.leave(createPlayerForTesting())).toThrowError(
-          PLAYER_NOT_IN_GAME_MESSAGE,
-        );
-      });
-
-      describe('when the player is in the game', () => {
-        describe('IN_PROGRESS', () => {
-          it('should set the game status to OVER if they were the only player', () => {
-            const player = createPlayerForTesting();
-            gameRelaxed.join(player);
-            gameRelaxed.startGame(player);
-            gameRelaxed.leave(player);
-            expect(gameRelaxed.state.status).toEqual('OVER');
-          });
-          it('should keep the game in IN_PROGRESS and just remove the player if there are other players', () => {
-            const player1 = createPlayerForTesting();
-            gameRelaxed.join(player1);
-            const player2 = createPlayerForTesting();
-            gameRelaxed.join(player2);
-            gameRelaxed.startGame(player1);
-            expect(gameRelaxed.numPlayers()).toBe(2);
-            gameRelaxed.leave(player1);
-            expect(gameRelaxed.state.status).toEqual('IN_PROGRESS');
-            expect(gameRelaxed.numPlayers()).toBe(1);
-            expect(() =>
-              gameRelaxed.applyMove({ gameID: '1234', playerID: player1.id, move: burger }),
-            ).toThrowError(PLAYER_NOT_IN_GAME_MESSAGE);
-            expect(gameRelaxed.state.winner).toBeUndefined();
-          });
-        });
-        describe('WAITING_TO_START', () => {
-          it('should set the game status to WAITING_FOR_PLAYERS if they were the only player', () => {
-            const player = createPlayerForTesting();
-            gameRelaxed.join(player);
-            gameRelaxed.leave(player);
-            expect(gameRelaxed.state.status).toEqual('WAITING_FOR_PLAYERS');
-          });
-          it('should keep the game in WAITING_TO_START and just remove the player if there are other players', () => {
-            const player1 = createPlayerForTesting();
-            gameRelaxed.join(player1);
-            const player2 = createPlayerForTesting();
-            gameRelaxed.join(player2);
-            expect(gameRelaxed.numPlayers()).toBe(2);
-            gameRelaxed.leave(player1);
-            expect(gameRelaxed.state.status).toEqual('WAITING_TO_START');
-            expect(gameRelaxed.numPlayers()).toBe(1);
-            expect(() =>
-              gameRelaxed.applyMove({ gameID: '1234', playerID: player1.id, move: burger }),
-            ).toThrowError(PLAYER_NOT_IN_GAME_MESSAGE);
-            expect(gameRelaxed.state.winner).toBeUndefined();
-          });
-        });
-      });
-    });
-    it('should throw an error if the player is not in the game', () => {
-      expect(() => gameRelaxed.leave(createPlayerForTesting())).toThrowError(
-        PLAYER_NOT_IN_GAME_MESSAGE,
-      );
-      const player = createPlayerForTesting();
-      gameRelaxed.join(player);
-      expect(() => gameRelaxed.leave(createPlayerForTesting())).toThrowError(
-        PLAYER_NOT_IN_GAME_MESSAGE,
-      );
-    });
-  });
-
-  describe('endGame', () => {
-    describe('timed mode', () => {
-      it('should throw an error if a non-present player tries to end the game', () => {
-        expect(() => gameRelaxed.endGame(createPlayerForTesting())).toThrowError(
-          PLAYER_NOT_IN_GAME_MESSAGE,
-        );
-        const player = createPlayerForTesting();
-        expect(() => gameTimed.endGame(player)).toThrowError(PLAYER_NOT_IN_GAME_MESSAGE);
-      });
-      it('should end the game for all players if a present player ends the game', () => {
-        const player1 = createPlayerForTesting();
-        gameTimed.join(player1);
-        const player2 = createPlayerForTesting();
-        gameTimed.join(player2);
-        gameTimed.startGame(player1);
-        expect(gameTimed.state.status).toEqual('IN_PROGRESS');
-        gameTimed.endGame(player1);
-        expect(gameTimed.state.status).toEqual('OVER');
-      });
-    });
-    describe('relaxed mode', () => {
-      it('should throw an error if a non-present player tries to end the game', () => {
-        expect(() => gameRelaxed.endGame(createPlayerForTesting())).toThrowError(
-          PLAYER_NOT_IN_GAME_MESSAGE,
-        );
-        const player = createPlayerForTesting();
-        expect(() => gameRelaxed.endGame(player)).toThrowError(PLAYER_NOT_IN_GAME_MESSAGE);
-      });
-      it('should end the game for all players if a present player ends the game', () => {
-        const player1 = createPlayerForTesting();
-        gameRelaxed.join(player1);
-        const player2 = createPlayerForTesting();
-        gameRelaxed.join(player2);
-        gameRelaxed.startGame(player1);
-        expect(gameRelaxed.state.status).toEqual('IN_PROGRESS');
-        gameRelaxed.endGame(player1);
-        expect(gameRelaxed.state.status).toEqual('OVER');
-      });
-    });
-
-    it('should not let players pick up items after the game has ended', () => {
-      const player1 = createPlayerForTesting();
-      gameRelaxed.join(player1);
-      const player2 = createPlayerForTesting();
-      gameRelaxed.join(player2);
-      gameRelaxed.startGame(player1);
-      gameRelaxed.endGame(player1);
-      expect(() =>
-        gameRelaxed.applyMove({ gameID: '1234', playerID: player1.id, move: burger }),
-      ).toThrowError('Game is over');
-      expect(() =>
-        gameRelaxed.applyMove({ gameID: '1234', playerID: player2.id, move: sushi }),
-      ).toThrowError('Game is over');
-    });
-  });
-
-  describe('Item assignment', () => {
-    it('should assign random locations and generate hints when the game starts in timed mode', () => {
-      const player = createPlayerForTesting();
-
-      gameTimed.join(player);
-      expect(gameTimed.state.items.length).toBe(0);
-      gameTimed.startGame(player);
-      expect(gameTimed.state.items.length).toBe(2 + 20);
-      expect(gameTimed.state.items[0].id).toBe(1234);
-      gameTimed.applyMove({
-        gameID: '1234',
-        playerID: player.id,
-        move: { gamePiece: 'burger', col: 0, row: 0 },
-      });
-      expect(gameTimed.state.items[0].foundBy).toBe(player.id);
-      expect(gameTimed.getScoreForPlayer(player)).toBe(1);
-      gameTimed.applyMove({
-        gameID: '1234',
-        playerID: player.id,
-        move: { gamePiece: 'sushi', col: 0, row: 0 },
-      });
-      expect(gameTimed.getScoreForPlayer(player)).toBe(2);
-      expect(gameTimed.state.items[1].foundBy).toBe(player.id);
-    });
-  });
-});
+  public getItemByLocation(x: number, y: number): ScavengerHuntItem {
+    return this.state.items.find(
+      item => item.location.x === x && item.location.y === y,
+    ) as ScavengerHuntItem;
+  }
+}
