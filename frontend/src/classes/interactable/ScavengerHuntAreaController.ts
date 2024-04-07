@@ -7,13 +7,7 @@ import {
   ScavengerHuntThemepack,
 } from '../../types/CoveyTownSocket';
 import PlayerController from '../PlayerController';
-import GameAreaController, {
-  GameEventTypes,
-  NO_GAME_IN_PROGRESS_ERROR,
-  NO_GAME_STARTABLE,
-  PLAYER_NOT_IN_GAME_ERROR,
-} from './GameAreaController';
-import TownGameScene from '../../components/Town/TownGameScene';
+import GameAreaController, { GameEventTypes, NO_GAME_STARTABLE } from './GameAreaController';
 export type ScavengerHuntEvents = GameEventTypes & {
   itemsChanged: (items: ScavengerHuntItem[] | undefined) => void;
 };
@@ -170,10 +164,5 @@ export default class ScavengerHuntAreaController extends GameAreaController<
         gameID: instanceID,
       });
     }
-
-    console.log('left game')
-    this._townController.globalScene.resetTotalItemCount();
-    console.log('reset total item count');
-    this._townController.globalScene.hideItemText();
   }
 }

@@ -320,13 +320,15 @@ export default class TownGameScene extends Phaser.Scene {
       const mouse = new Phaser.Math.Vector2(worldPoint);
 
       const itemsLayer = this.map.getLayer('Items');
-      
+
       if (this.input.manager.activePointer.isDown && this._isPointerOnItem(mouse.x, mouse.y)) {
-        itemsLayer?.tilemapLayer.removeTileAtWorldXY(mouse.x, mouse.y);
-        if (tile.index > 15053) {
+        const tile = itemsLayer?.tilemapLayer.removeTileAtWorldXY(mouse.x, mouse.y);
+        if (tile && tile.index > 15053) {
           this.coveyTownController.emitItemFound({ x: tile.x, y: tile.y });
           this._itemCount++;
-          this._itemsFoundText?.setText(`Items Found: ` + this._itemCount.toString() + ' / ' + this._totalItemCount.toString());
+          this._itemsFoundText?.setText(
+            `Items Found: ` + this._itemCount.toString() + ' / ' + this._totalItemCount.toString(),
+          );
         }
       }
     }
@@ -592,8 +594,6 @@ export default class TownGameScene extends Phaser.Scene {
       .setScrollFactor(0)
       .setDepth(30);
 
-
-
     this._ready = true;
     this.updatePlayers(this.coveyTownController.players);
     // Call any listeners that are waiting for the game to be initialized
@@ -702,17 +702,22 @@ export default class TownGameScene extends Phaser.Scene {
 
   showItemText() {
     this._itemsFoundText = this.add
-    .text(575, 16, `Items Found: ` + this._itemCount.toString() + ' / ' + this._totalItemCount.toString(), {
-      font: '15px monospace',
-      color: '#000000',
-      padding: {
-        x: 20,
-        y: 10,
-      },
-      backgroundColor: '#ffffff',
-    })
-    .setScrollFactor(0)
-    .setDepth(30);
+      .text(
+        575,
+        16,
+        `Items Found: ` + this._itemCount.toString() + ' / ' + this._totalItemCount.toString(),
+        {
+          font: '15px monospace',
+          color: '#000000',
+          padding: {
+            x: 20,
+            y: 10,
+          },
+          backgroundColor: '#ffffff',
+        },
+      )
+      .setScrollFactor(0)
+      .setDepth(30);
   }
 
   hideItemText() {
@@ -731,5 +736,4 @@ export default class TownGameScene extends Phaser.Scene {
   resetTimer() {
     this._timedEvent?.remove();
   }
-
 }

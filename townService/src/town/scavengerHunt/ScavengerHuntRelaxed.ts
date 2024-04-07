@@ -24,7 +24,7 @@ export default class ScavengerHuntRelaxed extends ScavengerHunt {
   public applyMove(move: GameMove<ScavengerHuntItem>): void {
     const player = this._players.find(p => p.id === move.playerID);
     if (!player) {
-       throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
+      throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
     }
     if (move.move.foundBy) {
       throw new InvalidParametersError(INVALID_MOVE_MESSAGE);
@@ -35,7 +35,7 @@ export default class ScavengerHuntRelaxed extends ScavengerHunt {
     if (this.state.status !== 'IN_PROGRESS') {
       throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
     }
-    
+
     move.move.foundBy = move.playerID;
     this._itemsFound.set(move.playerID, (this._itemsFound.get(move.playerID) || 0) + 1);
     this.state = {
