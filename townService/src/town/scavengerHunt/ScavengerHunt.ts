@@ -137,11 +137,11 @@ export default abstract class ScavengerHunt extends Game<
     return this._gameMode;
   }
 
-  public getThemePack(): Themepack | undefined {
+  public get themePack(): Themepack | undefined {
     return this._themepack;
   }
 
-  public setThemePack(themepack: Themepack): void {
+  public set themePack(themepack: Themepack | undefined) {
     this._themepack = themepack;
   }
 

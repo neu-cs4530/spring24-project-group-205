@@ -26,8 +26,8 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
     this._interactables = interactables;
   }
 
-  public getThemepack(): Themepack | undefined {
-    return this._game?.getThemePack();
+  public get themepack(): Themepack | undefined {
+    return this._game?.themePack;
   }
 
   protected getType(): InteractableType {
@@ -72,8 +72,8 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
         }
         game = new ScavengerHuntTimed(selectedThemepack);
         this._game = game;
-        if (!this.getThemepack()) {
-          game.setThemePack(selectedThemepack);
+        if (!this.themepack) {
+          game.themePack?(selectedThemepack):undefined;
         }
         game.join(player); // Pass themepack to join method
       }
@@ -90,8 +90,8 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
         }
         game = new ScavengerHuntRelaxed(selectedThemepack);
         this._game = game;
-        if (!this.getThemepack()) {
-          game.setThemePack(selectedThemepack);
+        if (!this.themepack) {
+          game.themePack?(selectedThemepack):undefined;
         }
         game.join(player); // Pass themepack to join method
       }

@@ -32,10 +32,10 @@ export default class ScavengerHuntRelaxed extends ScavengerHunt {
     if (this.state.status === 'OVER') {
       throw new InvalidParametersError(GAME_OVER_MESSAGE);
     }
-
     if (this.state.status !== 'IN_PROGRESS') {
       throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
     }
+    
     move.move.foundBy = move.playerID;
     this._itemsFound.set(move.playerID, (this._itemsFound.get(move.playerID) || 0) + 1);
     this.state = {
