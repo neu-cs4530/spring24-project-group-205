@@ -69,6 +69,8 @@ export default abstract class Game<StateType extends GameState, MoveType> {
    * @throws InvalidParametersError if the player can not join the game
    */
   public join(player: Player): void {
+    console.log(player.id + 'joined game');
+
     this._join(player);
     this._players.push(player);
   }
@@ -90,5 +92,13 @@ export default abstract class Game<StateType extends GameState, MoveType> {
       result: this._result,
       players: this._players.map(player => player.id),
     };
+  }
+
+  /**
+   * Method for testing purposes only.
+   * @returns number of players in the game
+   */
+  public numPlayers(): number {
+    return this._players.length;
   }
 }

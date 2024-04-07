@@ -7,7 +7,7 @@ export default class Item implements ScavengerHuntItem {
 
   location: XY;
 
-  foundBy?: string | undefined;
+  private _foundBy?: string | undefined;
 
   hint: string;
 
@@ -32,5 +32,13 @@ export default class Item implements ScavengerHuntItem {
 
   public setHint(hint: string): void {
     this.hint = hint;
+  }
+
+  public set foundBy(foundBy: string | undefined) {
+    this._foundBy = foundBy;
+  }
+
+  public get foundBy(): string | undefined {
+    return this._foundBy;
   }
 }

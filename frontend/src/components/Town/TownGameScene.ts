@@ -26,7 +26,7 @@ function interactableTypeForObjectType(type: string): any {
   }
 }
 
-const TIME_ALLOWED = 240;
+const TIME_ALLOWED = 120;
 
 // Original inspiration and code from:
 // https://medium.com/@michaelwesthadley/modular-game-worlds-in-phaser-3-tilemaps-1-958fc7e6bbd6
@@ -75,6 +75,8 @@ export default class TownGameScene extends Phaser.Scene {
   private _itemsFoundText: Phaser.GameObjects.Text | undefined;
 
   private _itemCount = 0;
+
+  private _totalItemCount = 0;
 
   /**
    * Layers that the player can collide with.
@@ -318,13 +320,22 @@ export default class TownGameScene extends Phaser.Scene {
       const mouse = new Phaser.Math.Vector2(worldPoint);
 
       const itemsLayer = this.map.getLayer('Items');
-      if (this.input.manager.activePointer.isDown) {
-        const tile = itemsLayer?.tilemapLayer.removeTileAtWorldXY(mouse.x, mouse.y);
-        if (tile && tile.index > 15053) {
+      
+      if (this.input.manager.activePointer.isDown && this._isPointerOnItem(mouse.x, mouse.y)) {
+        itemsLayer?.tilemapLayer.removeTileAtWorldXY(mouse.x, mouse.y);
+        if (tile.index > 15053) {
           this.coveyTownController.emitItemFound({ x: tile.x, y: tile.y });
+          this._itemCount++;
+          this._itemsFoundText?.setText(`Items Found: ` + this._itemCount.toString() + ' / ' + this._totalItemCount.toString());
         }
       }
     }
+  }
+
+  private _isPointerOnItem(x: number, y: number): boolean {
+    const itemsLayer = this.map.getLayer('Items');
+    const tile = itemsLayer?.tilemapLayer.getTileAtWorldXY(x, y);
+    return tile !== null;
   }
 
   public addTileOnMap(tileId: number, xTile: number, yTile: number): void {
@@ -581,45 +592,7 @@ export default class TownGameScene extends Phaser.Scene {
       .setScrollFactor(0)
       .setDepth(30);
 
-    this._countDownText = this.add
-      .text(600, 16, `Time Left: `, {
-        font: '15px monospace',
-        color: '#000000',
-        padding: {
-          x: 20,
-          y: 10,
-        },
-        backgroundColor: '#ffffff',
-      })
-      .setScrollFactor(0)
-      .setDepth(30);
 
-    this._itemsFoundText = this.add
-      .text(600, 62, `Items Found: ` + this._itemCount.toString(), {
-        font: '15px monospace',
-        color: '#000000',
-        padding: {
-          x: 20,
-          y: 10,
-        },
-        backgroundColor: '#ffffff',
-      })
-      .setScrollFactor(0)
-      .setDepth(30);
-
-    this._timedEvent = this.time.addEvent({
-      delay: 1000, // the amount of time in between ticks
-      repeat: TIME_ALLOWED, // how many ticks should complete
-      callback: () => {
-        const timeLeft = this._timedEvent?.repeatCount;
-        if (timeLeft) {
-          this._countDownText?.setText('Time: ' + this._formatTime(timeLeft));
-        }
-        if (this._timedEvent?.repeatCount === 0) {
-          this.timerEnded();
-        }
-      },
-    });
 
     this._ready = true;
     this.updatePlayers(this.coveyTownController.players);
@@ -630,7 +603,9 @@ export default class TownGameScene extends Phaser.Scene {
   }
 
   timerEnded() {
-    return;
+    // make background of countdown text red
+    this._countDownText?.setBackgroundColor('#E55451');
+    this._countDownText?.setText(`Time's up! \nGame over.`);
   }
 
   /**
@@ -695,4 +670,66 @@ export default class TownGameScene extends Phaser.Scene {
       this._previouslyCapturedKeys = [];
     }
   }
+
+  startTimer() {
+    this._countDownText = this.add
+      .text(575, 32, `Time Left:`, {
+        font: '15px monospace',
+        color: '#000000',
+        padding: {
+          x: 20,
+          y: 10,
+        },
+        backgroundColor: '#ffffff',
+      })
+      .setScrollFactor(0)
+      .setDepth(30);
+
+    this._timedEvent = this.time.addEvent({
+      delay: 1000, // the amount of time in between ticks
+      repeat: TIME_ALLOWED, // how many ticks should complete
+      callback: () => {
+        const timeLeft = this._timedEvent?.repeatCount;
+        if (timeLeft) {
+          this._countDownText?.setText('Time Left: ' + this._formatTime(timeLeft));
+        }
+        if (this._timedEvent?.repeatCount === 0) {
+          this.timerEnded();
+        }
+      },
+    });
+  }
+
+  showItemText() {
+    this._itemsFoundText = this.add
+    .text(575, 16, `Items Found: ` + this._itemCount.toString() + ' / ' + this._totalItemCount.toString(), {
+      font: '15px monospace',
+      color: '#000000',
+      padding: {
+        x: 20,
+        y: 10,
+      },
+      backgroundColor: '#ffffff',
+    })
+    .setScrollFactor(0)
+    .setDepth(30);
+  }
+
+  hideItemText() {
+    this._itemCount = 0;
+    this._itemsFoundText?.destroy(true);
+  }
+
+  setTotalItemCount(count: number) {
+    this._totalItemCount = count;
+  }
+
+  resetTotalItemCount() {
+    this._totalItemCount = 0;
+  }
+
+  resetTimer() {
+    this._timedEvent?.remove();
+  }
+
 }

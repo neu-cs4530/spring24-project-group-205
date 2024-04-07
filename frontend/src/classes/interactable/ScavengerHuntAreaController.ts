@@ -148,4 +148,32 @@ export default class ScavengerHuntAreaController extends GameAreaController<
     });
     this._instanceID = gameID;
   }
+
+  /**
+   * Sends a request to the server to leave the current game in the game area.
+   */
+  public async leaveGame(): Promise<void> {
+    const instanceID = this._instanceID;
+    if (instanceID) {
+      await this._townController.sendInteractableCommand(this.id, {
+        type: 'LeaveGame',
+        gameID: instanceID,
+      });
+    }
+  }
+
+  public async endGame(): Promise<void> {
+    const instanceID = this._instanceID;
+    if (instanceID) {
+      await this._townController.sendInteractableCommand(this.id, {
+        type: 'EndGame',
+        gameID: instanceID,
+      });
+    }
+
+    console.log('left game')
+    this._townController.globalScene.resetTotalItemCount();
+    console.log('reset total item count');
+    this._townController.globalScene.hideItemText();
+  }
 }

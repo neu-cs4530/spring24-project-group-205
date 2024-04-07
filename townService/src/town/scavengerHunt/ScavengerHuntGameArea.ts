@@ -26,8 +26,8 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
     this._interactables = interactables;
   }
 
-  public getThemepack(): Themepack | undefined {
-    return this._game?.getThemePack();
+  public get themepack(): Themepack | undefined {
+    return this._game?.themePack;
   }
 
   protected getType(): InteractableType {
@@ -70,7 +70,10 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
       if (!game) {
         game = new ScavengerHuntTimed(selectedThemepack);
         this._game = game;
-        game.setThemePack(selectedThemepack);
+        if (!this.themepack) {
+          game.themePack?(selectedThemepack):undefined;
+        }
+        game.join(player); // Pass themepack to join method
       }
       game.join(player); // Pass themepack to join method
       this._stateUpdated(game.toModel());
@@ -86,8 +89,8 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
         }
         game = new ScavengerHuntRelaxed(selectedThemepack);
         this._game = game;
-        if (!this.getThemepack()) {
-          game.setThemePack(selectedThemepack);
+        if (!this.themepack) {
+          game.themePack?(selectedThemepack):undefined;
         }
         game.join(player); // Pass themepack to join method
       }
@@ -116,6 +119,19 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
       }
       this._startTimer();
       game.startGame(player);
+      this._stateUpdated(game.toModel());
+      this._startTimer();
+      return undefined as InteractableCommandReturnType<CommandType>;
+    }
+    if (command.type == 'EndGame') {
+      const game = this._game;
+      if (!game) {
+        throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
+      }
+      if (this._game?.id !== command.gameID) {
+        throw new InvalidParametersError(GAME_ID_MISSMATCH_MESSAGE);
+      }
+      game.endGame(player);
       this._stateUpdated(game.toModel());
       return undefined as InteractableCommandReturnType<CommandType>;
     }
