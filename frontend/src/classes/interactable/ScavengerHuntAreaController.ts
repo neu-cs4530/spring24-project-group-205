@@ -13,7 +13,6 @@ import GameAreaController, {
   NO_GAME_STARTABLE,
   PLAYER_NOT_IN_GAME_ERROR,
 } from './GameAreaController';
-import ScavengerHuntItemOnMap from '../../components/Town/interactables/ScavengerHunt/ScavengerHuntItemOnMap';
 import TownGameScene from '../../components/Town/TownGameScene';
 export type ScavengerHuntEvents = GameEventTypes & {
   itemsChanged: (items: ScavengerHuntItem[] | undefined) => void;
@@ -24,8 +23,6 @@ export default class ScavengerHuntAreaController extends GameAreaController<
   ScavengerHuntEvents
 > {
   public items: ScavengerHuntItem[] = [];
-
-  //rivate _itemsOnMap: ScavengerHuntItemOnMap[] = [];
 
   /**
    * Returns the player who won the game, if there is one, or undefined otherwise
@@ -113,23 +110,29 @@ export default class ScavengerHuntAreaController extends GameAreaController<
     // this._renderInitialItems();
   }
 
+  // public renderItemsForAllPlayers(): void {
+  //   // console.log(this._townController.globalScene);
+  //   for (const player of this._townController.players) {
+  //     console.log('rendering items for player', player.userName);
+  //     this._renderInitialItems(player.scene);
+  //   }
+  // }
+
   public _renderInitialItems(): void {
     if (this.items) {
       for (const item of this.items) {
-        this._townController.globalScene.coveyTownController.globalScene.addTileOnMap(
+        this._townController.emitItemPlaced(item);
+        this._townController.ourPlayer.scene?.addTileOnMap(
           item.id,
           item.location.x,
           item.location.y,
         );
+        // this._townController.globalScene.addTileOnMap(item.id, item.location.x, item.location.y);
         // console.log('attempted to put item at location', item.location.x, item.location.y);
       }
     } else {
       throw new Error('Start Game could not find items');
     }
-  }
-
-  public getSceneForPlayer(): TownGameScene {
-    return this._townController.globalScene;
   }
 
   /**

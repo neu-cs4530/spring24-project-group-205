@@ -1,6 +1,7 @@
 import EventEmitter from 'events';
 import TypedEmitter from 'typed-emitter';
 import { Player as PlayerModel, PlayerLocation } from '../types/CoveyTownSocket';
+import TownGameScene from '../components/Town/TownGameScene';
 export const MOVEMENT_SPEED = 175;
 
 export type PlayerEvents = {
@@ -19,6 +20,8 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
 
   private readonly _userName: string;
 
+  private _scene?: TownGameScene;
+
   public gameObjects?: PlayerGameObjects;
 
   constructor(id: string, userName: string, location: PlayerLocation) {
@@ -26,6 +29,15 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
     this._id = id;
     this._userName = userName;
     this._location = location;
+  }
+
+  set scene(scene: TownGameScene) {
+    this._scene = scene;
+  }
+
+  get scene(): TownGameScene | undefined {
+    console.log('GOT SCENE FOR PLAYER: ', this._userName);
+    return this._scene;
   }
 
   set location(newLocation: PlayerLocation) {

@@ -14,9 +14,11 @@ import {
   InteractableCommand,
   InteractableCommandBase,
   PlayerLocation,
+  ScavengerHuntItem,
   ServerToClientEvents,
   SocketData,
   ViewingArea as ViewingAreaModel,
+  XY,
 } from '../types/CoveyTownSocket';
 import { logError } from '../Utils';
 import ConversationArea from './ConversationArea';
@@ -170,6 +172,14 @@ export default class Town {
           (viewingArea as ViewingArea).updateModel(update);
         }
       }
+    });
+
+    socket.on('itemPlaced', (item: ScavengerHuntItem) => {
+      newPlayer.townEmitter.emit('itemPlaced', item);
+    });
+
+    socket.on('itemFound', (location: XY) => {
+      newPlayer.townEmitter.emit('itemFound', location);
     });
 
     // Set up a listener to process commands to interactables.
