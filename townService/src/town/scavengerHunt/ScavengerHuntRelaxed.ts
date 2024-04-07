@@ -4,7 +4,7 @@ import InvalidParametersError, {
   INVALID_MOVE_MESSAGE,
   PLAYER_NOT_IN_GAME_MESSAGE,
 } from '../../lib/InvalidParametersError';
-import { GameMove, ScavengerHuntItem, ScavengerHuntMove } from '../../types/CoveyTownSocket';
+import { GameMove, ScavengerHuntItem } from '../../types/CoveyTownSocket';
 import ScavengerHunt from './ScavengerHunt';
 import Themepack from './Themepack';
 import GameDatabase from './GameDatabase';
@@ -38,15 +38,9 @@ export default class ScavengerHuntRelaxed extends ScavengerHunt {
 
     move.move.foundBy = move.playerID;
     this._itemsFound.set(move.playerID, (this._itemsFound.get(move.playerID) || 0) + 1);
-    const updatedItems = [...this.state.items];
-    updatedItems[foundItemIndex] = {
-      ...updatedItems[foundItemIndex],
-      foundBy: move.playerID,
-    };
     this.state = {
       ...this.state,
-      moves: [...this.state.moves, move.move],
-      items: updatedItems,
+      items: this.state.items.map(item => (item.id === move.move.id ? move.move : item)),
     };
   }
 

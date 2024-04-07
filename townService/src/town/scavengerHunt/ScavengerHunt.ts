@@ -11,7 +11,6 @@ import {
   PlayerID,
   ScavengerHuntGameState,
   ScavengerHuntItem,
-  ScavengerHuntMove,
 } from '../../types/CoveyTownSocket';
 import Game from '../games/Game';
 import Themepack from './Themepack';
@@ -23,7 +22,7 @@ const MAX_PLAYERS = 10;
 
 export default abstract class ScavengerHunt extends Game<
   ScavengerHuntGameState,
-  ScavengerHuntMove
+  ScavengerHuntItem
 > {
   // INFORMATION THAT IS SPECIFIC TO THE PLAYER:
   // The game mode the player is currently in
@@ -49,9 +48,9 @@ export default abstract class ScavengerHunt extends Game<
       mode: undefined,
       timeLeft: TIME_ALLOWED,
       items: [],
-      moves: [],
-      themepack: themePack,
       status: 'WAITING_TO_START',
+      themepack: themePack,
+      moves: [],
     });
   }
 
@@ -88,20 +87,6 @@ export default abstract class ScavengerHunt extends Game<
     this._assignRandomLocations();
   }
 
-  /**
-   *
-   * @returns a string with the hint associated with the next unfound item in the list
-   */
-  public requestHint(): string {
-    const unfoundItems = this.state.items.filter(item => item.foundBy === undefined);
-    if (unfoundItems.length === 0) {
-      return 'All items found!';
-    }
-
-    const nextItem = unfoundItems[0];
-    return nextItem.hint || 'No hint available';
-  }
-
   private _assignRandomLocations(): void {
     if (this.state.items.length === 0) {
       throw new Error('No items available in the scavenger hunt');
@@ -132,7 +117,7 @@ export default abstract class ScavengerHunt extends Game<
    * @param move A move to apply to the game.
    * @throws InvalidParametersError if the move is invalid.
    */
-  public abstract applyMove(move: GameMove<ScavengerHuntMove>): void;
+  public abstract applyMove(move: GameMove<ScavengerHuntItem>): void;
 
   /**
    * Gives the total number of items found at this point in the game.
@@ -159,7 +144,7 @@ export default abstract class ScavengerHunt extends Game<
     if (this._players.some(p => p.id === player.id)) {
       throw new InvalidParametersError(PLAYER_ALREADY_IN_GAME_MESSAGE);
     } else if (this._players.length < MAX_PLAYERS) {
-      this._players.push(player);
+      // EDIT
       this.state = {
         ...this.state,
         status: 'WAITING_TO_START',
@@ -184,13 +169,6 @@ export default abstract class ScavengerHunt extends Game<
   clearTimerInterval() {
     clearInterval(this._timerIntervalId);
   }
-
-  /**
-   * Determines if the current time (within milliseconds) is within the allotted time given
-   * @param currentTime the current time in milliseconds
-   * @returns true if the time is within the allotted time, false otherwise
-   */
-  protected abstract _isTimeRemaining(currentTime: number): boolean;
 
   /**
    * Determines if the current time (within milliseconds) is within the allotted time given
@@ -244,6 +222,20 @@ export default abstract class ScavengerHunt extends Game<
         this.state.status = 'WAITING_FOR_PLAYERS';
       }
     }
+  }
+
+  /**
+   *
+   * @returns a string with the hint associated with the next unfound item in the list
+   */
+  public requestHint(): string {
+    const unfoundItems = this.state.items.filter(item => item.foundBy === undefined);
+    if (unfoundItems.length === 0) {
+      return 'All items found!';
+    }
+
+    const nextItem = unfoundItems[0];
+    return nextItem.hint || 'No hint available';
   }
 
   /**
