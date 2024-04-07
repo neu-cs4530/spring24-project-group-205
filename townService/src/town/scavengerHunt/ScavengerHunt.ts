@@ -244,9 +244,6 @@ export default abstract class ScavengerHunt extends Game<
           status: 'OVER',
         };
     
-        this._addDatabaseEntries();
-        this.leaderboardData = this.leaderboard();
-    
         clearInterval(this._timerIntervalId);
       }
     }
