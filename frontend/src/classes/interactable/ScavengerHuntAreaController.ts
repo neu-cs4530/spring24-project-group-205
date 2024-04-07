@@ -1,4 +1,3 @@
-import React from 'react';
 import _ from 'lodash';
 import {
   ScavengerHuntItem,
@@ -14,8 +13,7 @@ import GameAreaController, {
   NO_GAME_STARTABLE,
   PLAYER_NOT_IN_GAME_ERROR,
 } from './GameAreaController';
-import ScavengerHuntItemOnMap from '../../components/Town/interactables/ScavengerHunt/ScavengerHuntItemOnMap';
-
+import TownGameScene from '../../components/Town/TownGameScene';
 export type ScavengerHuntEvents = GameEventTypes & {
   itemsChanged: (items: ScavengerHuntItem[] | undefined) => void;
 };
@@ -25,8 +23,6 @@ export default class ScavengerHuntAreaController extends GameAreaController<
   ScavengerHuntEvents
 > {
   public items: ScavengerHuntItem[] = [];
-
-  //rivate _itemsOnMap: ScavengerHuntItemOnMap[] = [];
 
   /**
    * Returns the player who won the game, if there is one, or undefined otherwise
@@ -56,6 +52,14 @@ export default class ScavengerHuntAreaController extends GameAreaController<
       return 'WAITING_FOR_PLAYERS';
     }
     return status;
+  }
+
+  get gamemode(): string | undefined {
+    return this._model.game?.state.gameMode;
+  }
+
+  get themepack(): ScavengerHuntThemepack | undefined {
+    return this._model.game?.state.themepack;
   }
 
   /**
@@ -102,24 +106,17 @@ export default class ScavengerHuntAreaController extends GameAreaController<
       gameID: instanceID,
       type: 'StartGame',
     });
-    console.log(this.items);
-    this._renderInitialItems();
-
-    // if the started game is timed, start the timer
-    if (this._model.game?.state.mode === 'timed') {
-      this._townController.globalScene.startTimer();
-      console.log('timer started');
-    }
-    this._townController.globalScene.setTotalItemCount(this.items.length);
-    this._townController.globalScene.showItemText();
-
   }
 
-  private _renderInitialItems(): void {
+  public _renderInitialItems(): void {
     if (this.items) {
       for (const item of this.items) {
-        this._townController.globalScene.addTileOnMap(item.id, item.location.x, item.location.y);
-        console.log('attempted to put item at location', item.location.x, item.location.y);
+        this._townController.emitItemPlaced(item);
+        this._townController.ourPlayer.scene?.addTileOnMap(
+          item.id,
+          item.location.x,
+          item.location.y,
+        );
       }
     } else {
       throw new Error('Start Game could not find items');
@@ -137,8 +134,6 @@ export default class ScavengerHuntAreaController extends GameAreaController<
       themepack: themepack,
     });
     this._instanceID = gameID;
-    //const scene = this._townController.globalScene;
-    //scene?.addTileOnMap(15053, 96, 32);
   }
 
   /**
