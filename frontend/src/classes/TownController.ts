@@ -219,8 +219,6 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    */
   private _interactableEmitter = new EventEmitter();
 
-  private _globalScene?: TownGameScene[];
-
   public constructor({ userName, townID, loginController }: ConnectionProperties) {
     super();
     this._townID = townID;
@@ -240,21 +238,6 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     this._townsService = new TownsServiceClient({ BASE: url }).towns;
     this.registerSocketListeners();
   }
-
-  public get globalScene(): TownGameScene[] {
-    if (!this._globalScene) {
-      throw new Error('Global scene not set');
-    }
-    return this._globalScene;
-  }
-
-  // public addGlobalScene(scene: TownGameScene) {
-  //   console.log('Adding global scene');
-  //   for (const player of this.players) {
-  //     console.log('added scene for player: ', player.userName);
-  //     player.setScene(scene);
-  //   }
-  // }
 
   public get sessionToken() {
     return this._sessionToken || '';
@@ -490,8 +473,6 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
 
     this._socket.on('itemPlaced', item => {
       for (const player of this.players) {
-        console.log('TRYING TO PLACE ITEM FOR PLAYER: ', player.userName);
-        console.log('PLAYER SCENE: ', player.scene);
         player.scene?.addTileOnMap(item.id, item.location.x, item.location.y);
       }
       this.emit('itemPlaced', item);

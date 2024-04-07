@@ -83,9 +83,6 @@ export default abstract class ScavengerHunt extends Game<
     });
 
     this._assignRandomLocations();
-    console.log('Starting game');
-    console.log('Players count:', this._players.length);
-    console.log('[DEBUG] Items: ', this.state.items);
   }
 
   private _assignRandomLocations(): void {
@@ -142,7 +139,6 @@ export default abstract class ScavengerHunt extends Game<
 
   // lets up to ten people join, and can be started as soon as the first person joins
   protected _join(player: Player): void {
-    console.log('Joining game in scavenger hunt');
     if (this._players.some(p => p.id === player.id)) {
       throw new InvalidParametersError(PLAYER_ALREADY_IN_GAME_MESSAGE);
     } else if (this._players.length < MAX_PLAYERS) {

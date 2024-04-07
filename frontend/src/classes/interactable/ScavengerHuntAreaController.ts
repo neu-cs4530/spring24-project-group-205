@@ -106,17 +106,7 @@ export default class ScavengerHuntAreaController extends GameAreaController<
       gameID: instanceID,
       type: 'StartGame',
     });
-    console.log(this.items);
-    // this._renderInitialItems();
   }
-
-  // public renderItemsForAllPlayers(): void {
-  //   // console.log(this._townController.globalScene);
-  //   for (const player of this._townController.players) {
-  //     console.log('rendering items for player', player.userName);
-  //     this._renderInitialItems(player.scene);
-  //   }
-  // }
 
   public _renderInitialItems(): void {
     if (this.items) {
@@ -127,8 +117,6 @@ export default class ScavengerHuntAreaController extends GameAreaController<
           item.location.x,
           item.location.y,
         );
-        // this._townController.globalScene.addTileOnMap(item.id, item.location.x, item.location.y);
-        // console.log('attempted to put item at location', item.location.x, item.location.y);
       }
     } else {
       throw new Error('Start Game could not find items');
@@ -146,8 +134,6 @@ export default class ScavengerHuntAreaController extends GameAreaController<
       themepack: themepack,
     });
     this._instanceID = gameID;
-    //const scene = this._townController.globalScene;
-    //scene?.addTileOnMap(15053, 96, 32);
   }
 
   /**

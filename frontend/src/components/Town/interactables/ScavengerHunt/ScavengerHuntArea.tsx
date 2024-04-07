@@ -111,7 +111,6 @@ export default function ScavengerHuntArea({
       } else {
         throw new Error('Please select a game mode before joining the game.');
       }
-      console.log('mode set');
     } catch (err) {
       toast({
         title: 'Error joining game',

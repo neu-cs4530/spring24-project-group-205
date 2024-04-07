@@ -317,7 +317,6 @@ export default class TownGameScene extends Phaser.Scene {
 
       const mouse = new Phaser.Math.Vector2(worldPoint);
 
-      // Draw tiles (only within the groundLayer)
       const itemsLayer = this.map.getLayer('Items');
       if (this.input.manager.activePointer.isDown) {
         const tile = itemsLayer?.tilemapLayer.removeTileAtWorldXY(mouse.x, mouse.y);

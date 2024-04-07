@@ -36,7 +36,6 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
   }
 
   get scene(): TownGameScene | undefined {
-    console.log('GOT SCENE FOR PLAYER: ', this._userName);
     return this._scene;
   }
 
