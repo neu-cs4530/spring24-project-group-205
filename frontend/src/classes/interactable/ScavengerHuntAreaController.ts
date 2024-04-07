@@ -9,15 +9,7 @@ import {
   XY,
 } from '../../types/CoveyTownSocket';
 import PlayerController from '../PlayerController';
-import GameAreaController, {
-  GameEventTypes,
-  NO_GAME_IN_PROGRESS_ERROR,
-  NO_GAME_STARTABLE,
-  PLAYER_NOT_IN_GAME_ERROR,
-} from './GameAreaController';
-import ScavengerHuntItemOnMap from '../../components/Town/interactables/ScavengerHunt/ScavengerHuntItemOnMap';
-import TownController from '../TownController';
-import TownGameScene from '../../components/Town/TownGameScene';
+import GameAreaController, { GameEventTypes, NO_GAME_STARTABLE } from './GameAreaController';
 export type ScavengerHuntEvents = GameEventTypes & {
   itemsChanged: (items: ScavengerHuntItem[] | undefined) => void;
 };
@@ -123,7 +115,7 @@ export default class ScavengerHuntAreaController extends GameAreaController<
       gameID: instanceID,
       type: 'StartGame',
     });
-    console.log(this.items);
+    this._townController.ourPlayer.scene?.updateItemsFound(true);
   }
 
   public _renderInitialItems(): void {
@@ -163,6 +155,21 @@ export default class ScavengerHuntAreaController extends GameAreaController<
   }
 
   /**
+   * Sends a request to the server to leave the current game in the game area.
+   */
+  public async leaveGameScavenger() {
+    const instanceID = this._instanceID;
+    if (instanceID) {
+      await this._townController.sendInteractableCommand(this.id, {
+        type: 'LeaveGame',
+        gameID: instanceID,
+      });
+      this._townController.ourPlayer.scene?.updateTimer(false, 'Timed');
+      this._townController.ourPlayer.scene?.updateItemsFound(false);
+    }
+  }
+
+  /**
    * Sends a request to the server to join the current timed game in the game area, or create a new one if there is no game in progress.
    *
    * @throws An error if the server rejects the request to join the game.
@@ -173,8 +180,7 @@ export default class ScavengerHuntAreaController extends GameAreaController<
       themepack: themepack,
     });
     this._instanceID = gameID;
-    //const scene = this._townController.globalScene;
-    //scene?.addTileOnMap(15053, 96, 32);
+    this._townController.ourPlayer.scene?.updateTimer(true, 'Timed');
   }
 
   /**
@@ -188,5 +194,6 @@ export default class ScavengerHuntAreaController extends GameAreaController<
       themepack: themepack,
     });
     this._instanceID = gameID;
+    this._townController.ourPlayer.scene?.updateTimer(true, 'relaxed');
   }
 }

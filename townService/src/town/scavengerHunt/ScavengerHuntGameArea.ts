@@ -132,14 +132,11 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
       return { hint: requestedHint } as InteractableCommandReturnType<CommandType>;
     }
     if (command.type === 'ItemFound') {
-      console.log('Item found by ', player.userName);
       const game = this._game;
       if (!game) {
         throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
       }
       const item = game.getItemByLocation(command.location.x, command.location.y);
-      console.log('item is ', item);
-      // game.applyMove({ gameID: game.id, playerID: player.id, move: item });
       return undefined as InteractableCommandReturnType<CommandType>;
     }
     throw new InvalidParametersError('INVALID_COMMAND_MESSAGE');
