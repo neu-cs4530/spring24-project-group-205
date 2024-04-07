@@ -649,43 +649,45 @@ export default class TownGameScene extends Phaser.Scene {
       .setDepth(30);
   }
 
-  // Method to update timer component visibility when the game state changes
-  public updateTimer(gameStarted: boolean, gameMode: string) {
-    if (gameStarted && gameMode === 'Timed') {
-      this._countDownText?.setVisible(true);
-
-      // Start the timer event only when the game is started and the mode is timed
-      if (!this._timerFlag) {
-        this._timerFlag = true;
-        this._timedEvent = this.time.addEvent({
-          delay: 1000, // the amount of time in between ticks
-          repeat: TIME_ALLOWED, // how many ticks should complete
-          callback: () => {
-            const timeLeft = this._timedEvent?.repeatCount;
-            if (timeLeft) {
-              this._countDownText?.setText('Time: ' + this._formatTime(timeLeft));
-            }
-            if (this._timedEvent?.repeatCount === 0) {
-              this.timerEnded();
-            }
-          },
-        });
-      }
-    } else {
-      // Hide the timer component if the game is not started or the mode is not timed
-      this._countDownText?.setVisible(false);
-
-      // Stop the timer event
-      this._timerFlag = false;
-      this._timedEvent?.remove(false);
+  startTimer() {
+    // Start the timer event only if it's not already started
+    if (!this._timerFlag) {
+      this._timerFlag = true;
+      this._timedEvent = this.time.addEvent({
+        delay: 1000, // the amount of time in between ticks
+        repeat: TIME_ALLOWED, // how many ticks should complete
+        callback: () => {
+          const timeLeft = this._timedEvent?.repeatCount;
+          if (timeLeft) {
+            this._countDownText?.setText('Time: ' + this._formatTime(timeLeft));
+          }
+          if (this._timedEvent?.repeatCount === 0) {
+            this.stopTimer();
+          }
+        },
+      });
     }
   }
 
-  // Method to handle timer end
-  timerEnded() {
-    // Hide the timer component
-    this._countDownText?.setVisible(false);
-    // Handle other game over logic
+  // Method to update timer component visibility and start the timer when the game starts
+  public updateTimer(gameStarted: boolean, gameMode: string) {
+    if (gameStarted && gameMode === 'Timed') {
+      // Show the countdown text when the game is started and the mode is timed
+      this._countDownText?.setVisible(true);
+    } else {
+      // Hide the countdown text when the game is not started or the mode is not timed
+      this._countDownText?.setVisible(false);
+
+      // Stop the timer when the game is not started or the mode is not timed
+      this.stopTimer();
+    }
+  }
+
+  // Method to stop the timer
+  stopTimer() {
+    // Stop the timer event
+    this._timerFlag = false;
+    this._timedEvent?.remove(false);
   }
 
   /**

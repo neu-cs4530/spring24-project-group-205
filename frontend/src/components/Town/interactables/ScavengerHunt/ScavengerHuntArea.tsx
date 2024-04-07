@@ -241,15 +241,27 @@ export default function ScavengerHuntArea({
                     <HStack>
                       <VStack>
                         <Image src='/food.png' alt='food' boxSize='100px' />
-                        <Button onClick={() => handleClick('food')}>Food</Button>
+                        <Button
+                          onClick={() => handleClick('food')}
+                          colorScheme={themepack === 'food' ? 'orange' : 'gray'}>
+                          Food
+                        </Button>
                       </VStack>
                       <VStack>
                         <Image src='/emojis.png' alt='emoji' boxSize='100px' />
-                        <Button onClick={() => handleClick('emojis')}>Emojis</Button>
+                        <Button
+                          onClick={() => handleClick('emojis')}
+                          colorScheme={themepack === 'emojis' ? 'orange' : 'gray'}>
+                          Emojis
+                        </Button>
                       </VStack>
                       <VStack>
                         <Image src='/egg.png' alt='egg' boxSize='100px' />
-                        <Button onClick={() => handleClick('egg')}>Egg</Button>
+                        <Button
+                          onClick={() => handleClick('egg')}
+                          colorScheme={themepack === 'egg' ? 'orange' : 'gray'}>
+                          Egg
+                        </Button>
                       </VStack>
                     </HStack>
                   </VStack>
