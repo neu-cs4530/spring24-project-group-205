@@ -96,6 +96,9 @@ export default class ScavengerHuntAreaController extends GameAreaController<
     if (!instanceID) {
       throw new Error(NO_GAME_STARTABLE);
     }
+    this._townController.ourPlayer.scene?.startTimer();
+    this._townController.ourPlayer.scene?.setTotalItemCount(this.items.length);
+    this._townController.ourPlayer.scene?.showItemText();
     await this._townController.sendInteractableCommand(this.id, {
       gameID: instanceID,
       type: 'StartGame',

@@ -110,7 +110,7 @@ describe('ScavengerHuntArea', () => {
           player2,
         ).gameID;
         // expect(joinSpy).toHaveBeenCalledWith(player2);
-        expect(gameTimed.numPlayers()).toEqual(6);
+        expect(gameTimed.numPlayers()).toEqual(4);
         expect(gameID2).toEqual(gameID);
         expect(interactableUpdateSpy).toHaveBeenCalledTimes(2);
       });

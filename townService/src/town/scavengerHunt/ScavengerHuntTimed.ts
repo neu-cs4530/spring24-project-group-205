@@ -33,7 +33,7 @@ export default class ScavengerHuntTimed extends ScavengerHunt {
   public applyMove(move: GameMove<ScavengerHuntItem>): void {
     const player = this._players.find(p => p.id === move.playerID);
     if (!player) {
-       throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
+      throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
     }
     if (move.move.foundBy) {
       throw new InvalidParametersError(INVALID_MOVE_MESSAGE);
