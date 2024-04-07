@@ -9,7 +9,6 @@ import GameArea from './interactables/GameArea';
 import Transporter from './interactables/Transporter';
 import ViewingArea from './interactables/ViewingArea';
 import TownController from '../../classes/TownController';
-import ScavengerHuntItemOnMap from './interactables/ScavengerHunt/ScavengerHuntItemOnMap';
 
 // Still not sure what the right type is here... "Interactable" doesn't do it
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -318,10 +317,12 @@ export default class TownGameScene extends Phaser.Scene {
 
       const mouse = new Phaser.Math.Vector2(worldPoint);
 
-      // Draw tiles (only within the groundLayer)
       const itemsLayer = this.map.getLayer('Items');
       if (this.input.manager.activePointer.isDown) {
-        itemsLayer?.tilemapLayer.removeTileAtWorldXY(mouse.x, mouse.y);
+        const tile = itemsLayer?.tilemapLayer.removeTileAtWorldXY(mouse.x, mouse.y);
+        if (tile && tile.index > 15053) {
+          this.coveyTownController.emitItemFound({ x: tile.x, y: tile.y });
+        }
       }
     }
   }
@@ -332,7 +333,6 @@ export default class TownGameScene extends Phaser.Scene {
       itemsLayer?.tilemapLayer.putTileAt(tileId, xTile, yTile);
     } catch (e) {
       console.error('Error adding tile to map', e);
-      console.log('TileId:', tileId, 'xTile:', xTile, 'yTile:', yTile);
     }
   }
 
@@ -487,6 +487,7 @@ export default class TownGameScene extends Phaser.Scene {
     };
 
     this._interactables = this.getInteractables();
+    console.log(this._interactables);
     const xyList: { x: number; y: number }[] = [];
     xyList.push({ x: 58, y: 39 });
     xyList.push({ x: 41, y: 32 });
@@ -497,12 +498,12 @@ export default class TownGameScene extends Phaser.Scene {
     xyList.push({ x: 58, y: 25 });
     xyList.push({ x: 77, y: 26 });
     xyList.push({ x: 44, y: 27 });
-    for (const xy of xyList) {
-      const item = new ScavengerHuntItemOnMap(this);
-      item.setX(xy.x);
-      item.setY(xy.y);
-      item.addItemOnScene();
-    }
+    // for (const xy of xyList) {
+    //   const item = new ScavengerHuntItemOnMap(this);
+    //   item.setX(xy.x);
+    //   item.setY(xy.y);
+    //   item.addItemOnScene();
+    // }
 
     this.moveOurPlayerTo({ rotation: 'front', moving: false, x: spawnPoint.x, y: spawnPoint.y });
 
