@@ -28,8 +28,6 @@ export default class ScavengerHuntAreaController extends GameAreaController<
 > {
   public items: ScavengerHuntItem[] = [];
 
-  //rivate _itemsOnMap: ScavengerHuntItemOnMap[] = [];
-
   public requestedHint?: string;
 
   /**
@@ -125,13 +123,14 @@ export default class ScavengerHuntAreaController extends GameAreaController<
       gameID: instanceID,
       type: 'StartGame',
     });
-    this._townController.globalScene.updateItemsFound(true);
+    console.log(this.items);
   }
 
   public _renderInitialItems(): void {
     if (this.items) {
       for (const item of this.items) {
-        this._townController.globalScene.coveyTownController.globalScene.addTileOnMap(
+        this._townController.emitItemPlaced(item);
+        this._townController.ourPlayer.scene?.addTileOnMap(
           item.id,
           item.location.x,
           item.location.y,
@@ -140,50 +139,6 @@ export default class ScavengerHuntAreaController extends GameAreaController<
     } else {
       throw new Error('Start Game could not find items');
     }
-  }
-
-  public removeTileOnMap(xTile: number, yTile: number): void {
-    const itemsLayer = this._townController.globalScene.map.getLayer('Items');
-    itemsLayer?.tilemapLayer.removeTileAt(xTile, yTile);
-  }
-
-  /**
-   * Sends a request to the server to leave the current game in the game area.
-   */
-  public async leaveGameScavenger() {
-    const instanceID = this._instanceID;
-    if (instanceID) {
-      await this._townController.sendInteractableCommand(this.id, {
-        type: 'LeaveGame',
-        gameID: instanceID,
-      });
-      this._townController.globalScene.updateTimer(false, 'Timed');
-      this._townController.globalScene.updateItemsFound(false);
-    }
-  }
-
-  /**
-   * Sends a request to the server to collect an object
-   *
-   * @throws an error with message NO_GAME_IN_PROGRESS_ERROR if there is no game in progress
-   *
-   * @param name name of object collected
-   */
-  public async makeMove(location: XY): Promise<void> {
-    const instanceID = this._instanceID;
-    if (!instanceID || this._model.game?.state.status !== 'IN_PROGRESS') {
-      throw new Error(NO_GAME_IN_PROGRESS_ERROR);
-    }
-    const move: ScavengerHuntMove = {
-      gamePiece: 'item',
-      col: location.x,
-      row: location.y,
-    };
-    await this._townController.sendInteractableCommand(this.id, {
-      type: 'GameMove',
-      gameID: instanceID,
-      move,
-    });
   }
 
   /**
@@ -207,10 +162,6 @@ export default class ScavengerHuntAreaController extends GameAreaController<
     this.requestedHint = hint;
   }
 
-  public getSceneForPlayer(): TownGameScene {
-    return this._townController.globalScene;
-  }
-
   /**
    * Sends a request to the server to join the current timed game in the game area, or create a new one if there is no game in progress.
    *
@@ -222,7 +173,6 @@ export default class ScavengerHuntAreaController extends GameAreaController<
       themepack: themepack,
     });
     this._instanceID = gameID;
-    this._townController.globalScene.updateTimer(true, 'Timed');
     //const scene = this._townController.globalScene;
     //scene?.addTileOnMap(15053, 96, 32);
   }
@@ -238,6 +188,5 @@ export default class ScavengerHuntAreaController extends GameAreaController<
       themepack: themepack,
     });
     this._instanceID = gameID;
-    this._townController.globalScene.updateTimer(true, 'relaxed');
   }
 }

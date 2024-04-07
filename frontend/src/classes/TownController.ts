@@ -23,8 +23,10 @@ import {
   InteractableID,
   PlayerID,
   PlayerLocation,
+  ScavengerHuntItem,
   TownSettingsUpdate,
   ViewingArea as ViewingAreaModel,
+  XY,
 } from '../types/CoveyTownSocket';
 import {
   isConnectFourArea,
@@ -44,7 +46,6 @@ import ScavengerHuntAreaController from './interactable/ScavengerHuntAreaControl
 import TicTacToeAreaController from './interactable/TicTacToeAreaController';
 import ViewingAreaController from './interactable/ViewingAreaController';
 import PlayerController from './PlayerController';
-import ScavengerHuntItem from '../components/Town/interactables/ScavengerHunt/ScavengerHuntItemOnMap';
 import TownGameScene from '../components/Town/TownGameScene';
 
 const CALCULATE_NEARBY_PLAYERS_DELAY_MS = 300;
@@ -112,6 +113,10 @@ export type TownEvents = {
    * @param obj the interactable that is being interacted with
    */
   interact: <T extends Interactable>(typeName: T['name'], obj: T) => void;
+
+  itemPlaced: (item: ScavengerHuntItem) => void;
+
+  itemFound: (location: XY) => void;
 };
 
 /**
@@ -214,8 +219,6 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    */
   private _interactableEmitter = new EventEmitter();
 
-  private _globalScene?: TownGameScene;
-
   public constructor({ userName, townID, loginController }: ConnectionProperties) {
     super();
     this._townID = townID;
@@ -234,17 +237,6 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     this._socket = io(url, { auth: { userName, townID } });
     this._townsService = new TownsServiceClient({ BASE: url }).towns;
     this.registerSocketListeners();
-  }
-
-  public get globalScene(): TownGameScene {
-    if (!this._globalScene) {
-      throw new Error('Global scene not set');
-    }
-    return this._globalScene;
-  }
-
-  public set globalScene(scene: TownGameScene) {
-    this._globalScene = scene;
   }
 
   public get sessionToken() {
@@ -478,6 +470,20 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         console.trace(err);
       }
     });
+
+    this._socket.on('itemPlaced', item => {
+      for (const player of this.players) {
+        player.scene?.addTileOnMap(item.id, item.location.x, item.location.y);
+      }
+      this.emit('itemPlaced', item);
+    });
+
+    this._socket.on('itemFound', location => {
+      for (const player of this.players) {
+        player.scene?.removeTileOnMap(location.x, location.y);
+      }
+      this.emit('itemFound', location);
+    });
   }
 
   /**
@@ -694,18 +700,18 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     }
   }
 
-  public getScavengerHuntController(
-    scavengerHuntItem: ScavengerHuntItem,
-  ): ScavengerHuntAreaController {
-    const existingController = this._interactableControllers.find(
-      eachExistingArea => eachExistingArea.id === scavengerHuntItem.name,
-    );
-    if (existingController instanceof ScavengerHuntAreaController) {
-      return existingController;
-    } else {
-      throw new Error(`No such scavenger hunt controller ${existingController}`);
-    }
-  }
+  // public getScavengerHuntController(
+  //   scavengerHuntItem: ScavengerHuntItem,
+  // ): ScavengerHuntAreaController {
+  //   const existingController = this._interactableControllers.find(
+  //     eachExistingArea => eachExistingArea.id === scavengerHuntItem.name,
+  //   );
+  //   if (existingController instanceof ScavengerHuntAreaController) {
+  //     return existingController;
+  //   } else {
+  //     throw new Error(`No such scavenger hunt controller ${existingController}`);
+  //   }
+  // }
 
   /**
    * Retrives the game area controller corresponding to a game area by ID, or
@@ -734,6 +740,14 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    */
   public emitViewingAreaUpdate(viewingArea: ViewingAreaController) {
     this._socket.emit('interactableUpdate', viewingArea.toInteractableAreaModel());
+  }
+
+  public emitItemPlaced(item: ScavengerHuntItem) {
+    this._socket.emit('itemPlaced', item);
+  }
+
+  public emitItemFound(location: XY) {
+    this._socket.emit('itemFound', location);
   }
 
   /**

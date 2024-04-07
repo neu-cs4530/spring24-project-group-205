@@ -9,7 +9,6 @@ import GameArea from './interactables/GameArea';
 import Transporter from './interactables/Transporter';
 import ViewingArea from './interactables/ViewingArea';
 import TownController from '../../classes/TownController';
-import ScavengerHuntItemOnMap from './interactables/ScavengerHunt/ScavengerHuntItemOnMap';
 
 // Still not sure what the right type is here... "Interactable" doesn't do it
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -73,9 +72,9 @@ export default class TownGameScene extends Phaser.Scene {
   private _timedEvent: Phaser.Time.TimerEvent | undefined;
 
   // item found count components:
-  public _itemsFoundText: Phaser.GameObjects.Text | undefined;
+  private _itemsFoundText: Phaser.GameObjects.Text | undefined;
 
-  public _itemsFound = 0;
+  private _itemCount = 0;
 
   /**
    * Layers that the player can collide with.
@@ -314,20 +313,16 @@ export default class TownGameScene extends Phaser.Scene {
         }
       }
 
-      const itemsLayer = this.map.getLayer('Items');
-      if (itemsLayer) {
-        this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-          const worldPoint = pointer.positionToCamera(this.cameras.main);
-          const mouse = new Phaser.Math.Vector2(worldPoint);
+      const worldPoint = this.input.activePointer.positionToCamera(this.cameras.main);
 
-          const clickedTile = itemsLayer.tilemapLayer.getTileAtWorldXY(mouse.x, mouse.y);
-          if (clickedTile) {
-            const removedTile = itemsLayer.tilemapLayer.removeTileAtWorldXY(mouse.x, mouse.y);
-            if (removedTile !== null) {
-              this.updateItemsFoundCount();
-            }
-          }
-        });
+      const mouse = new Phaser.Math.Vector2(worldPoint);
+
+      const itemsLayer = this.map.getLayer('Items');
+      if (this.input.manager.activePointer.isDown) {
+        const tile = itemsLayer?.tilemapLayer.removeTileAtWorldXY(mouse.x, mouse.y);
+        if (tile && tile.index > 15053) {
+          this.coveyTownController.emitItemFound({ x: tile.x, y: tile.y });
+        }
       }
     }
   }
@@ -338,14 +333,13 @@ export default class TownGameScene extends Phaser.Scene {
       itemsLayer?.tilemapLayer.putTileAt(tileId, xTile, yTile);
     } catch (e) {
       console.error('Error adding tile to map', e);
-      console.log('TileId:', tileId, 'xTile:', xTile, 'yTile:', yTile);
     }
   }
 
-  // public removeTileOnMap(xTile: number, yTile: number): void {
-  //   const itemsLayer = this.map.getLayer('Items');
-  //   itemsLayer?.tilemapLayer.removeTileAt(xTile, yTile);
-  // }
+  public removeTileOnMap(xTile: number, yTile: number): void {
+    const itemsLayer = this.map.getLayer('Items');
+    itemsLayer?.tilemapLayer.removeTileAt(xTile, yTile);
+  }
 
   private _map?: Phaser.Tilemaps.Tilemap;
 
@@ -493,6 +487,7 @@ export default class TownGameScene extends Phaser.Scene {
     };
 
     this._interactables = this.getInteractables();
+    console.log(this._interactables);
     const xyList: { x: number; y: number }[] = [];
     xyList.push({ x: 58, y: 39 });
     xyList.push({ x: 41, y: 32 });
@@ -503,12 +498,12 @@ export default class TownGameScene extends Phaser.Scene {
     xyList.push({ x: 58, y: 25 });
     xyList.push({ x: 77, y: 26 });
     xyList.push({ x: 44, y: 27 });
-    for (const xy of xyList) {
-      const item = new ScavengerHuntItemOnMap(this);
-      item.setX(xy.x);
-      item.setY(xy.y);
-      item.addItemOnScene();
-    }
+    // for (const xy of xyList) {
+    //   const item = new ScavengerHuntItemOnMap(this);
+    //   item.setX(xy.x);
+    //   item.setY(xy.y);
+    //   item.addItemOnScene();
+    // }
 
     this.moveOurPlayerTo({ rotation: 'front', moving: false, x: spawnPoint.x, y: spawnPoint.y });
 
@@ -586,54 +581,6 @@ export default class TownGameScene extends Phaser.Scene {
       .setScrollFactor(0)
       .setDepth(30);
 
-    this._initializeTimer();
-    this._countDownText?.setVisible(false);
-
-    this._initializeItemsFound();
-    this._itemsFoundText?.setVisible(false);
-
-    this._ready = true;
-    this.updatePlayers(this.coveyTownController.players);
-    // Call any listeners that are waiting for the game to be initialized
-    this._onGameReadyListeners.forEach(listener => listener());
-    this._onGameReadyListeners = [];
-    this.coveyTownController.addListener('playersChanged', players => this.updatePlayers(players));
-    this.events.on('itemFound', this.updateItemsFoundCount, this);
-  }
-
-  _initializeItemsFound() {
-    this._itemsFoundText = this.add
-      .text(600, 56, `Items Found: ${this._itemsFound}`, {
-        // Adjusted Y position to appear below the timer
-        font: '15px monospace',
-        color: '#000000',
-        padding: {
-          x: 20,
-          y: 10,
-        },
-        backgroundColor: '#ffffff',
-      })
-      .setScrollFactor(0)
-      .setDepth(30);
-  }
-
-  public updateItemsFound(gameStarted: boolean) {
-    // Show the items found text component when the game is started
-    if (gameStarted) {
-      this._itemsFoundText?.setVisible(true);
-    } else {
-      // Hide the items found text component if the game is not started
-      this._itemsFoundText?.setVisible(false);
-    }
-  }
-
-  public updateItemsFoundCount() {
-    this._itemsFound = this._itemsFound + 1;
-    this._itemsFoundText?.setText(`Items Found: ${this._itemsFound}`);
-  }
-
-  _initializeTimer() {
-    // Create the timer component
     this._countDownText = this.add
       .text(600, 16, `Time Left: `, {
         font: '15px monospace',
@@ -646,45 +593,44 @@ export default class TownGameScene extends Phaser.Scene {
       })
       .setScrollFactor(0)
       .setDepth(30);
+
+    this._itemsFoundText = this.add
+      .text(600, 62, `Items Found: ` + this._itemCount.toString(), {
+        font: '15px monospace',
+        color: '#000000',
+        padding: {
+          x: 20,
+          y: 10,
+        },
+        backgroundColor: '#ffffff',
+      })
+      .setScrollFactor(0)
+      .setDepth(30);
+
+    this._timedEvent = this.time.addEvent({
+      delay: 1000, // the amount of time in between ticks
+      repeat: TIME_ALLOWED, // how many ticks should complete
+      callback: () => {
+        const timeLeft = this._timedEvent?.repeatCount;
+        if (timeLeft) {
+          this._countDownText?.setText('Time: ' + this._formatTime(timeLeft));
+        }
+        if (this._timedEvent?.repeatCount === 0) {
+          this.timerEnded();
+        }
+      },
+    });
+
+    this._ready = true;
+    this.updatePlayers(this.coveyTownController.players);
+    // Call any listeners that are waiting for the game to be initialized
+    this._onGameReadyListeners.forEach(listener => listener());
+    this._onGameReadyListeners = [];
+    this.coveyTownController.addListener('playersChanged', players => this.updatePlayers(players));
   }
 
-  // Method to update timer component visibility when the game state changes
-  public updateTimer(gameStarted: boolean, gameMode: string) {
-    if (gameStarted && gameMode === 'Timed') {
-      this._countDownText?.setVisible(true);
-
-      // Start the timer event only when the game is started and the mode is timed
-      if (!this._timerFlag) {
-        this._timerFlag = true;
-        this._timedEvent = this.time.addEvent({
-          delay: 1000, // the amount of time in between ticks
-          repeat: TIME_ALLOWED, // how many ticks should complete
-          callback: () => {
-            const timeLeft = this._timedEvent?.repeatCount;
-            if (timeLeft) {
-              this._countDownText?.setText('Time: ' + this._formatTime(timeLeft));
-            }
-            if (this._timedEvent?.repeatCount === 0) {
-              this.timerEnded();
-            }
-          },
-        });
-      }
-    } else {
-      // Hide the timer component if the game is not started or the mode is not timed
-      this._countDownText?.setVisible(false);
-
-      // Stop the timer event
-      this._timerFlag = false;
-      this._timedEvent?.remove(false);
-    }
-  }
-
-  // Method to handle timer end
   timerEnded() {
-    // Hide the timer component
-    this._countDownText?.setVisible(false);
-    // Handle other game over logic
+    return;
   }
 
   /**

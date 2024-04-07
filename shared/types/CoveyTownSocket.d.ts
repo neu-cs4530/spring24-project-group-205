@@ -249,7 +249,7 @@ interface InteractableCommandBase {
   type: string;
 }
 
-export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | JoinRelaxedGameCommand | JoinTimedGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | GameMoveCommand<ScavengerHuntMove> | StartGameCommand | LeaveGameCommand | RequestHintCommand;
+export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | JoinRelaxedGameCommand | JoinTimedGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | StartGameCommand | LeaveGameCommand | ItemFoundCommand | RequestHintCommand;
 export interface ViewingAreaUpdateCommand  {
   type: 'ViewingAreaUpdate';
   update: ViewingArea;
@@ -257,13 +257,10 @@ export interface ViewingAreaUpdateCommand  {
 export interface JoinGameCommand {
   type: 'JoinGame';
 }
-
-export interface ScavengerHuntMoveCommand {
-  type: 'GameMove';
-  gameID: GameInstanceID;
-  move: ScavengerHuntMove;
+export interface ItemFoundCommand {
+  type: 'ItemFound';
+  location: XY;
 }
-
 export interface JoinRelaxedGameCommand {
   type: 'JoinRelaxedGame';
   themepack: string;
@@ -316,6 +313,8 @@ export interface ServerToClientEvents {
   chatMessage: (message: ChatMessage) => void;
   interactableUpdate: (interactable: Interactable) => void;
   commandResponse: (response: InteractableCommandResponse) => void;
+  itemFound: (location: XY) => void;
+  itemPlaced: (item: ScavengerHuntItem) => void;
 }
 
 export interface ClientToServerEvents {
@@ -323,4 +322,6 @@ export interface ClientToServerEvents {
   playerMovement: (movementData: PlayerLocation) => void;
   interactableUpdate: (update: Interactable) => void;
   interactableCommand: (command: InteractableCommand & InteractableCommandBase) => void;
+  itemFound: (location: XY) => void;
+  itemPlaced: (item: ScavengerHuntItem) => void;
 }

@@ -21,7 +21,7 @@ import {
 } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 import ScavengerHuntAreaController from '../../../../classes/interactable/ScavengerHuntAreaController';
-import { useInteractableAreaController } from '../../../../classes/TownController';
+import { useInteractableAreaController, usePlayers } from '../../../../classes/TownController';
 import { InteractableID } from '../../../../types/CoveyTownSocket';
 import { forEach } from 'lodash';
 import TownGameScene from '../../TownGameScene';
@@ -115,7 +115,6 @@ export default function ScavengerHuntArea({
       } else {
         throw new Error('Please select a game mode before joining the game.');
       }
-      console.log('mode set');
     } catch (err) {
       toast({
         title: 'Error joining game',

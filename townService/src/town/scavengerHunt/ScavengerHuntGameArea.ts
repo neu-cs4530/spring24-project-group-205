@@ -35,7 +35,6 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
   }
 
   private _stateUpdated(updatedState: GameInstance<ScavengerHuntGameState>) {
-    console.log('state updated');
     if (updatedState.state.status === 'OVER') {
       const gameID = this._game?.id;
       if (gameID && !this._history.find(eachResult => eachResult.gameID === gameID)) {
@@ -54,7 +53,6 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
         }
       }
     }
-    // console.log(this._game);
     this._emitAreaChanged();
   }
 
@@ -116,7 +114,6 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
       if (this._game?.id !== command.gameID) {
         throw new InvalidParametersError(GAME_ID_MISSMATCH_MESSAGE);
       }
-      // console.log('updating state in start game');
       this._startTimer();
       game.startGame(player);
       this._stateUpdated(game.toModel());
@@ -134,20 +131,15 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
       const requestedHint = game.requestHint();
       return { hint: requestedHint } as InteractableCommandReturnType<CommandType>;
     }
-    if (command.type === 'GameMove') {
+    if (command.type === 'ItemFound') {
+      console.log('Item found by ', player.userName);
       const game = this._game;
       if (!game) {
         throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
       }
-      if (this._game?.id !== command.gameID) {
-        throw new InvalidParametersError(GAME_ID_MISSMATCH_MESSAGE);
-      }
-      game.applyMove({
-        gameID: command.gameID,
-        playerID: player.id,
-        move: command.move,
-      });
-      this._stateUpdated(game.toModel());
+      const item = game.getItemByLocation(command.location.x, command.location.y);
+      console.log('item is ', item);
+      // game.applyMove({ gameID: game.id, playerID: player.id, move: item });
       return undefined as InteractableCommandReturnType<CommandType>;
     }
     throw new InvalidParametersError('INVALID_COMMAND_MESSAGE');
@@ -158,7 +150,6 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
    * @throws an error if the game is not in progress
    */
   private _incrementTimer(): void {
-    console.log('incrementing timer');
     const game = this._game;
 
     if (!game) {
@@ -175,18 +166,12 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
    * @throws an error if there is no game in progress
    */
   private _startTimer() {
-    console.log('starting timer');
     const intervalId = setInterval(() => {
-      console.log('this.game: ', this.game);
-      console.log('this.game.state.status: ', this.game?.state.status);
-      console.log('this.game.state.timeLeft: ', this.game?.state.timeLeft);
       if (this.game && this.game.state.status === 'IN_PROGRESS' && this.game.state.timeLeft > 0) {
-        console.log('incrementing timer INNER');
         this._incrementTimer();
       } else if (!this.game) {
         throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
       } else {
-        console.log('clearing interval');
         clearInterval(intervalId);
       }
     }, 1000);
