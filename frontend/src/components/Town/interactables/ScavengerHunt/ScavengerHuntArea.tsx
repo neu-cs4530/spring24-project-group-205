@@ -21,10 +21,8 @@ import {
 } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 import ScavengerHuntAreaController from '../../../../classes/interactable/ScavengerHuntAreaController';
-import { useInteractableAreaController, usePlayers } from '../../../../classes/TownController';
+import { useInteractableAreaController } from '../../../../classes/TownController';
 import { InteractableID } from '../../../../types/CoveyTownSocket';
-import { forEach } from 'lodash';
-import TownGameScene from '../../TownGameScene';
 
 /**
  * The ScavengerHuntArea component renders the Scavenger Hunt game area.

@@ -111,6 +111,9 @@ export default class ScavengerHuntAreaController extends GameAreaController<
     if (!instanceID) {
       throw new Error(NO_GAME_STARTABLE);
     }
+    this._townController.ourPlayer.scene?.startTimer();
+    this._townController.ourPlayer.scene?.setTotalItemCount(this.items.length);
+    this._townController.ourPlayer.scene?.showItemText();
     await this._townController.sendInteractableCommand(this.id, {
       gameID: instanceID,
       type: 'StartGame',
@@ -208,5 +211,28 @@ export default class ScavengerHuntAreaController extends GameAreaController<
     });
     this._instanceID = gameID;
     this._townController.ourPlayer.scene?.updateTimer(true, 'relaxed');
+  }
+
+  /**
+   * Sends a request to the server to leave the current game in the game area.
+   */
+  public async leaveGame(): Promise<void> {
+    const instanceID = this._instanceID;
+    if (instanceID) {
+      await this._townController.sendInteractableCommand(this.id, {
+        type: 'LeaveGame',
+        gameID: instanceID,
+      });
+    }
+  }
+
+  public async endGame(): Promise<void> {
+    const instanceID = this._instanceID;
+    if (instanceID) {
+      await this._townController.sendInteractableCommand(this.id, {
+        type: 'EndGame',
+        gameID: instanceID,
+      });
+    }
   }
 }

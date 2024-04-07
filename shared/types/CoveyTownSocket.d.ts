@@ -146,6 +146,7 @@ export interface TicTacToeGameState extends WinnableGameState {
 }
 
 export interface ScavengerHuntGameState extends WinnableGameState {
+  mode?: GameMode;
   timeLeft: number;
   items: ReadonlyArray<ScavengerHuntItem>;
   moves: ReadonlyArray<ScavengerHuntMove>;
@@ -262,11 +263,6 @@ export interface ItemFoundCommand {
   location: XY;
 }
 
-export interface EndGameCommand {
-  type: 'EndGame';
-  gameID: GameInstanceID;
-}
-
 export interface JoinRelaxedGameCommand {
   type: 'JoinRelaxedGame';
   themepack: string;
@@ -281,6 +277,10 @@ export interface LeaveGameCommand {
 }
 export interface RequestHintCommand {
   type: 'RequestHint';
+  gameID: GameInstanceID;
+}
+export interface EndGameCommand {
+  type: 'EndGame';
   gameID: GameInstanceID;
 }
 export interface StartGameCommand {

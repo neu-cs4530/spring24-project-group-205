@@ -46,6 +46,7 @@ export default abstract class ScavengerHunt extends Game<
 
   public constructor(themePack?: Themepack) {
     super({
+      mode: undefined,
       timeLeft: TIME_ALLOWED,
       items: [],
       moves: [],
@@ -145,11 +146,11 @@ export default abstract class ScavengerHunt extends Game<
     return this.state.gameMode;
   }
 
-  public getThemePack(): Themepack | undefined {
+  public get themePack(): Themepack | undefined {
     return this.state.themepack;
   }
 
-  public setThemePack(themepack: Themepack): void {
+  public set themePack(themepack: Themepack | undefined) {
     this.state.themepack = themepack;
   }
 
@@ -191,6 +192,13 @@ export default abstract class ScavengerHunt extends Game<
   }
 
   /**
+   * Determines if the current time (within milliseconds) is within the allotted time given
+   * @param currentTime the current time in milliseconds
+   * @returns true if the time is within the allotted time, false otherwise
+   */
+  protected abstract _isTimeRemaining(currentTime: number): boolean;
+
+  /**
    * Removes the given player from the game, and reflects the game's state accordingly.
    *
    * If the game state is 'IN_PROGRESS' and there is only one player left, the game ends.
@@ -221,7 +229,6 @@ export default abstract class ScavengerHunt extends Game<
           ...this.state,
           status: 'OVER',
         };
-
         clearInterval(this._timerIntervalId);
       }
     }
@@ -251,7 +258,7 @@ export default abstract class ScavengerHunt extends Game<
   /**
    * Ends the game and clears the timer
    */
-  public _endGame(player: Player): void {
+  public endGame(player: Player): void {
     if (!this._players.includes(player)) {
       throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
     }
@@ -268,7 +275,7 @@ export default abstract class ScavengerHunt extends Game<
 
   private _endGameForAllPlayers(): void {
     this._players.forEach(p => {
-      this._endGame(p);
+      this.endGame(p);
     });
   }
 

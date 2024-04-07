@@ -91,4 +91,12 @@ export default abstract class Game<StateType extends GameState, MoveType> {
       players: this._players.map(player => player.id),
     };
   }
+
+  /**
+   * Method for testing purposes only.
+   * @returns number of players in the game
+   */
+  public numPlayers(): number {
+    return this._players.length;
+  }
 }

@@ -26,7 +26,7 @@ function interactableTypeForObjectType(type: string): any {
   }
 }
 
-const TIME_ALLOWED = 240;
+const TIME_ALLOWED = 120;
 
 // Original inspiration and code from:
 // https://medium.com/@michaelwesthadley/modular-game-worlds-in-phaser-3-tilemaps-1-958fc7e6bbd6
@@ -332,6 +332,12 @@ export default class TownGameScene extends Phaser.Scene {
         });
       }
     }
+  }
+
+  private _isPointerOnItem(x: number, y: number): boolean {
+    const itemsLayer = this.map.getLayer('Items');
+    const tile = itemsLayer?.tilemapLayer.getTileAtWorldXY(x, y);
+    return tile !== null;
   }
 
   public addTileOnMap(tileId: number, xTile: number, yTile: number): void {

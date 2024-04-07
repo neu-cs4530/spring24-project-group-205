@@ -33,6 +33,14 @@ class MockScavengerHuntAreaController extends ScavengerHuntAreaController {
   public constructor() {
     super(nanoid(), mock<GameArea<ScavengerHuntGameState>>(), mock<TownController>());
   }
+
+  get gamemode() {
+    return 'timed';
+  }
+
+  get themepack() {
+    return { name: 'food', items: [] };
+  }
 }
 describe('Scavenger Hunt Area', () => {
   let consoleErrorSpy: jest.SpyInstance<void, [message?: any, ...optionalParms: any[]]>;
@@ -79,7 +87,7 @@ describe('Scavenger Hunt Area', () => {
   describe('Render UI', () => {
     it('shows game modes', () => {
       renderScavengerHuntArea();
-      expect(screen.queryByText('Game Mode:')).toBeInTheDocument();
+      expect(screen.queryByText('Game Mode: timed')).toBeInTheDocument();
     });
     it('shows leaderboard', () => {
       renderScavengerHuntArea();
@@ -88,7 +96,7 @@ describe('Scavenger Hunt Area', () => {
     });
     it('shows themes', () => {
       renderScavengerHuntArea();
-      expect(screen.queryByText('Theme:')).toBeInTheDocument();
+      expect(screen.queryByText('Theme: food')).toBeInTheDocument();
       expect(screen.queryByText('Food')).toBeInTheDocument();
       expect(screen.queryByText('Emojis')).toBeInTheDocument();
       expect(screen.queryByText('Egg')).toBeInTheDocument();
