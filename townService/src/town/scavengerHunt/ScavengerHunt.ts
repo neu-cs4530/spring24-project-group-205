@@ -26,10 +26,10 @@ export default abstract class ScavengerHunt extends Game<
 > {
   // INFORMATION THAT IS SPECIFIC TO THE PLAYER:
   // The game mode the player is currently in
-  protected _gameMode?: GameMode;
+  // protected _gameMode?: GameMode;
 
   // The themepack the player is currently using; the default is the "nature" themepack
-  protected _themepack?: Themepack;
+  // protected _themepack?: Themepack;
 
   // the time it took for the player to complete the scavenger hunt -- this is only applicable if the game mode is competitive
   private _timeInSeconds = 0;
@@ -49,14 +49,13 @@ export default abstract class ScavengerHunt extends Game<
       timeLeft: TIME_ALLOWED,
       items: [],
       status: 'WAITING_TO_START',
+      themepack: themePack,
     });
-
-    this._themepack = themePack;
   }
 
   // Method to start the game
   public startGame(player: Player): void {
-    if (!this._themepack) {
+    if (!this.state.themepack) {
       throw new InvalidParametersError('No themepack selected for the game');
     }
 
@@ -68,7 +67,7 @@ export default abstract class ScavengerHunt extends Game<
       throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
     }
 
-    const items = this._themepack.createItems(this._players.length * 10);
+    const items = this.state.themepack.createItems(this._players.length * 20);
     this._gameStartTime = Date.now();
 
     this._timerIntervalId = setInterval(() => {
@@ -85,12 +84,6 @@ export default abstract class ScavengerHunt extends Game<
     });
 
     this._assignRandomLocations();
-    console.log('Starting game');
-    // console.log('State:', this.state);
-    // console.log(
-    //   'Item locations: ',
-    //   this.state.items.map(item => item.location),
-    // );
   }
 
   private _assignRandomLocations(): void {
@@ -134,7 +127,7 @@ export default abstract class ScavengerHunt extends Game<
   }
 
   public get gameMode(): GameMode | undefined {
-    return this._gameMode;
+    return this.state.gameMode;
   }
 
   public get themePack(): Themepack | undefined {
@@ -143,6 +136,7 @@ export default abstract class ScavengerHunt extends Game<
 
   public set themePack(themepack: Themepack | undefined) {
     this._themepack = themepack;
+
   }
 
   // lets up to ten people join, and can be started as soon as the first person joins
@@ -182,35 +176,6 @@ export default abstract class ScavengerHunt extends Game<
    * @returns true if the time is within the allotted time, false otherwise
    */
   protected abstract _isTimeRemaining(currentTime: number): boolean;
-
-  protected _leave1(player: Player): void {
-    if (this.state.status === 'OVER') {
-      return;
-    }
-    if (!this._players.includes(player)) {
-      throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
-    }
-    this.state = {
-      ...this.state,
-    };
-    switch (this.state.status) {
-      case 'WAITING_TO_START':
-      case 'WAITING_FOR_PLAYERS':
-        // no-ops: nothing needs to happen here
-        this.state.status = 'WAITING_FOR_PLAYERS';
-        break;
-      case 'IN_PROGRESS':
-        this.state = {
-          ...this.state,
-          status: 'OVER',
-          winner: Array.from(this._itemsFound.entries()).reduce((a, b) => (b[1] > a[1] ? b : a))[0],
-        };
-        break;
-      default:
-        // This behavior can be undefined :)
-        throw new Error(`Unexpected game status: ${this.state.status}`);
-    }
-  }
 
   /**
    * Removes the given player from the game, and reflects the game's state accordingly.
@@ -296,5 +261,10 @@ export default abstract class ScavengerHunt extends Game<
     this._players.forEach(p => {
       this.endGame(p);
     });
+
+  public getItemByLocation(x: number, y: number): ScavengerHuntItem {
+    return this.state.items.find(
+      item => item.location.x === x && item.location.y === y,
+    ) as ScavengerHuntItem;
   }
 }

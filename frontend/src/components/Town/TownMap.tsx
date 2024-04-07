@@ -72,7 +72,7 @@ export default function TownMap(): JSX.Element {
     game.scene.add('coveyBoard', newGameScene, true);
     const pauseListener = newGameScene.pause.bind(newGameScene);
     const unPauseListener = newGameScene.resume.bind(newGameScene);
-    coveyTownController.globalScene = newGameScene;
+    coveyTownController.ourPlayer.scene = newGameScene;
     coveyTownController.addListener('pause', pauseListener);
     coveyTownController.addListener('unPause', unPauseListener);
     return () => {
