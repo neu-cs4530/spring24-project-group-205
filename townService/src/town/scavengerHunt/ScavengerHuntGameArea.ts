@@ -1,3 +1,4 @@
+import { isJSDocOverrideTag } from 'typescript';
 import InvalidParametersError, {
   GAME_ID_MISSMATCH_MESSAGE,
   GAME_NOT_IN_PROGRESS_MESSAGE,
@@ -32,6 +33,8 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
   protected getType(): InteractableType {
     return 'ScavengerHuntArea' as InteractableType;
   }
+
+  protected overlapExit(): void {}
 
   private _stateUpdated(updatedState: GameInstance<ScavengerHuntGameState>) {
     if (updatedState.state.status === 'OVER') {
