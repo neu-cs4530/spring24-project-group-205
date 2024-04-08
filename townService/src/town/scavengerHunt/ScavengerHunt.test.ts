@@ -46,6 +46,13 @@ describe('ScavengerHunt', () => {
       const player11 = createPlayerForTesting();
       expect(() => gameRelaxed.join(player11)).toThrowError(GAME_FULL_MESSAGE);
     });
+    it('should throw an error if the game is already started and a player tries to join', () => {
+      const player = createPlayerForTesting();
+      gameRelaxed.join(player);
+      gameRelaxed.startGame(player);
+      expect(gameRelaxed.state.status).toEqual('IN_PROGRESS');
+      expect(() => gameRelaxed.join(createPlayerForTesting())).toThrowError();
+    });
 
     describe('When the player can be added', () => {
       it('makes the player the current scavenger and starts the game in relaxed mode', () => {
