@@ -115,6 +115,12 @@ export interface TicTacToeMove {
   col: TicTacToeGridPosition;
 }
 
+export interface ScavengerHuntMove {
+  gamePiece: string,
+  row: number,
+  col: number,
+}
+
 export interface ScavengerHuntItem {
   id: number;
   name: string;
@@ -143,6 +149,7 @@ export interface ScavengerHuntGameState extends WinnableGameState {
   mode?: GameMode;
   timeLeft: number;
   items: ReadonlyArray<ScavengerHuntItem>;
+  moves: ReadonlyArray<ScavengerHuntMove>;
   gameMode?: GameMode;
   themepack?: Themepack;
 }
@@ -243,8 +250,7 @@ interface InteractableCommandBase {
   type: string;
 }
 
-export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | JoinRelaxedGameCommand | JoinTimedGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | StartGameCommand | LeaveGameCommand | ItemFoundCommand | EndGameCommand;
-
+export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | JoinRelaxedGameCommand | JoinTimedGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | StartGameCommand | LeaveGameCommand | ItemFoundCommand | RequestHintCommand | EndGameCommand;
 export interface ViewingAreaUpdateCommand  {
   type: 'ViewingAreaUpdate';
   update: ViewingArea;
@@ -256,6 +262,7 @@ export interface ItemFoundCommand {
   type: 'ItemFound';
   location: XY;
 }
+
 export interface JoinRelaxedGameCommand {
   type: 'JoinRelaxedGame';
   themepack: string;
@@ -266,6 +273,10 @@ export interface JoinTimedGameCommand {
 }
 export interface LeaveGameCommand {
   type: 'LeaveGame';
+  gameID: GameInstanceID;
+}
+export interface RequestHintCommand {
+  type: 'RequestHint';
   gameID: GameInstanceID;
 }
 export interface EndGameCommand {
@@ -286,6 +297,7 @@ export type InteractableCommandReturnType<CommandType extends InteractableComman
   CommandType extends JoinTimedGameCommand ? { gameID: string}:
   CommandType extends JoinRelaxedGameCommand ? { gameID: string}:
   CommandType extends ViewingAreaUpdateCommand ? undefined :
+  CommandType extends ViewingAreaUpdateCommand ? { hint: string} :
   CommandType extends GameMoveCommand<TicTacToeMove> ? undefined :
   CommandType extends LeaveGameCommand ? undefined :
   CommandType extends EndGameCommand ? undefined :

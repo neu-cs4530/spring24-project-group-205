@@ -5,6 +5,8 @@ import {
   ScavengerHuntGameState,
   GameStatus,
   ScavengerHuntThemepack,
+  ScavengerHuntMove,
+  XY,
 } from '../../types/CoveyTownSocket';
 import PlayerController from '../PlayerController';
 import GameAreaController, { GameEventTypes, NO_GAME_STARTABLE } from './GameAreaController';
@@ -17,6 +19,8 @@ export default class ScavengerHuntAreaController extends GameAreaController<
   ScavengerHuntEvents
 > {
   public items: ScavengerHuntItem[] = [];
+
+  public requestedHint?: string;
 
   /**
    * Returns the player who won the game, if there is one, or undefined otherwise
@@ -54,6 +58,17 @@ export default class ScavengerHuntAreaController extends GameAreaController<
 
   get themepack(): ScavengerHuntThemepack | undefined {
     return this._model.game?.state.themepack;
+  }
+
+  /**
+   * Returns the status of the game
+   * If there is no game, returns 'WAITING_FOR_PLAYERS'
+   */
+  get hint(): string {
+    if (!this.requestedHint) {
+      throw new Error('No hint available');
+    }
+    return this.requestedHint;
   }
 
   /**
@@ -96,13 +111,12 @@ export default class ScavengerHuntAreaController extends GameAreaController<
     if (!instanceID) {
       throw new Error(NO_GAME_STARTABLE);
     }
-    this._townController.ourPlayer.scene?.startTimer();
-    this._townController.ourPlayer.scene?.setTotalItemCount(this.items.length);
-    this._townController.ourPlayer.scene?.showItemText();
     await this._townController.sendInteractableCommand(this.id, {
       gameID: instanceID,
       type: 'StartGame',
     });
+    this._townController.ourPlayer.scene?.updateItemsFound(true);
+    this._townController.ourPlayer.scene?.startTimer();
   }
 
   public _renderInitialItems(): void {
@@ -121,29 +135,24 @@ export default class ScavengerHuntAreaController extends GameAreaController<
   }
 
   /**
-   * Sends a request to the server to join the current timed game in the game area, or create a new one if there is no game in progress.
+   * Sends a request to the server to get a hint for the next unfound item.
    *
    * @throws An error if the server rejects the request to join the game.
    */
-  public async joinTimedGame(themepack: string): Promise<void> {
-    const { gameID } = await this._townController.sendInteractableCommand(this.id, {
-      type: 'JoinTimedGame',
-      themepack: themepack,
+  public async requestHint(): Promise<void> {
+    const instanceID = this._instanceID;
+    if (!instanceID) {
+      throw new Error(NO_GAME_STARTABLE);
+    }
+    if (this._model.game?.state.status !== 'IN_PROGRESS') {
+      throw new Error('Game is not in progress');
+    }
+    const { hint } = await this._townController.sendInteractableCommand(this.id, {
+      type: 'RequestHint',
+      gameID: instanceID,
     });
-    this._instanceID = gameID;
-  }
 
-  /**
-   * Sends a request to the server to join the current relaxed game in the game area, or create a new one if there is no game in progress.
-   *
-   * @throws An error if the server rejects the request to join the game.
-   */
-  public async joinRelaxedGame(themepack: string): Promise<void> {
-    const { gameID } = await this._townController.sendInteractableCommand(this.id, {
-      type: 'JoinRelaxedGame',
-      themepack: themepack,
-    });
-    this._instanceID = gameID;
+    this.requestedHint = hint;
   }
 
   /**
@@ -157,6 +166,8 @@ export default class ScavengerHuntAreaController extends GameAreaController<
         gameID: instanceID,
       });
     }
+    this._townController.ourPlayer.scene?.updateTimer(false, 'Null');
+    this._townController.ourPlayer.scene?.updateItemsFound(false);
   }
 
   public async endGame(): Promise<void> {
@@ -167,5 +178,35 @@ export default class ScavengerHuntAreaController extends GameAreaController<
         gameID: instanceID,
       });
     }
+    this._townController.ourPlayer.scene?.updateTimer(false, 'Null');
+    this._townController.ourPlayer.scene?.updateItemsFound(false);
+  }
+
+  /**
+   * Sends a request to the server to join the current timed game in the game area, or create a new one if there is no game in progress.
+   *
+   * @throws An error if the server rejects the request to join the game.
+   */
+  public async joinTimedGame(themepack: string): Promise<void> {
+    const { gameID } = await this._townController.sendInteractableCommand(this.id, {
+      type: 'JoinTimedGame',
+      themepack: themepack,
+    });
+    this._instanceID = gameID;
+    this._townController.ourPlayer.scene?.updateTimer(true, 'Timed');
+  }
+
+  /**
+   * Sends a request to the server to join the current relaxed game in the game area, or create a new one if there is no game in progress.
+   *
+   * @throws An error if the server rejects the request to join the game.
+   */
+  public async joinRelaxedGame(themepack: string): Promise<void> {
+    const { gameID } = await this._townController.sendInteractableCommand(this.id, {
+      type: 'JoinRelaxedGame',
+      themepack: themepack,
+    });
+    this._instanceID = gameID;
+    this._townController.ourPlayer.scene?.updateTimer(true, 'relaxed');
   }
 }

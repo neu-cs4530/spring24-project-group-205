@@ -50,6 +50,7 @@ export default abstract class ScavengerHunt extends Game<
       items: [],
       status: 'WAITING_TO_START',
       themepack: themePack,
+      moves: [],
     });
   }
 
@@ -221,6 +222,20 @@ export default abstract class ScavengerHunt extends Game<
         this.state.status = 'WAITING_FOR_PLAYERS';
       }
     }
+  }
+
+  /**
+   *
+   * @returns a string with the hint associated with the next unfound item in the list
+   */
+  public requestHint(): string {
+    const unfoundItems = this.state.items.filter(item => item.foundBy === undefined);
+    if (unfoundItems.length === 0) {
+      return 'All items found!';
+    }
+
+    const nextItem = unfoundItems[0];
+    return nextItem.hint || 'No hint available';
   }
 
   /**

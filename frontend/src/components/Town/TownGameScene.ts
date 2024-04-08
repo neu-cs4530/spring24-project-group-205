@@ -74,9 +74,7 @@ export default class TownGameScene extends Phaser.Scene {
   // item found count components:
   private _itemsFoundText: Phaser.GameObjects.Text | undefined;
 
-  private _itemCount = 0;
-
-  private _totalItemCount = 0;
+  private _itemsFound = 0;
 
   /**
    * Layers that the player can collide with.
@@ -315,21 +313,23 @@ export default class TownGameScene extends Phaser.Scene {
         }
       }
 
-      const worldPoint = this.input.activePointer.positionToCamera(this.cameras.main);
-
-      const mouse = new Phaser.Math.Vector2(worldPoint);
-
       const itemsLayer = this.map.getLayer('Items');
+      if (itemsLayer) {
+        this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+          const worldPoint = pointer.positionToCamera(this.cameras.main);
+          const mouse = new Phaser.Math.Vector2(worldPoint);
 
-      if (this.input.manager.activePointer.isDown && this._isPointerOnItem(mouse.x, mouse.y)) {
-        const tile = itemsLayer?.tilemapLayer.removeTileAtWorldXY(mouse.x, mouse.y);
-        if (tile && tile.index > 15053) {
-          this.coveyTownController.emitItemFound({ x: tile.x, y: tile.y });
-          this._itemCount++;
-          this._itemsFoundText?.setText(
-            `Items Found: ` + this._itemCount.toString() + ' / ' + this._totalItemCount.toString(),
-          );
-        }
+          const clickedTile = itemsLayer.tilemapLayer.getTileAtWorldXY(mouse.x, mouse.y);
+          if (clickedTile) {
+            const removedTile = itemsLayer.tilemapLayer.removeTileAtWorldXY(mouse.x, mouse.y);
+            if (removedTile !== null) {
+              this.updateItemsFoundCount();
+              if (clickedTile && clickedTile.index > 15053) {
+                this.coveyTownController.emitItemFound({ x: clickedTile.x, y: clickedTile.y });
+              }
+            }
+          }
+        });
       }
     }
   }
@@ -594,6 +594,12 @@ export default class TownGameScene extends Phaser.Scene {
       .setScrollFactor(0)
       .setDepth(30);
 
+    this._initializeTimer();
+    this._countDownText?.setVisible(false);
+
+    this._initializeItemsFound();
+    this._itemsFoundText?.setVisible(false);
+
     this._ready = true;
     this.updatePlayers(this.coveyTownController.players);
     // Call any listeners that are waiting for the game to be initialized
@@ -602,10 +608,92 @@ export default class TownGameScene extends Phaser.Scene {
     this.coveyTownController.addListener('playersChanged', players => this.updatePlayers(players));
   }
 
-  timerEnded() {
-    // make background of countdown text red
-    this._countDownText?.setBackgroundColor('#E55451');
-    this._countDownText?.setText(`Time's up! \nGame over.`);
+  _initializeItemsFound() {
+    this._itemsFoundText = this.add
+      .text(600, 56, `Items Found: ${this._itemsFound}`, {
+        // Adjusted Y position to appear below the timer
+        font: '15px monospace',
+        color: '#000000',
+        padding: {
+          x: 20,
+          y: 10,
+        },
+        backgroundColor: '#ffffff',
+      })
+      .setScrollFactor(0)
+      .setDepth(30);
+  }
+
+  public updateItemsFound(gameStarted: boolean) {
+    // Show the items found text component when the game is started
+    if (gameStarted) {
+      this._itemsFoundText?.setVisible(true);
+    } else {
+      // Hide the items found text component if the game is not started
+      this._itemsFoundText?.setVisible(false);
+    }
+  }
+
+  public updateItemsFoundCount() {
+    this._itemsFound = this._itemsFound + 1;
+    this._itemsFoundText?.setText(`Items Found: ${this._itemsFound}`);
+  }
+
+  _initializeTimer() {
+    // Create the timer component
+    this._countDownText = this.add
+      .text(600, 16, `Time Left: `, {
+        font: '15px monospace',
+        color: '#000000',
+        padding: {
+          x: 20,
+          y: 10,
+        },
+        backgroundColor: '#ffffff',
+      })
+      .setScrollFactor(0)
+      .setDepth(30);
+  }
+
+  startTimer() {
+    // Start the timer event only if it's not already started
+    if (!this._timerFlag) {
+      this._timerFlag = true;
+      this._timedEvent = this.time.addEvent({
+        delay: 1000, // the amount of time in between ticks
+        repeat: TIME_ALLOWED, // how many ticks should complete
+        callback: () => {
+          const timeLeft = this._timedEvent?.repeatCount;
+          if (timeLeft) {
+            this._countDownText?.setText('Time: ' + this._formatTime(timeLeft));
+          }
+          if (this._timedEvent?.repeatCount === 0) {
+            this.stopTimer();
+          }
+        },
+      });
+    }
+  }
+
+  // Method to update timer component visibility and start the timer when the game starts
+  public updateTimer(gameStarted: boolean, gameMode: string) {
+    if (gameStarted && gameMode === 'Timed') {
+      // Show the countdown text when the game is started and the mode is timed
+      this._countDownText?.setVisible(true);
+    } else {
+      // Hide the countdown text when the game is not started or the mode is not timed
+      this._countDownText?.setVisible(false);
+
+      // Stop the timer when the game is not started or the mode is not timed
+      this.stopTimer();
+    }
+  }
+
+  // Method to stop the timer
+  stopTimer() {
+    // Stop the timer event
+    this._timerFlag = false;
+    this._timedEvent?.remove(false);
   }
 
   /**
@@ -669,71 +757,5 @@ export default class TownGameScene extends Phaser.Scene {
       }
       this._previouslyCapturedKeys = [];
     }
-  }
-
-  startTimer() {
-    this._countDownText = this.add
-      .text(575, 32, `Time Left:`, {
-        font: '15px monospace',
-        color: '#000000',
-        padding: {
-          x: 20,
-          y: 10,
-        },
-        backgroundColor: '#ffffff',
-      })
-      .setScrollFactor(0)
-      .setDepth(30);
-
-    this._timedEvent = this.time.addEvent({
-      delay: 1000, // the amount of time in between ticks
-      repeat: TIME_ALLOWED, // how many ticks should complete
-      callback: () => {
-        const timeLeft = this._timedEvent?.repeatCount;
-        if (timeLeft) {
-          this._countDownText?.setText('Time Left: ' + this._formatTime(timeLeft));
-        }
-        if (this._timedEvent?.repeatCount === 0) {
-          this.timerEnded();
-        }
-      },
-    });
-  }
-
-  showItemText() {
-    this._itemsFoundText = this.add
-      .text(
-        575,
-        16,
-        `Items Found: ` + this._itemCount.toString() + ' / ' + this._totalItemCount.toString(),
-        {
-          font: '15px monospace',
-          color: '#000000',
-          padding: {
-            x: 20,
-            y: 10,
-          },
-          backgroundColor: '#ffffff',
-        },
-      )
-      .setScrollFactor(0)
-      .setDepth(30);
-  }
-
-  hideItemText() {
-    this._itemCount = 0;
-    this._itemsFoundText?.destroy(true);
-  }
-
-  setTotalItemCount(count: number) {
-    this._totalItemCount = count;
-  }
-
-  resetTotalItemCount() {
-    this._totalItemCount = 0;
-  }
-
-  resetTimer() {
-    this._timedEvent?.remove();
   }
 }

@@ -10,6 +10,7 @@ export default class TestingTimedGame extends Game<ScavengerHuntGameState, Scave
       timeLeft: 10,
       items: [],
       status: 'WAITING_TO_START',
+      moves: [],
     });
   }
 

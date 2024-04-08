@@ -101,13 +101,6 @@ describe('Scavenger Hunt Area', () => {
       expect(screen.queryByText('Emojis')).toBeInTheDocument();
       expect(screen.queryByText('Egg')).toBeInTheDocument();
     });
-    it('shows hints', () => {
-      renderScavengerHuntArea();
-      expect(screen.queryByText('Request Hint')).toBeInTheDocument();
-      expect(
-        screen.queryByText('This is a hint. This box should only appear when a hint is requested.'),
-      ).toBeInTheDocument();
-    });
     it('shows players', () => {
       renderScavengerHuntArea();
       expect(screen.queryByText('Current Players:')).toBeInTheDocument();
