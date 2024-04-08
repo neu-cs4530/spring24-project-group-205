@@ -64,7 +64,7 @@ export default class ScavengerHuntRelaxed extends ScavengerHunt {
     const database = new GameDatabase();
     database.addGameDetails(
       this.state.gameMode,
-      this.state.themepack.name,
+      this.state.themepack?.name,
       this._gameStartTime,
       this._players.length,
     );

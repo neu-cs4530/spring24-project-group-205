@@ -206,6 +206,8 @@ export default abstract class ScavengerHunt extends Game<
         this._players = this._players.filter(p => p.id !== player.id);
         this.state = {
           ...this.state,
+          themepack: undefined,
+          gameMode: undefined,
           status: 'OVER',
         };
         clearInterval(this._timerIntervalId);
@@ -256,13 +258,15 @@ export default abstract class ScavengerHunt extends Game<
       throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
     }
 
-    this.state = {
-      ...this.state,
-      status: 'OVER',
-    };
-
     this._addDatabaseEntries();
     this.leaderboardData = this.leaderboard();
+
+    this.state = {
+      ...this.state,
+      themepack: undefined,
+      gameMode: undefined,
+      status: 'OVER',
+    };
 
     // go through all players and remove them from the game
     this._players.forEach(p => {
