@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid';
-import { mock } from 'jest-mock-extended';
+import { mock, mockReset } from 'jest-mock-extended';
 import Themepack from './Themepack';
 import { TownEmitter } from '../../types/CoveyTownSocket';
 import { createPlayerForTesting } from '../../TestUtils';
@@ -50,9 +50,7 @@ describe('ScavengerHuntArea', () => {
       mock<TownEmitter>(),
     );
     gameArea.add(player1);
-    // gameTimed.join(player1);
     gameArea.add(player2);
-    // gameTimed.join(player2);
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore (Testing without using the real game class)
     interactableUpdateSpy = jest.spyOn(gameArea, '_emitAreaChanged');
@@ -285,6 +283,39 @@ describe('ScavengerHuntArea', () => {
           ).toThrowError(GAME_ID_MISSMATCH_MESSAGE);
         });
       });
+    });
+    it('timed mode: should start the game timer by calling setInterval', () => {
+      const setIntervalSpy = jest.spyOn(global, 'setInterval');
+      setIntervalSpy.mockImplementation();
+      expect(setIntervalSpy).not.toHaveBeenCalled();
+
+      const { gameID } = gameArea.handleCommand(
+        { type: 'JoinTimedGame', themepack: 'fruit' },
+        player1,
+      );
+      expect(gameID).toBeDefined();
+      if (!gameTimed) {
+        throw new Error('Game was not created by the first call to join');
+      }
+      gameArea.handleCommand({ type: 'StartGame', gameID }, player1);
+      expect(setIntervalSpy).toHaveBeenCalled();
+      mockReset(setIntervalSpy);
+    });
+    it('relaxed mode: should start the game timer by calling setInterval', () => {
+      const setIntervalSpy = jest.spyOn(global, 'setInterval');
+      setIntervalSpy.mockImplementation();
+      expect(setIntervalSpy).not.toHaveBeenCalled();
+      const { gameID } = gameArea.handleCommand(
+        { type: 'JoinRelaxedGame', themepack: 'fruit' },
+        player1,
+      );
+      expect(gameID).toBeDefined();
+      if (!gameRelaxed) {
+        throw new Error('Game was not created by the first call to join');
+      }
+      gameArea.handleCommand({ type: 'StartGame', gameID }, player1);
+      expect(setIntervalSpy).toHaveBeenCalled();
+      mockReset(setIntervalSpy);
     });
   });
 });

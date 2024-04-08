@@ -5,8 +5,6 @@ import {
   ScavengerHuntGameState,
   GameStatus,
   ScavengerHuntThemepack,
-  ScavengerHuntMove,
-  XY,
 } from '../../types/CoveyTownSocket';
 import PlayerController from '../PlayerController';
 import GameAreaController, { GameEventTypes, NO_GAME_STARTABLE } from './GameAreaController';
