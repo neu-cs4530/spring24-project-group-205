@@ -113,8 +113,9 @@ export default class ScavengerHuntAreaController extends GameAreaController<
       gameID: instanceID,
       type: 'StartGame',
     });
-    this._townController.ourPlayer.scene?.updateItemsFound(true);
     this._townController.ourPlayer.scene?.startTimer();
+    this._townController.emitStartTimer();
+    this._townController.ourPlayer.scene?.updateItemsFound(true);
   }
 
   public _renderInitialItems(): void {
