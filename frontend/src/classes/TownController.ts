@@ -116,6 +116,8 @@ export type TownEvents = {
   itemPlaced: (item: ScavengerHuntItem) => void;
 
   itemFound: (location: XY) => void;
+
+  startTimer: () => void;
 };
 
 /**
@@ -472,16 +474,36 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
 
     this._socket.on('itemPlaced', item => {
       for (const player of this.players) {
-        player.scene?.addTileOnMap(item.id, item.location.x, item.location.y);
+        try {
+          player.scene?.addTileOnMap(item.id, item.location.x, item.location.y);
+          player.scene?.updateItemsFound(true);
+        } catch (e) {
+          // fix this
+        }
       }
       this.emit('itemPlaced', item);
     });
 
     this._socket.on('itemFound', location => {
       for (const player of this.players) {
-        player.scene?.removeTileOnMap(location.x, location.y);
+        try {
+          player.scene?.removeTileOnMap(location.x, location.y);
+        } catch (e) {
+          // fix this
+        }
       }
       this.emit('itemFound', location);
+    });
+
+    this._socket.on('startTimer', () => {
+      for (const player of this.players) {
+        try {
+          player.scene?.startTimer();
+        } catch (e) {
+          // fix this
+        }
+      }
+      this.emit('startTimer');
     });
   }
 
@@ -747,6 +769,10 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
 
   public emitItemFound(location: XY) {
     this._socket.emit('itemFound', location);
+  }
+
+  public emitStartTimer() {
+    this._socket.emit('startTimer');
   }
 
   /**

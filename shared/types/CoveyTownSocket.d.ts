@@ -322,6 +322,7 @@ export interface ServerToClientEvents {
   commandResponse: (response: InteractableCommandResponse) => void;
   itemFound: (location: XY) => void;
   itemPlaced: (item: ScavengerHuntItem) => void;
+  startTimer: () => void;
 }
 
 export interface ClientToServerEvents {
@@ -331,4 +332,5 @@ export interface ClientToServerEvents {
   interactableCommand: (command: InteractableCommand & InteractableCommandBase) => void;
   itemFound: (location: XY) => void;
   itemPlaced: (item: ScavengerHuntItem) => void;
+  startTimer: () => void;
 }
