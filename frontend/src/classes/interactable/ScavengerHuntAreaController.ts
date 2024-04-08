@@ -168,6 +168,7 @@ export default class ScavengerHuntAreaController extends GameAreaController<
     }
     this._townController.ourPlayer.scene?.updateTimer(false, 'Null');
     this._townController.ourPlayer.scene?.updateItemsFound(false);
+    this._townController.ourPlayer.scene?.clearItemsLayer();
   }
 
   public async endGame(): Promise<void> {
@@ -180,6 +181,7 @@ export default class ScavengerHuntAreaController extends GameAreaController<
     }
     this._townController.ourPlayer.scene?.updateTimer(false, 'Null');
     this._townController.ourPlayer.scene?.updateItemsFound(false);
+    this._townController.ourPlayer.scene?.clearItemsLayer();
   }
 
   /**

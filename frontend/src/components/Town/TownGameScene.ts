@@ -675,6 +675,18 @@ export default class TownGameScene extends Phaser.Scene {
     }
   }
 
+  public clearItemsLayer() {
+    const itemsLayer = this.map.getLayer('Items');
+    if (itemsLayer) {
+      itemsLayer.tilemapLayer.forEachTile(tile => {
+        itemsLayer.tilemapLayer.removeTileAt(tile.x, tile.y);
+      });
+      // Update the items found count after clearing the items layer
+      this._itemsFound = 0;
+      this.updateItemsFoundCount();
+    }
+  }
+
   // Method to update timer component visibility and start the timer when the game starts
   public updateTimer(gameStarted: boolean, gameMode: string) {
     if (gameStarted && gameMode === 'Timed') {
