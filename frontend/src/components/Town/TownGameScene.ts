@@ -76,6 +76,8 @@ export default class TownGameScene extends Phaser.Scene {
 
   private _itemsFound = 0;
 
+  private _totalItemsPlaced = 0;
+
   /**
    * Layers that the player can collide with.
    */
@@ -610,7 +612,7 @@ export default class TownGameScene extends Phaser.Scene {
 
   _initializeItemsFound() {
     this._itemsFoundText = this.add
-      .text(600, 56, `Items Found: ${this._itemsFound}`, {
+      .text(600, 56, `Items Found: ${this._itemsFound} / ${this._totalItemsPlaced}`, {
         // Adjusted Y position to appear below the timer
         font: '15px monospace',
         color: '#000000',
@@ -636,7 +638,7 @@ export default class TownGameScene extends Phaser.Scene {
 
   public updateItemsFoundCount() {
     this._itemsFound = this._itemsFound + 1;
-    this._itemsFoundText?.setText(`Items Found: ${this._itemsFound}`);
+    this._itemsFoundText?.setText(`Items Found: ${this._itemsFound} / ${this._totalItemsPlaced}`);
   }
 
   _initializeTimer() {
@@ -694,6 +696,11 @@ export default class TownGameScene extends Phaser.Scene {
     // Stop the timer event
     this._timerFlag = false;
     this._timedEvent?.remove(false);
+  }
+
+  setTotalItemsPlaced(totalItemsPlaced: number) {
+    this._totalItemsPlaced = totalItemsPlaced;
+    this._itemsFoundText?.setText(`Items Found: ${this._itemsFound} / ${this._totalItemsPlaced}`);
   }
 
   /**
