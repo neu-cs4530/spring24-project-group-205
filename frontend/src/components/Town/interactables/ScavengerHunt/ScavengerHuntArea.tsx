@@ -82,6 +82,14 @@ export default function ScavengerHuntArea({
     }
   };
 
+  // if no players in an ongoing game, unlock the mode and themepack and reset the state
+  useEffect(() => {
+    if (gameAreaController.players.length === 0) {
+      setMode('');
+      setThemepack('');
+    }
+  }, [gameAreaController.players]);
+
   const [joiningGame, setJoiningGame] = useState(false);
   const [startingGame, setStartingGame] = useState(false);
   const [joinedPlayers, setJoinedPlayers] = useState<string[]>([]);

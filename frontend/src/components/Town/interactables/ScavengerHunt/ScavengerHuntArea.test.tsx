@@ -87,7 +87,7 @@ describe('Scavenger Hunt Area', () => {
   describe('Render UI', () => {
     it('shows game modes', () => {
       renderScavengerHuntArea();
-      expect(screen.queryByText('Game Mode: timed')).toBeInTheDocument();
+      expect(screen.queryByText('Game Mode:')).toBeInTheDocument();
     });
     it('shows leaderboard', () => {
       renderScavengerHuntArea();

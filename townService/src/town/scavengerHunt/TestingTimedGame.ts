@@ -14,6 +14,13 @@ export default class TestingTimedGame extends Game<ScavengerHuntGameState, Scave
     });
   }
 
+  public iterateClock(): void {
+    this.state = {
+      ...this.state,
+      timeLeft: this.state.timeLeft - 1,
+    };
+  }
+
   public applyMove(move: GameMove<ScavengerHuntItem>): void {}
 
   public endGame(): void {
@@ -23,7 +30,12 @@ export default class TestingTimedGame extends Game<ScavengerHuntGameState, Scave
     };
   }
 
-  public startGame(player: Player): void {}
+  public startGame(player: Player): void {
+    this.state = {
+      ...this.state,
+      status: 'IN_PROGRESS',
+    };
+  }
 
   protected _join(player: Player): void {
     if (this.numPlayers() < 10) {
