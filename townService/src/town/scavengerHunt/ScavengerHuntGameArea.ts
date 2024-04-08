@@ -131,8 +131,7 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
       if (this._game?.id !== command.gameID) {
         throw new InvalidParametersError(GAME_ID_MISSMATCH_MESSAGE);
       }
-      game.leave(player);
-      game.endGameForAllPlayers(player);
+      game.endGame(player);
       this._stateUpdated(game.toModel());
       return undefined as InteractableCommandReturnType<CommandType>;
     }

@@ -159,10 +159,7 @@ export default abstract class ScavengerHunt extends Game<
    */
   private _endGameIfTimesUp() {
     if (!this._isTimeRemaining(Date.now())) {
-      this._players.forEach(p => {
-        this._leave(p);
-        this.endGame(p);
-      });
+      this._endGameForAllPlayers();
     }
   }
 
@@ -258,7 +255,6 @@ export default abstract class ScavengerHunt extends Game<
     if (!this._players.includes(player)) {
       throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
     }
-    this._leave(player);
     this.state = {
       ...this.state,
       status: 'OVER',
@@ -270,12 +266,8 @@ export default abstract class ScavengerHunt extends Game<
     clearInterval(this._timerIntervalId);
   }
 
-  public endGameForAllPlayers(player: Player): void {
-    if (!this._players.includes(player)) {
-      throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
-    }
+  private _endGameForAllPlayers(): void {
     this._players.forEach(p => {
-      this._leave(p);
       this.endGame(p);
     });
   }
