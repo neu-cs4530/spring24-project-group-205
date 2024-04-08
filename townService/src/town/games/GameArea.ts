@@ -62,4 +62,19 @@ export default abstract class GameArea<
       super.remove(player);
     }
   }
+
+  public removeScavengerHuntOnRefresh(player: Player): void {
+    if (this._game) {
+      try {
+        this._game.leave(player);
+      } catch (e) {
+        if ((e as InvalidParametersError).message === PLAYER_NOT_IN_GAME_MESSAGE) {
+          // do nothing
+        } else {
+          throw e;
+        }
+      }
+    }
+    super.remove(player);
+  }
 }
