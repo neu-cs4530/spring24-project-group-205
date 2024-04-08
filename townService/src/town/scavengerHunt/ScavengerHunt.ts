@@ -59,21 +59,15 @@ export default abstract class ScavengerHunt extends Game<
     if (!this.state.themepack) {
       throw new InvalidParametersError('No themepack selected for the game');
     }
-
     if (this.state.status !== 'WAITING_TO_START') {
       throw new InvalidParametersError(GAME_NOT_STARTABLE_MESSAGE);
     }
-
     if (!this._players.includes(player)) {
       throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
     }
 
     const items = this.state.themepack.createItems(this._players.length * 20);
-    this._gameStartTime = Date.now();
 
-    this._timerIntervalId = setInterval(() => {
-      this._endGameIfTimesUp();
-    }, 500);
     this.state = {
       ...this.state,
       items,
@@ -85,6 +79,12 @@ export default abstract class ScavengerHunt extends Game<
     });
 
     this._assignRandomLocations();
+
+    this._gameStartTime = Date.now();
+
+    this._timerIntervalId = setInterval(() => {
+      this._endGameIfTimesUp();
+    }, 500);
   }
 
   private _assignRandomLocations(): void {
@@ -206,6 +206,8 @@ export default abstract class ScavengerHunt extends Game<
         this._players = this._players.filter(p => p.id !== player.id);
         this.state = {
           ...this.state,
+          themepack: undefined,
+          gameMode: undefined,
           status: 'OVER',
         };
         clearInterval(this._timerIntervalId);
@@ -255,15 +257,31 @@ export default abstract class ScavengerHunt extends Game<
     if (!this._players.includes(player)) {
       throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
     }
-    this.state = {
-      ...this.state,
-      status: 'OVER',
-    };
 
     this._addDatabaseEntries();
     this.leaderboardData = this.leaderboard();
 
+    this.state = {
+      ...this.state,
+      themepack: undefined,
+      gameMode: undefined,
+      status: 'OVER',
+    };
+
+    // go through all players and remove them from the game
+    this._players.forEach(p => {
+      this._players = this._players.filter(playera => playera.id !== p.id);
+    });
+
     clearInterval(this._timerIntervalId);
+    this._clearAllItems();
+  }
+
+  private _clearAllItems(): void {
+    this.state = {
+      ...this.state,
+      items: [],
+    };
   }
 
   private _endGameForAllPlayers(): void {
