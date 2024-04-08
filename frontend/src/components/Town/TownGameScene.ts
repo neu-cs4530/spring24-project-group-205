@@ -502,23 +502,6 @@ export default class TownGameScene extends Phaser.Scene {
     };
 
     this._interactables = this.getInteractables();
-    console.log(this._interactables);
-    const xyList: { x: number; y: number }[] = [];
-    xyList.push({ x: 58, y: 39 });
-    xyList.push({ x: 41, y: 32 });
-    xyList.push({ x: 26, y: 31 });
-    xyList.push({ x: 34, y: 25 });
-    xyList.push({ x: 68, y: 33 });
-    xyList.push({ x: 55, y: 31 });
-    xyList.push({ x: 58, y: 25 });
-    xyList.push({ x: 77, y: 26 });
-    xyList.push({ x: 44, y: 27 });
-    // for (const xy of xyList) {
-    //   const item = new ScavengerHuntItemOnMap(this);
-    //   item.setX(xy.x);
-    //   item.setY(xy.y);
-    //   item.addItemOnScene();
-    // }
 
     this.moveOurPlayerTo({ rotation: 'front', moving: false, x: spawnPoint.x, y: spawnPoint.y });
 
@@ -673,9 +656,22 @@ export default class TownGameScene extends Phaser.Scene {
             this._countDownText?.setBackgroundColor('#E55451');
             this._countDownText?.setText(`Time's up!`);
             this.stopTimer();
+            this._countDownText?.setText(`Time's up! Game over.`);
           }
         },
       });
+    }
+  }
+
+  public clearItemsLayer() {
+    const itemsLayer = this.map.getLayer('Items');
+    if (itemsLayer) {
+      itemsLayer.tilemapLayer.forEachTile(tile => {
+        itemsLayer.tilemapLayer.removeTileAt(tile.x, tile.y);
+      });
+      // Update the items found count after clearing the items layer
+      this._itemsFound = 0;
+      this.updateItemsFoundCount();
     }
   }
 
@@ -697,7 +693,7 @@ export default class TownGameScene extends Phaser.Scene {
   stopTimer() {
     // Stop the timer event
     this._timerFlag = false;
-    this._timedEvent?.remove(false);
+    this._timedEvent?.remove();
   }
 
   setTotalItemsPlaced(totalItemsPlaced: number) {
