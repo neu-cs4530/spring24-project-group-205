@@ -622,6 +622,11 @@ export default class TownGameScene extends Phaser.Scene {
     this._itemsFoundText?.setText(`Items Found: ${this._itemsFound}`);
   }
 
+  public resetItemsFoundCount() {
+    this._itemsFound = 0;
+    this._itemsFoundText?.setText(`Items Found: ${this._itemsFound}`);
+  }
+
   _initializeTimer() {
     // Create the timer component
     this._countDownText = this.add

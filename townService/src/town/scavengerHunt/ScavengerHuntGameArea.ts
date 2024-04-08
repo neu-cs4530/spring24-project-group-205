@@ -60,20 +60,23 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
     player: Player,
   ): InteractableCommandReturnType<CommandType> {
     if (command.type === 'JoinTimedGame') {
+      console.log('trying to join timed game');
       let game = this._game;
-      const selectedThemepack = this.game?.themePack || new Themepack(command.themepack); // Declare themepack variable
-      // selectedThemepack = new Themepack(command.themepack); // Assign themepack if not already present
-      if (!selectedThemepack) {
-        throw new InvalidParametersError('No themepack selected for the game');
-      }
-      if (!game) {
+      let selectedThemepack: Themepack | undefined; // Declare themepack variable
+      if (!game || game.state.status === 'OVER') {
+        console.log('made it here');
+        selectedThemepack = new Themepack(command.themepack); // Assign themepack if not already present
+        if (!selectedThemepack) {
+          throw new InvalidParametersError('No themepack selected for the game 3');
+        }
         game = new ScavengerHuntTimed(selectedThemepack);
         this._game = game;
         if (!this.themepack) {
           game.themePack = selectedThemepack;
         }
+        console.log('made it here 2');
+        game.join(player); // Pass themepack to join method
       }
-      game.join(player); // Pass themepack to join method
       this._stateUpdated(game.toModel());
       return { gameID: game.id } as InteractableCommandReturnType<CommandType>;
     }
@@ -83,7 +86,7 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
       if (!game || game.state.status === 'OVER') {
         selectedThemepack = new Themepack(command.themepack); // Assign themepack if not already present
         if (!selectedThemepack) {
-          throw new InvalidParametersError('No themepack selected for the game');
+          throw new InvalidParametersError('No themepack selected for the game 3');
         }
         game = new ScavengerHuntRelaxed(selectedThemepack);
         this._game = game;
@@ -105,6 +108,7 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
       }
       game.leave(player);
       this._stateUpdated(game.toModel());
+      this.removeScavengerHuntOnRefresh(player);
       return undefined as InteractableCommandReturnType<CommandType>;
     }
     if (command.type === 'StartGame') {

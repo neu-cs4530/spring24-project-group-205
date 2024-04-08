@@ -57,7 +57,7 @@ export default abstract class ScavengerHunt extends Game<
   // Method to start the game
   public startGame(player: Player): void {
     if (!this.state.themepack) {
-      throw new InvalidParametersError('No themepack selected for the game');
+      throw new InvalidParametersError('No themepack selected for the game 1');
     }
     if (this.state.status !== 'WAITING_TO_START') {
       throw new InvalidParametersError(GAME_NOT_STARTABLE_MESSAGE);

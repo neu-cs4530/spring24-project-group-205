@@ -474,9 +474,6 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
 
     this._socket.on('itemPlaced', item => {
       for (const player of this.players) {
-        console.log(player.location.interactableID);
-      }
-      for (const player of this.players) {
         if (player.location.interactableID === 'Scavenger Hunt') {
           try {
             player.scene?.addTileOnMap(item.id, item.location.x, item.location.y);
@@ -507,6 +504,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         if (player.location.interactableID === 'Scavenger Hunt') {
           try {
             player.scene?.startTimer();
+            player.scene?.resetItemsFoundCount();
           } catch (e) {
             // fix this
           }
