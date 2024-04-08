@@ -669,9 +669,22 @@ export default class TownGameScene extends Phaser.Scene {
           }
           if (this._timedEvent?.repeatCount === 0) {
             this.stopTimer();
+            this._countDownText?.setText(`Time's up! Game over.`);
           }
         },
       });
+    }
+  }
+
+  public clearItemsLayer() {
+    const itemsLayer = this.map.getLayer('Items');
+    if (itemsLayer) {
+      itemsLayer.tilemapLayer.forEachTile(tile => {
+        itemsLayer.tilemapLayer.removeTileAt(tile.x, tile.y);
+      });
+      // Update the items found count after clearing the items layer
+      this._itemsFound = 0;
+      this.updateItemsFoundCount();
     }
   }
 
@@ -693,7 +706,7 @@ export default class TownGameScene extends Phaser.Scene {
   stopTimer() {
     // Stop the timer event
     this._timerFlag = false;
-    this._timedEvent?.remove(false);
+    this._timedEvent?.remove();
   }
 
   /**

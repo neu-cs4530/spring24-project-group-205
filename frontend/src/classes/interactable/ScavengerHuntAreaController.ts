@@ -38,6 +38,10 @@ export default class ScavengerHuntAreaController extends GameAreaController<
     return this._model.game?.players.includes(this._townController.ourPlayer.id) ?? false;
   }
 
+  resetHint() {
+    this.requestedHint = undefined;
+  }
+
   /**
    * Returns the status of the game
    * If there is no game, returns 'WAITING_FOR_PLAYERS'
@@ -167,6 +171,7 @@ export default class ScavengerHuntAreaController extends GameAreaController<
     }
     this._townController.ourPlayer.scene?.updateTimer(false, 'Null');
     this._townController.ourPlayer.scene?.updateItemsFound(false);
+    this._townController.ourPlayer.scene?.clearItemsLayer();
   }
 
   public async endGame(): Promise<void> {
@@ -179,6 +184,7 @@ export default class ScavengerHuntAreaController extends GameAreaController<
     }
     this._townController.ourPlayer.scene?.updateTimer(false, 'Null');
     this._townController.ourPlayer.scene?.updateItemsFound(false);
+    this._townController.ourPlayer.scene?.clearItemsLayer();
   }
 
   /**

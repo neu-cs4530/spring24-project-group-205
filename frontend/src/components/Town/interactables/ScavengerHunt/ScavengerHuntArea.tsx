@@ -93,6 +93,7 @@ export default function ScavengerHuntArea({
   const [joiningGame, setJoiningGame] = useState(false);
   const [startingGame, setStartingGame] = useState(false);
   const [joinedPlayers, setJoinedPlayers] = useState<string[]>([]);
+  const [requestedHint, setRequestedHint] = useState('');
 
   useEffect(() => {
     const playersJoined = gameAreaController.players.map(player => player.userName);
@@ -149,6 +150,7 @@ export default function ScavengerHuntArea({
   const handleLeaveGame = async () => {
     try {
       await gameAreaController.leaveGame();
+      gameAreaController.resetHint();
     } catch (err) {
       toast({
         title: 'Error leaving game',
@@ -161,6 +163,7 @@ export default function ScavengerHuntArea({
   const handleEndGame = async () => {
     try {
       await gameAreaController.endGame();
+      gameAreaController.resetHint();
     } catch (err) {
       toast({
         title: 'Error ending game',
@@ -173,6 +176,9 @@ export default function ScavengerHuntArea({
   const handleRequestHint = async () => {
     try {
       await gameAreaController.requestHint();
+      if (gameAreaController.requestedHint) {
+        setRequestedHint(gameAreaController.requestedHint);
+      }
     } catch (err) {
       toast({
         title: 'Error requesting hint',
@@ -341,10 +347,10 @@ export default function ScavengerHuntArea({
               )}
             </VStack>
             <Box boxSize='20px'> </Box>
-            {gameAreaController.requestedHint && (
+            {requestedHint && (
               <Alert status='info'>
                 <AlertIcon />
-                <span>{gameAreaController.requestedHint}</span>
+                <span>{requestedHint}</span>
               </Alert>
             )}
           </TabPanel>
