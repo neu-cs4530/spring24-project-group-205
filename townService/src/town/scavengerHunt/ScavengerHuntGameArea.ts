@@ -33,8 +33,6 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
     return 'ScavengerHuntArea' as InteractableType;
   }
 
-  protected overlapExit(): void {}
-
   private _stateUpdated(updatedState: GameInstance<ScavengerHuntGameState>) {
     if (updatedState.state.status === 'OVER') {
       const gameID = this._game?.id;
