@@ -186,6 +186,10 @@ export default class Town {
       scavengerHuntArea?.handleCommand({ type: 'ItemFound', location }, newPlayer);
     });
 
+    socket.on('startTimer', () => {
+      newPlayer.townEmitter.emit('startTimer');
+    });
+
     // Set up a listener to process commands to interactables.
     // Dispatches commands to the appropriate interactable and sends the response back to the client
     socket.on('interactableCommand', (command: InteractableCommand & InteractableCommandBase) => {
