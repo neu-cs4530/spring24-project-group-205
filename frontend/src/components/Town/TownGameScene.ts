@@ -612,7 +612,7 @@ export default class TownGameScene extends Phaser.Scene {
 
   _initializeItemsFound() {
     this._itemsFoundText = this.add
-      .text(600, 56, `Items Found: ${this._itemsFound} / ${this._totalItemsPlaced}`, {
+      .text(575, 60, `Items Found: ${this._itemsFound} / ${this._totalItemsPlaced}`, {
         // Adjusted Y position to appear below the timer
         font: '15px monospace',
         color: '#000000',
@@ -644,7 +644,7 @@ export default class TownGameScene extends Phaser.Scene {
   _initializeTimer() {
     // Create the timer component
     this._countDownText = this.add
-      .text(600, 16, `Time Left: `, {
+      .text(575, 20, `Time Left: `, {
         font: '15px monospace',
         color: '#000000',
         padding: {
@@ -667,9 +667,11 @@ export default class TownGameScene extends Phaser.Scene {
         callback: () => {
           const timeLeft = this._timedEvent?.repeatCount;
           if (timeLeft) {
-            this._countDownText?.setText('Time: ' + this._formatTime(timeLeft));
+            this._countDownText?.setText('Time Left: ' + this._formatTime(timeLeft));
           }
           if (this._timedEvent?.repeatCount === 0) {
+            this._countDownText?.setBackgroundColor('#E55451');
+            this._countDownText?.setText(`Time's up!`);
             this.stopTimer();
           }
         },
