@@ -47,17 +47,19 @@ export default abstract class GameArea<
   protected abstract getType(): InteractableType;
 
   public remove(player: Player): void {
-    if (this._game) {
-      try {
-        this._game.leave(player);
-      } catch (e) {
-        if ((e as InvalidParametersError).message === PLAYER_NOT_IN_GAME_MESSAGE) {
-          // do nothing
-        } else {
-          throw e;
+    if (this.id !== 'Scavenger Hunt') {
+      if (this._game) {
+        try {
+          this._game.leave(player);
+        } catch (e) {
+          if ((e as InvalidParametersError).message === PLAYER_NOT_IN_GAME_MESSAGE) {
+            // do nothing
+          } else {
+            throw e;
+          }
         }
       }
+      super.remove(player);
     }
-    super.remove(player);
   }
 }
