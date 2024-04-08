@@ -14,6 +14,7 @@ import {
   InteractableCommand,
   InteractableCommandBase,
   PlayerLocation,
+  ScavengerHuntGameState,
   ScavengerHuntItem,
   ServerToClientEvents,
   SocketData,
@@ -25,6 +26,9 @@ import ConversationArea from './ConversationArea';
 import GameAreaFactory from './games/GameAreaFactory';
 import InteractableArea from './InteractableArea';
 import ViewingArea from './ViewingArea';
+import GameArea from './games/GameArea';
+import ScavengerHuntGameArea from './scavengerHunt/ScavengerHuntGameArea';
+import ScavengerHunt from './scavengerHunt/ScavengerHunt';
 
 /**
  * The Town class implements the logic for each town: managing the various events that
@@ -242,6 +246,7 @@ export default class Town {
    * @param session PlayerSession to destroy
    */
   private _removePlayer(player: Player): void {
+    this._removePlayerFromScavengerHunt(player);
     if (player.location.interactableID) {
       this._removePlayerFromInteractable(player);
     }
@@ -297,6 +302,13 @@ export default class Town {
     );
     if (area) {
       area.remove(player);
+    }
+  }
+
+  private _removePlayerFromScavengerHunt(player: Player): void {
+    const area = this._interactables.find(eachArea => eachArea.id === 'Scavenger Hunt');
+    if (area) {
+      (area as GameArea<ScavengerHunt>).removeScavengerHuntOnRefresh(player);
     }
   }
 
