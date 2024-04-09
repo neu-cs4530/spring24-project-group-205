@@ -1,13 +1,14 @@
 import InvalidParametersError, {
   GAME_FULL_MESSAGE,
+  GAME_NOT_IN_PROGRESS_MESSAGE,
   GAME_NOT_STARTABLE_MESSAGE,
+  GAME_OVER_MESSAGE,
   PLAYER_ALREADY_IN_GAME_MESSAGE,
   PLAYER_NOT_IN_GAME_MESSAGE,
   PLAYER_UNABLE_TO_JOIN_MESSAGE,
 } from '../../lib/InvalidParametersError';
 import Player from '../../lib/Player';
 import {
-  GameMode,
   GameMove,
   PlayerID,
   ScavengerHuntGameState,
@@ -15,23 +16,26 @@ import {
 } from '../../types/CoveyTownSocket';
 import Game from '../games/Game';
 import Themepack from './Themepack';
-import { setRandomLocationAndHint } from './Utils';
+import { setRandomLocationAndHint } from './HidingSpot';
 
 const TIME_ALLOWED = 120;
 
 const MAX_PLAYERS = 10;
 
+/**
+ * A class representing a scavenger hunt game
+ */
 export default abstract class ScavengerHunt extends Game<
   ScavengerHuntGameState,
   ScavengerHuntItem
 > {
-  // number of items found by each player
   protected _itemsFound = new Map<PlayerID, number>();
 
   protected _gameStartTime?: number;
 
   private _timerIntervalId?: NodeJS.Timeout;
 
+  // takes in a themepack that represents the items in the game
   public constructor(themePack?: Themepack) {
     super({
       gameMode: undefined,
@@ -43,7 +47,12 @@ export default abstract class ScavengerHunt extends Game<
     });
   }
 
-  // Method to start the game
+  /**
+   * Starts the scavenger hunt game for a given player and starts the timer, as well as initialize the items locations.
+   *
+   * @param player - The player who wants to start the game.
+   * @throws {InvalidParametersError} If no themepack is selected for the game, if the game is not in the 'WAITING_TO_START' status, or if the player is not in the game.
+   */
   public startGame(player: Player): void {
     if (!this.state.themepack) {
       throw new InvalidParametersError('No themepack selected for the game 1');
@@ -101,14 +110,6 @@ export default abstract class ScavengerHunt extends Game<
   }
 
   /**
-   * Apply a move to the game.
-   * This method should be implemented by subclasses.
-   * @param move A move to apply to the game.
-   * @throws InvalidParametersError if the move is invalid.
-   */
-  public abstract applyMove(move: GameMove<ScavengerHuntItem>): void;
-
-  /**
    * Gives the total number of items found at this point in the game.
    * @returns number of items found.
    */
@@ -124,7 +125,10 @@ export default abstract class ScavengerHunt extends Game<
     this.state.themepack = themepack;
   }
 
-  // lets up to ten people join, and can be started as soon as the first person joins
+  /**
+   * lets up to 10 players join and can be started with just one player
+   * @param player - The player to join the game
+   */
   protected _join(player: Player): void {
     if (this._players.some(p => p.id === player.id)) {
       throw new InvalidParametersError(PLAYER_ALREADY_IN_GAME_MESSAGE);
@@ -219,6 +223,31 @@ export default abstract class ScavengerHunt extends Game<
   }
 
   /**
+   * Applies a move made by a player where if an item is found, the foundBy is updated and the items found is incremented by 1
+   * @param move - The game move made by the player.
+   * @throws {InvalidParametersError} If the player is not in the game, the game is over, or the game is not in progress.
+   */
+  public applyMove(move: GameMove<ScavengerHuntItem>): void {
+    const player = this._players.find(p => p.id === move.playerID);
+    if (!player) {
+      throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
+    }
+    if (this.state.status === 'OVER') {
+      throw new InvalidParametersError(GAME_OVER_MESSAGE);
+    }
+    if (this.state.status !== 'IN_PROGRESS') {
+      throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
+    }
+
+    move.move.foundBy = move.playerID;
+    this._itemsFound.set(move.playerID, (this._itemsFound.get(move.playerID) || 0) + 1);
+    this.state = {
+      ...this.state,
+      items: this.state.items.map(item => (item.id === move.move.id ? move.move : item)),
+    };
+  }
+
+  /**
    *
    * @returns a string with the hint associated with the next unfound item in the list
    */
@@ -271,6 +300,12 @@ export default abstract class ScavengerHunt extends Game<
     };
   }
 
+  /**
+   * Returns the item identified at the given location
+   * @param x - The x coordinate of the location
+   * @param y - The y coordinate of the location
+   * @returns The item at the location
+   */
   public getItemByLocation(x: number, y: number): ScavengerHuntItem {
     const item = this.state.items.find(
       i => i.location.x === x && i.location.y === y,

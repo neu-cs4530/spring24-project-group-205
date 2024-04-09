@@ -48,6 +48,25 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
     this._emitAreaChanged();
   }
 
+  /**
+   * Handles the execution of different types of commands in the scavenger hunt game area.
+   * Supported commands:
+   * - JoinGame (joins the game `this._game`, or creates a new one if none is in progress)
+   * - StartGame (indicates that the player is ready to start the game)
+   * - GameMove (applies a move to the game)
+   * - LeaveGame (leaves the game)
+   * - EndGame (ends the game)
+   * - ItemFound (indicates that an item has been found)
+   * - RequestHint (requests a hint)
+   * - TimedLeaderboard (requests the timed leaderboard)
+   * - RelaxedLeaderboard (requests the relaxed leaderboard)
+   *
+   * @template CommandType - The type of command to be handled.
+   * @param {CommandType} command - The command to be executed.
+   * @param {Player} player - The player executing the command.
+   * @returns {InteractableCommandReturnType<CommandType> | undefined} - The result of the command execution.
+   * @throws {InvalidParametersError} - If the command or parameters are invalid.
+   */
   public handleCommand<CommandType extends InteractableCommand>(
     command: CommandType,
     player: Player,
