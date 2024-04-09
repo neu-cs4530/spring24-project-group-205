@@ -6,7 +6,7 @@ import Game from '../games/Game';
 export default class TestingRelaxedGame extends Game<ScavengerHuntGameState, ScavengerHuntItem> {
   public constructor(themePack?: Themepack) {
     super({
-      mode: 'relaxed',
+      gameMode: 'relaxed',
       timeLeft: 10,
       items: [],
       status: 'WAITING_TO_START',

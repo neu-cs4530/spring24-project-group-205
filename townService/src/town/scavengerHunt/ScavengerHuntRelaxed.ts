@@ -1,7 +1,6 @@
 import InvalidParametersError, {
   GAME_NOT_IN_PROGRESS_MESSAGE,
   GAME_OVER_MESSAGE,
-  INVALID_MOVE_MESSAGE,
   PLAYER_NOT_IN_GAME_MESSAGE,
 } from '../../lib/InvalidParametersError';
 import { GameMove, ScavengerHuntItem } from '../../types/CoveyTownSocket';
@@ -25,9 +24,6 @@ export default class ScavengerHuntRelaxed extends ScavengerHunt {
     const player = this._players.find(p => p.id === move.playerID);
     if (!player) {
       throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
-    }
-    if (move.move.foundBy) {
-      throw new InvalidParametersError(INVALID_MOVE_MESSAGE);
     }
     if (this.state.status === 'OVER') {
       throw new InvalidParametersError(GAME_OVER_MESSAGE);

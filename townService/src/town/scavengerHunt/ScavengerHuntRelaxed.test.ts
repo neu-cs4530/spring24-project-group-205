@@ -103,28 +103,6 @@ describe('ScavengerHunt', () => {
       game.iterateClock();
       expect(game.getTimeLeft()).toBe(120);
     });
-    it('should throw an error if a player tries to find an item that they already found', () => {
-      const player = createPlayerForTesting();
-      const burger = new Item(1234, 'burger', { x: 0, y: 0 }, '');
-      themepack.addItem(burger);
-      game.join(player);
-      game.startGame(player);
-      game.applyMove({ gameID: '1234', playerID: player.id, move: burger });
-      expect(() => game.applyMove({ gameID: '1234', playerID: player.id, move: burger })).toThrow();
-    });
-    it('should throw an error if another player tries to find an item that has already been found', () => {
-      const player = createPlayerForTesting();
-      const player2 = createPlayerForTesting();
-      const burger = new Item(1234, 'burger', { x: 0, y: 0 }, '');
-      themepack.addItem(burger);
-      game.join(player);
-      game.join(player2);
-      game.startGame(player);
-      game.applyMove({ gameID: '1234', playerID: player.id, move: burger });
-      expect(() =>
-        game.applyMove({ gameID: '1234', playerID: player2.id, move: burger }),
-      ).toThrow();
-    });
     it('should throw an error if non-present player tries to find an item', () => {
       const player = createPlayerForTesting();
       const player2 = createPlayerForTesting();

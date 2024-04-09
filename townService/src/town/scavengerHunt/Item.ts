@@ -7,15 +7,16 @@ export default class Item implements ScavengerHuntItem {
 
   location: XY;
 
-  private _foundBy?: string | undefined;
-
   hint: string;
+
+  foundBy: string;
 
   constructor(id: number, name: string, location: XY, hint: string) {
     this.id = id;
     this.name = name;
     this.location = location;
     this.hint = hint;
+    this.foundBy = 'n/a';
   }
 
   public setID(id: number): void {
@@ -32,13 +33,5 @@ export default class Item implements ScavengerHuntItem {
 
   public setHint(hint: string): void {
     this.hint = hint;
-  }
-
-  public set foundBy(foundBy: string | undefined) {
-    this._foundBy = foundBy;
-  }
-
-  public get foundBy(): string | undefined {
-    return this._foundBy;
   }
 }

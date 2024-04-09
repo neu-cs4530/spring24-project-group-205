@@ -77,7 +77,7 @@ export default class ScavengerHuntAreaController extends GameAreaController<
    * Returns true if the game is not empty and the game is not waiting for players
    */
   public isActive(): boolean {
-    return !this.isEmpty() && this.status !== 'WAITING_FOR_PLAYERS';
+    return this.status === 'IN_PROGRESS' || this.status === 'WAITING_TO_START';
   }
 
   /**
@@ -117,9 +117,12 @@ export default class ScavengerHuntAreaController extends GameAreaController<
       gameID: instanceID,
       type: 'StartGame',
     });
-    this._townController.ourPlayer.scene?.startTimer();
-    this._townController.emitStartTimer();
+    if (this._model.game?.state.gameMode === 'timed') {
+      this._townController.ourPlayer.scene?.startTimer();
+      this._townController.emitStartTimer();
+    }
     this._townController.ourPlayer.scene?.updateItemsFound(true);
+    this._townController.ourPlayer.scene?.resetItemsFoundCount();
   }
 
   public _renderInitialItems(): void {
@@ -185,6 +188,7 @@ export default class ScavengerHuntAreaController extends GameAreaController<
     this._townController.ourPlayer.scene?.updateTimer(false, 'Null');
     this._townController.ourPlayer.scene?.updateItemsFound(false);
     this._townController.ourPlayer.scene?.clearItemsLayer();
+    this._townController.emitEndGame();
   }
 
   /**
