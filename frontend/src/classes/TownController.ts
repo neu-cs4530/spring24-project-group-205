@@ -478,6 +478,10 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
       }
     });
 
+    /**
+     * When an item is placed in scavenger hunt we need to update the map and the items found count
+     * for all other players. Some player scenes are undefine if they joined the Town after a game starts.
+     */
     this._socket.on('itemPlaced', item => {
       const scav = this._interactableControllers.find(
         interactable => interactable.id === 'Scavenger Hunt',
@@ -495,6 +499,9 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
       this.emit('itemPlaced', item);
     });
 
+    /**
+     * When an item is found in scavenger hunt we need to update the map and the items found count
+     */
     this._socket.on('itemFound', location => {
       const scav = this._interactableControllers.find(
         interactable => interactable.id === 'Scavenger Hunt',
@@ -511,14 +518,23 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
       this.emit('itemFound', location);
     });
 
+    /**
+     * When the relaxed leaderboard is updated, emit an event to the controller's event listeners
+     */
     this._socket.on('relaxedLeaderboard', relaxedLeaderboard => {
       this.emit('relaxedLeaderboard', relaxedLeaderboard);
     });
 
+    /**
+     * When the timed leaderboard is updated, emit an event to the controller's event listeners
+     */
     this._socket.on('timedLeaderboard', timedLeaderboard => {
       this.emit('timedLeaderboard', timedLeaderboard);
     });
 
+    /**
+     * When the scavenger hunt timer starts, emit an event to the controller's event listeners
+     */
     this._socket.on('startTimer', () => {
       const scav = this._interactableControllers.find(
         interactable => interactable.id === 'Scavenger Hunt',
@@ -536,6 +552,9 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
       this.emit('startTimer');
     });
 
+    /**
+     * When the scavenger hunt game ends, emit an event to the controller's event listeners
+     */
     this._socket.on('endGame', () => {
       const scav = this._interactableControllers.find(
         interactable => interactable.id === 'Scavenger Hunt',
@@ -770,19 +789,6 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     }
   }
 
-  // public getScavengerHuntController(
-  //   scavengerHuntItem: ScavengerHuntItem,
-  // ): ScavengerHuntAreaController {
-  //   const existingController = this._interactableControllers.find(
-  //     eachExistingArea => eachExistingArea.id === scavengerHuntItem.name,
-  //   );
-  //   if (existingController instanceof ScavengerHuntAreaController) {
-  //     return existingController;
-  //   } else {
-  //     throw new Error(`No such scavenger hunt controller ${existingController}`);
-  //   }
-  // }
-
   /**
    * Retrives the game area controller corresponding to a game area by ID, or
    * throws an error if the game area controller does not exist
@@ -812,18 +818,32 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     this._socket.emit('interactableUpdate', viewingArea.toInteractableAreaModel());
   }
 
+  /**
+   * Emit a scavenger hun item placed to the townService
+   * @param item the item that was placed
+   */
   public emitItemPlaced(item: ScavengerHuntItem) {
     this._socket.emit('itemPlaced', item);
   }
 
+  /**
+   * Emit a scavenger hunt item found to the townService
+   * @param location the location of the item that was found
+   */
   public emitItemFound(location: XY) {
     this._socket.emit('itemFound', location);
   }
 
+  /**
+   * Emit to start the timer for the scavenger hunt
+   */
   public emitStartTimer() {
     this._socket.emit('startTimer');
   }
 
+  /**
+   * Emit to end the scavenger hunt game
+   */
   public emitEndGame() {
     this._socket.emit('endGame');
   }
