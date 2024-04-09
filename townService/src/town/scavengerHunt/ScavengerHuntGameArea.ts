@@ -118,7 +118,6 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
       this._startTimer();
       game.startGame(player);
       this._stateUpdated(game.toModel());
-      this._startTimer();
       return undefined as InteractableCommandReturnType<CommandType>;
     }
     if (command.type === 'EndGame') {

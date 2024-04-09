@@ -657,9 +657,11 @@ export default class TownGameScene extends Phaser.Scene {
             this._countDownText?.setText(`Time's up!`);
             this.stopTimer();
             this._countDownText?.setText(`Time's up! Game over.`);
+            this.clearItemsLayer();
           }
         },
       });
+      this._countDownText?.setBackgroundColor('#ffffff');
     }
   }
 
@@ -671,7 +673,7 @@ export default class TownGameScene extends Phaser.Scene {
       });
       // Update the items found count after clearing the items layer
       this._itemsFound = 0;
-      this.updateItemsFoundCount();
+      this._itemsFoundText?.setText(`Items Found: ${this._itemsFound} / ${this._totalItemsPlaced}`);
     }
   }
 
@@ -694,6 +696,7 @@ export default class TownGameScene extends Phaser.Scene {
     // Stop the timer event
     this._timerFlag = false;
     this._timedEvent?.remove();
+    
   }
 
   setTotalItemsPlaced(totalItemsPlaced: number) {

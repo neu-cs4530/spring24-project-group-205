@@ -95,6 +95,25 @@ describe('ScavengerHunt', () => {
           expect(gameRelaxed.state.status).toEqual('OVER');
         });
       });
+      describe('if the player is the only one, it should end the game', () => {
+        test('in relaxed mode', () => {
+          const player = createPlayerForTesting();
+          gameRelaxed.join(player);
+          gameRelaxed.startGame(player);
+          gameRelaxed.leave(player);
+          expect(gameRelaxed.state.status).toEqual('OVER');
+          expect(gameRelaxed.numPlayers()).toEqual(0);
+        });
+
+        test('in timed mode', () => {
+          const player = createPlayerForTesting();
+          gameTimed.join(player);
+          gameTimed.startGame(player);
+          gameTimed.leave(player);
+          expect(gameTimed.state.status).toEqual('OVER');
+          expect(gameRelaxed.numPlayers()).toEqual(0);
+        });
+      });
 
       describe('when the game is in progress, it should set the game status to OVER in timed mode', () => {
         test('when player leaves', () => {
@@ -151,6 +170,40 @@ describe('ScavengerHunt', () => {
         expect(gameTimed.hasPlayer(player)).toBe(false);
         expect(gameTimed.hasPlayer(player2)).toBe(false);
       });
+    });
+    describe('should end game for both players', () => {
+      it('in relaxed mode', () => {
+        const player = createPlayerForTesting();
+        const player2 = createPlayerForTesting();
+        gameRelaxed.join(player);
+        gameRelaxed.join(player2);
+        gameRelaxed.startGame(player);
+        expect(gameRelaxed.state.items.length).toBe(42);
+        expect(gameRelaxed.hasPlayer(player)).toBe(true);
+        expect(gameRelaxed.hasPlayer(player2)).toBe(true);
+        gameRelaxed.endGame(player);
+        expect(gameRelaxed.state.items.length).toBe(0);
+        expect(gameRelaxed.numPlayers()).toEqual(0);
+        expect(gameRelaxed.hasPlayer(player)).toBe(false);
+        expect(gameRelaxed.hasPlayer(player2)).toBe(false);
+      });
+
+      it('in timed mode', () => {
+        const player = createPlayerForTesting();
+        const player2 = createPlayerForTesting();
+        gameTimed.join(player);
+        gameTimed.join(player2);
+        gameTimed.startGame(player);
+        expect(gameTimed.state.items.length).toBe(42);
+        expect(gameTimed.hasPlayer(player)).toBe(true);
+        expect(gameTimed.hasPlayer(player2)).toBe(true);
+        gameTimed.endGame(player);
+        expect(gameTimed.state.items.length).toBe(0);
+        expect(gameTimed.numPlayers()).toEqual(0);
+        expect(gameTimed.hasPlayer(player)).toBe(false);
+        expect(gameTimed.hasPlayer(player2)).toBe(false);
+      });
+
     });
   });
 });
