@@ -41,8 +41,6 @@ export default abstract class ScavengerHunt extends Game<
 
   private _timerIntervalId?: NodeJS.Timeout;
 
-  protected leaderboardData = this.leaderboard();
-
   public constructor(themePack?: Themepack) {
     super({
       mode: undefined,
@@ -229,11 +227,6 @@ export default abstract class ScavengerHunt extends Game<
   protected abstract _addDatabaseEntries(): void;
 
   /**
-   * Gets entries of top 5 users the leaderboard.
-   */
-  protected abstract leaderboard(): Promise<{ username: string; objects_found: number }[]>;
-
-  /**
    * Ends the game and clears the timer
    */
   public endGame(player: Player): void {
@@ -246,7 +239,6 @@ export default abstract class ScavengerHunt extends Game<
     };
 
     this._addDatabaseEntries();
-    this.leaderboardData = this.leaderboard();
 
     clearInterval(this._timerIntervalId);
   }

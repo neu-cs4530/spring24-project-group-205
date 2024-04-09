@@ -243,7 +243,7 @@ interface InteractableCommandBase {
   type: string;
 }
 
-export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | JoinRelaxedGameCommand | JoinTimedGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | StartGameCommand | LeaveGameCommand | ItemFoundCommand | EndGameCommand;
+export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | JoinRelaxedGameCommand | JoinTimedGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | StartGameCommand | LeaveGameCommand | ItemFoundCommand | EndGameCommand | RelaxedLeaderboardCommand | TimedLeaderboardCommand;
 
 export interface ViewingAreaUpdateCommand  {
   type: 'ViewingAreaUpdate';
@@ -281,14 +281,22 @@ export interface GameMoveCommand<MoveType> {
   gameID: GameInstanceID;
   move: MoveType;
 }
+export interface RelaxedLeaderboardCommand {
+  type: 'RelaxedLeaderboard';
+}
+export interface TimedLeaderboardCommand {
+  type: 'TimedLeaderboard';
+}
 export type InteractableCommandReturnType<CommandType extends InteractableCommand> = 
   CommandType extends JoinGameCommand ? { gameID: string}:
   CommandType extends JoinTimedGameCommand ? { gameID: string}:
-  CommandType extends JoinRelaxedGameCommand ? { gameID: string}:
+  CommandType extends JoinRelaxedGameCommand ? { gameID: string} :
   CommandType extends ViewingAreaUpdateCommand ? undefined :
   CommandType extends GameMoveCommand<TicTacToeMove> ? undefined :
   CommandType extends LeaveGameCommand ? undefined :
   CommandType extends EndGameCommand ? undefined :
+  CommandType extends RelaxedLeaderboardCommand ? undefined :
+  CommandType extends TimedLeaderboardCommand ? undefined :
   never;
 
 export type InteractableCommandResponse<MessageType> = {
@@ -310,6 +318,8 @@ export interface ServerToClientEvents {
   commandResponse: (response: InteractableCommandResponse) => void;
   itemFound: (location: XY) => void;
   itemPlaced: (item: ScavengerHuntItem) => void;
+  relaxedLeaderboard: (relaxedLeaderboard: { username: string; objects_found: number }[]) => void;
+  timedLeaderboard: (timedLeaderboard: { username: string; objects_found: number }[]) => void;
 }
 
 export interface ClientToServerEvents {

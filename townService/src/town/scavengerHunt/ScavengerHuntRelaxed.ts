@@ -73,10 +73,4 @@ export default class ScavengerHuntRelaxed extends ScavengerHunt {
       database.addRelaxedLeaderboardEntry(player, score);
     });
   }
-
-  protected leaderboard(): Promise<{ username: string; objects_found: number }[]> {
-    const database = new GameDatabase();
-    const results = database.top5RelaxedLeaderboard();
-    return results;
-  }
 }

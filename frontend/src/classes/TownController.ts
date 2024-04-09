@@ -116,6 +116,10 @@ export type TownEvents = {
   itemPlaced: (item: ScavengerHuntItem) => void;
 
   itemFound: (location: XY) => void;
+
+  relaxedLeaderboard: (relaxedLeaderboard: { username: string; objects_found: number }[]) => void;
+
+  timedLeaderboard: (timedLeaderboard: { username: string; objects_found: number }[]) => void;
 };
 
 /**
@@ -482,6 +486,14 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         player.scene?.removeTileOnMap(location.x, location.y);
       }
       this.emit('itemFound', location);
+    });
+
+    this._socket.on('relaxedLeaderboard', relaxedLeaderboard => {
+      this.emit('relaxedLeaderboard', relaxedLeaderboard);
+    });
+
+    this._socket.on('timedLeaderboard', timedLeaderboard => {
+      this.emit('timedLeaderboard', timedLeaderboard);
     });
   }
 

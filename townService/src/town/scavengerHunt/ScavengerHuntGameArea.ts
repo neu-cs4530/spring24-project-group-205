@@ -16,6 +16,7 @@ import InteractableArea from '../InteractableArea';
 import ScavengerHuntTimed from './ScavengerHuntTimed';
 import ScavengerHuntRelaxed from './ScavengerHuntRelaxed';
 import Themepack from './Themepack';
+import GameDatabase from './GameDatabase';
 
 export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
   private _interactables: InteractableArea[] = [];
@@ -142,7 +143,27 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
       // game.applyMove({ gameID: game.id, playerID: player.id, move: item });
       return undefined as InteractableCommandReturnType<CommandType>;
     }
+    if (command.type === 'RelaxedLeaderboard') {
+      this._sendRelaxedLeaderboard();
+      return undefined as InteractableCommandReturnType<CommandType>;
+    }
+    if (command.type === 'TimedLeaderboard') {
+      this._sendTimedLeaderboard();
+      return undefined as InteractableCommandReturnType<CommandType>;
+    }
     throw new InvalidParametersError('INVALID_COMMAND_MESSAGE');
+  }
+
+  private async _sendTimedLeaderboard() {
+    const database = new GameDatabase();
+    const data = await database.top5TimedLeaderboard();
+    this._townEmitter.emit('timedLeaderboard', data);
+  }
+
+  private async _sendRelaxedLeaderboard() {
+    const database = new GameDatabase();
+    const data = await database.top5RelaxedLeaderboard();
+    this._townEmitter.emit('relaxedLeaderboard', data);
   }
 
   /**
