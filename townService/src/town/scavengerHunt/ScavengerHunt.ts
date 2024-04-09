@@ -300,6 +300,12 @@ export default abstract class ScavengerHunt extends Game<
     };
   }
 
+  /**
+   * Returns the item identified at the given location
+   * @param x - The x coordinate of the location
+   * @param y - The y coordinate of the location
+   * @returns The item at the location
+   */
   public getItemByLocation(x: number, y: number): ScavengerHuntItem {
     const item = this.state.items.find(
       i => i.location.x === x && i.location.y === y,
