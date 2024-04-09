@@ -488,7 +488,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
             player.scene?.addTileOnMap(item.id, item.location.x, item.location.y);
             player.scene?.updateItemsFound(true);
           } catch (e) {
-            // fix this
+            // do nothing
           }
         }
       }
@@ -504,7 +504,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
           try {
             player.scene?.removeTileOnMap(location.x, location.y);
           } catch (e) {
-            // fix this
+            // do nothing
           }
         }
       }
@@ -529,7 +529,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
             player.scene?.startTimer();
             player.scene?.resetItemsFoundCount();
           } catch (e) {
-            // fix this
+            // do nothing
           }
         }
       }
@@ -548,7 +548,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
             player.scene?.updateItemsFound(false);
             player.scene?.resetItemsFoundCount();
           } catch (e) {
-            // fix this
+            // do nothing
           }
         }
       }

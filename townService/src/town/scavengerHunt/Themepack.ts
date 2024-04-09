@@ -25,7 +25,7 @@ export default class Themepack implements ScavengerHuntThemepack {
     this.name = name;
     if (name === 'food') {
       this._lowerBound = 15054;
-      this._upperBound = 15054 + 63;
+      this._upperBound = 15054 + 62;
     }
     if (name === 'emojis') {
       this._lowerBound = 15117;
