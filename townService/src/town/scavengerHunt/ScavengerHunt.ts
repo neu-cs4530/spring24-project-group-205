@@ -3,6 +3,7 @@ import InvalidParametersError, {
   GAME_NOT_STARTABLE_MESSAGE,
   PLAYER_ALREADY_IN_GAME_MESSAGE,
   PLAYER_NOT_IN_GAME_MESSAGE,
+  PLAYER_UNABLE_TO_JOIN_MESSAGE,
 } from '../../lib/InvalidParametersError';
 import Player from '../../lib/Player';
 import {
@@ -83,7 +84,7 @@ export default abstract class ScavengerHunt extends Game<
     this._gameStartTime = Date.now();
 
     this._timerIntervalId = setInterval(() => {
-      this._endGameIfTimesUp();
+      this._endGameIfTimesUp(player);
     }, 500);
   }
 
@@ -143,6 +144,8 @@ export default abstract class ScavengerHunt extends Game<
   protected _join(player: Player): void {
     if (this._players.some(p => p.id === player.id)) {
       throw new InvalidParametersError(PLAYER_ALREADY_IN_GAME_MESSAGE);
+    } else if (this.state.status === 'IN_PROGRESS') {
+      throw new InvalidParametersError(PLAYER_UNABLE_TO_JOIN_MESSAGE);
     } else if (this._players.length < MAX_PLAYERS) {
       // EDIT
       this.state = {
@@ -157,9 +160,9 @@ export default abstract class ScavengerHunt extends Game<
   /**
    * Ends the game if the time is up
    */
-  private _endGameIfTimesUp() {
+  private _endGameIfTimesUp(player: Player) {
     if (!this._isTimeRemaining(Date.now())) {
-      this._endGameForAllPlayers();
+      this.endGame(player);
     }
   }
 
@@ -197,7 +200,12 @@ export default abstract class ScavengerHunt extends Game<
       throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
     }
 
+    if (this.state.status === 'OVER') {
+      return;
+    }
+
     if (this.state.status === 'IN_PROGRESS') {
+      this._itemsFound.set(player.id, 0);
       if (this._players.length > 1) {
         // remove the given player fron list of players, but status can stay the same
         this._players = this._players.filter(p => p.id !== player.id);
@@ -258,6 +266,7 @@ export default abstract class ScavengerHunt extends Game<
       throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
     }
 
+    this._itemsFound.set(player.id, 0);
     this._addDatabaseEntries();
     this.leaderboardData = this.leaderboard();
 
@@ -282,12 +291,6 @@ export default abstract class ScavengerHunt extends Game<
       ...this.state,
       items: [],
     };
-  }
-
-  private _endGameForAllPlayers(): void {
-    this._players.forEach(p => {
-      this.endGame(p);
-    });
   }
 
   public getItemByLocation(x: number, y: number): ScavengerHuntItem {

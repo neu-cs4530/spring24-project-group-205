@@ -116,7 +116,6 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
       }
       game.startGame(player);
       this._stateUpdated(game.toModel());
-      this._startTimer();
       return undefined as InteractableCommandReturnType<CommandType>;
     }
     if (command.type === 'EndGame') {
@@ -137,7 +136,6 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
         throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
       }
       const item = game.getItemByLocation(command.location.x, command.location.y);
-      console.log('item', item);
       item.foundBy = player.id;
       try {
         game.applyMove({ gameID: game.id, playerID: player.id, move: item });
