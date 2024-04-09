@@ -137,7 +137,12 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
         throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
       }
       const item = game.getItemByLocation(command.location.x, command.location.y);
-      game.applyMove({ gameID: game.id, playerID: player.id, move: item });
+      item.foundBy = player.id;
+      try {
+        game.applyMove({ gameID: game.id, playerID: player.id, move: item });
+      } catch (e) {
+        // catch error in edge case that two players click item at same exact time
+      }
       return undefined as InteractableCommandReturnType<CommandType>;
     }
     if (command.type === 'RequestHint') {
