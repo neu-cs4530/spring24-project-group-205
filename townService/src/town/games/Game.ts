@@ -99,4 +99,14 @@ export default abstract class Game<StateType extends GameState, MoveType> {
   public numPlayers(): number {
     return this._players.length;
   }
+
+  /**
+   * Testing method to see if the givne player is in the game
+   * @param player The player to check for
+   *
+   * @returns true if the player is in the game, false otherwise
+   */
+  public hasPlayer(player: Player): boolean {
+    return this._players.some(p => p.id === player.id);
+  }
 }

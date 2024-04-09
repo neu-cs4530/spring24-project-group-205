@@ -1,7 +1,6 @@
 import InvalidParametersError, {
   GAME_NOT_IN_PROGRESS_MESSAGE,
   GAME_OVER_MESSAGE,
-  INVALID_MOVE_MESSAGE,
   PLAYER_NOT_IN_GAME_MESSAGE,
 } from '../../lib/InvalidParametersError';
 import { GameMove, ScavengerHuntItem } from '../../types/CoveyTownSocket';
@@ -21,8 +20,8 @@ export default class ScavengerHuntTimed extends ScavengerHunt {
    * Updates the time left in the game by decreasing it by 1 second
    */
   public iterateClock(): void {
-    const newTimeLeft = TIME_ALLOWED - 1;
-    if (newTimeLeft < TIME_ALLOWED) {
+    const newTimeLeft = this.state.timeLeft - 1;
+    if (newTimeLeft >= 0) {
       this.state = {
         ...this.state,
         timeLeft: newTimeLeft,
@@ -34,9 +33,6 @@ export default class ScavengerHuntTimed extends ScavengerHunt {
     const player = this._players.find(p => p.id === move.playerID);
     if (!player) {
       throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
-    }
-    if (move.move.foundBy) {
-      throw new InvalidParametersError(INVALID_MOVE_MESSAGE);
     }
     if (this.state.status === 'OVER') {
       throw new InvalidParametersError(GAME_OVER_MESSAGE);
@@ -51,13 +47,6 @@ export default class ScavengerHuntTimed extends ScavengerHunt {
       ...this.state,
       items: this.state.items.map(item => (item.id === move.move.id ? move.move : item)),
     };
-    if (this.state.items.every(item => item.foundBy)) {
-      this.state = {
-        ...this.state,
-        status: 'OVER',
-        winner: Array.from(this._itemsFound.entries()).reduce((a, b) => (b[1] > a[1] ? b : a))[0],
-      };
-    }
   }
 
   protected _isTimeRemaining(currentTime: number): boolean {
@@ -67,7 +56,7 @@ export default class ScavengerHuntTimed extends ScavengerHunt {
     }
 
     // If the game has been running for longer than the allotted time, there is no time remaining
-    if (currentTime >= (TIME_ALLOWED + this._gameStartTime) / 1000) {
+    if (currentTime < this._gameStartTime) {
       return false;
     }
 

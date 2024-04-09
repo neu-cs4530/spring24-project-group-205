@@ -95,16 +95,29 @@ export default function ScavengerHuntArea({
   }, [gameAreaController.themepack]);
 
   const handleClick = (newThemepack: string) => {
-    setThemepack(newThemepack);
+    if (!themepack) {
+      setThemepack(newThemepack);
+    }
   };
 
   const handleClickMode = (newMode: string) => {
-    setMode(newMode);
+    if (!mode) {
+      setMode(newMode);
+    }
   };
+
+  // if no players in an ongoing game, unlock the mode and themepack and reset the state
+  useEffect(() => {
+    if (gameAreaController.players.length === 0) {
+      setMode('');
+      setThemepack('');
+    }
+  }, [gameAreaController.players]);
 
   const [joiningGame, setJoiningGame] = useState(false);
   const [startingGame, setStartingGame] = useState(false);
   const [joinedPlayers, setJoinedPlayers] = useState<string[]>([]);
+  const [requestedHint, setRequestedHint] = useState('');
 
   useEffect(() => {
     const playersJoined = gameAreaController.players.map(player => player.userName);
@@ -161,6 +174,7 @@ export default function ScavengerHuntArea({
   const handleLeaveGame = async () => {
     try {
       await gameAreaController.leaveGame();
+      gameAreaController.resetHint();
     } catch (err) {
       toast({
         title: 'Error leaving game',
@@ -173,6 +187,7 @@ export default function ScavengerHuntArea({
   const handleEndGame = async () => {
     try {
       await gameAreaController.endGame();
+      gameAreaController.resetHint();
     } catch (err) {
       toast({
         title: 'Error ending game',
@@ -188,6 +203,21 @@ export default function ScavengerHuntArea({
     } catch (err) {
       toast({
         title: 'Error getting relaxed leaderboard',
+        description: (err as Error).toString(),
+        status: 'error',
+      });
+    }
+  };
+    
+  const handleRequestHint = async () => {
+    try {
+      await gameAreaController.requestHint();
+      if (gameAreaController.requestedHint) {
+        setRequestedHint(gameAreaController.requestedHint);
+      }
+    } catch (err) {
+      toast({
+        title: 'Error requesting hint',
         description: (err as Error).toString(),
         status: 'error',
       });
@@ -248,11 +278,19 @@ export default function ScavengerHuntArea({
                     <HStack>
                       <VStack>
                         <Image src='/timed.png' alt='timed' boxSize='100px' />
-                        <Button onClick={() => handleClickMode('timed')}>Timed</Button>
+                        <Button
+                          onClick={() => handleClickMode('timed')}
+                          colorScheme={mode === 'timed' ? 'orange' : 'gray'}>
+                          Timed
+                        </Button>
                       </VStack>
                       <VStack>
                         <Image src='/relaxed.png' alt='relaxed' boxSize='100px' />
-                        <Button onClick={() => handleClickMode('relaxed')}>Relaxed</Button>
+                        <Button
+                          onClick={() => handleClickMode('relaxed')}
+                          colorScheme={mode === 'relaxed' ? 'orange' : 'gray'}>
+                          Relaxed
+                        </Button>
                       </VStack>
                     </HStack>
                   </VStack>
@@ -266,15 +304,27 @@ export default function ScavengerHuntArea({
                     <HStack>
                       <VStack>
                         <Image src='/food.png' alt='food' boxSize='100px' />
-                        <Button onClick={() => handleClick('food')}>Food</Button>
+                        <Button
+                          onClick={() => handleClick('food')}
+                          colorScheme={themepack === 'food' ? 'orange' : 'gray'}>
+                          Food
+                        </Button>
                       </VStack>
                       <VStack>
                         <Image src='/emojis.png' alt='emoji' boxSize='100px' />
-                        <Button onClick={() => handleClick('emojis')}>Emojis</Button>
+                        <Button
+                          onClick={() => handleClick('emojis')}
+                          colorScheme={themepack === 'emojis' ? 'orange' : 'gray'}>
+                          Emojis
+                        </Button>
                       </VStack>
                       <VStack>
                         <Image src='/egg.png' alt='egg' boxSize='100px' />
-                        <Button onClick={() => handleClick('egg')}>Egg</Button>
+                        <Button
+                          onClick={() => handleClick('egg')}
+                          colorScheme={themepack === 'egg' ? 'orange' : 'gray'}>
+                          Egg
+                        </Button>
                       </VStack>
                     </HStack>
                   </VStack>
@@ -318,7 +368,7 @@ export default function ScavengerHuntArea({
               </Button>
               <Button onClick={handleLeaveGame}>Leave Game</Button>
               <Button onClick={handleEndGame}>End Game</Button>
-              <Button>Request Hint</Button>
+              <Button onClick={handleRequestHint}>Request Hint</Button>
             </HStack>
             <Box boxSize='20px'> </Box>
             <VStack>
@@ -336,10 +386,12 @@ export default function ScavengerHuntArea({
               )}
             </VStack>
             <Box boxSize='20px'> </Box>
-            <Alert status='info'>
-              <AlertIcon />
-              This is a hint. This box should only appear when a hint is requested.
-            </Alert>
+            {requestedHint && (
+              <Alert status='info'>
+                <AlertIcon />
+                <span>{requestedHint}</span>
+              </Alert>
+            )}
           </TabPanel>
           <TabPanel>
             <Tabs isFitted variant='enclosed'>

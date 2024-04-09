@@ -115,11 +115,17 @@ export interface TicTacToeMove {
   col: TicTacToeGridPosition;
 }
 
+export interface ScavengerHuntMove {
+  gamePiece: string,
+  row: number,
+  col: number,
+}
+
 export interface ScavengerHuntItem {
   id: number;
   name: string;
   location: XY;
-  foundBy?: PlayerID;
+  foundBy: PlayerID;
   hint: string;
 }
 
@@ -140,9 +146,9 @@ export interface TicTacToeGameState extends WinnableGameState {
 }
 
 export interface ScavengerHuntGameState extends WinnableGameState {
-  mode?: GameMode;
   timeLeft: number;
   items: ReadonlyArray<ScavengerHuntItem>;
+  moves: ReadonlyArray<ScavengerHuntMove>;
   gameMode?: GameMode;
   themepack?: Themepack;
 }
@@ -243,7 +249,7 @@ interface InteractableCommandBase {
   type: string;
 }
 
-export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | JoinRelaxedGameCommand | JoinTimedGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | StartGameCommand | LeaveGameCommand | ItemFoundCommand | EndGameCommand | RelaxedLeaderboardCommand | TimedLeaderboardCommand;
+export type InteractableCommand =  ViewingAreaUpdateCommand | JoinGameCommand | JoinRelaxedGameCommand | JoinTimedGameCommand | GameMoveCommand<TicTacToeMove> | GameMoveCommand<ConnectFourMove> | StartGameCommand | LeaveGameCommand | ItemFoundCommand | RequestHintCommand | EndGameCommand | RelaxedLeaderboardCommand | TimedLeaderboardCommand;
 
 export interface ViewingAreaUpdateCommand  {
   type: 'ViewingAreaUpdate';
@@ -256,6 +262,7 @@ export interface ItemFoundCommand {
   type: 'ItemFound';
   location: XY;
 }
+
 export interface JoinRelaxedGameCommand {
   type: 'JoinRelaxedGame';
   themepack: string;
@@ -266,6 +273,10 @@ export interface JoinTimedGameCommand {
 }
 export interface LeaveGameCommand {
   type: 'LeaveGame';
+  gameID: GameInstanceID;
+}
+export interface RequestHintCommand {
+  type: 'RequestHint';
   gameID: GameInstanceID;
 }
 export interface EndGameCommand {
@@ -292,6 +303,7 @@ export type InteractableCommandReturnType<CommandType extends InteractableComman
   CommandType extends JoinTimedGameCommand ? { gameID: string}:
   CommandType extends JoinRelaxedGameCommand ? { gameID: string} :
   CommandType extends ViewingAreaUpdateCommand ? undefined :
+  CommandType extends ViewingAreaUpdateCommand ? { hint: string} :
   CommandType extends GameMoveCommand<TicTacToeMove> ? undefined :
   CommandType extends LeaveGameCommand ? undefined :
   CommandType extends EndGameCommand ? undefined :
@@ -320,6 +332,8 @@ export interface ServerToClientEvents {
   itemPlaced: (item: ScavengerHuntItem) => void;
   relaxedLeaderboard: (relaxedLeaderboard: { username: string; objects_found: number }[]) => void;
   timedLeaderboard: (timedLeaderboard: { username: string; objects_found: number }[]) => void;
+  startTimer: () => void;
+  endGame: () => void;
 }
 
 export interface ClientToServerEvents {
@@ -329,4 +343,6 @@ export interface ClientToServerEvents {
   interactableCommand: (command: InteractableCommand & InteractableCommandBase) => void;
   itemFound: (location: XY) => void;
   itemPlaced: (item: ScavengerHuntItem) => void;
+  startTimer: () => void;
+  endGame: () => void;
 }

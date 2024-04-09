@@ -6,6 +6,7 @@ import InvalidParametersError, {
 import Player from '../../lib/Player';
 import {
   ConnectFourGameState,
+  ConnectFourMove,
   GameInstance,
   InteractableCommand,
   InteractableCommandReturnType,
@@ -91,7 +92,7 @@ export default class ConnectFourGameArea extends GameArea<ConnectFourGame> {
       game.applyMove({
         gameID: command.gameID,
         playerID: player.id,
-        move: command.move,
+        move: command.move as ConnectFourMove,
       });
       this._stateUpdated(game.toModel());
       return undefined as InteractableCommandReturnType<CommandType>;

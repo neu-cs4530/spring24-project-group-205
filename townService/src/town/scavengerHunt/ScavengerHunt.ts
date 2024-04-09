@@ -3,6 +3,7 @@ import InvalidParametersError, {
   GAME_NOT_STARTABLE_MESSAGE,
   PLAYER_ALREADY_IN_GAME_MESSAGE,
   PLAYER_NOT_IN_GAME_MESSAGE,
+  PLAYER_UNABLE_TO_JOIN_MESSAGE,
 } from '../../lib/InvalidParametersError';
 import Player from '../../lib/Player';
 import {
@@ -43,34 +44,29 @@ export default abstract class ScavengerHunt extends Game<
 
   public constructor(themePack?: Themepack) {
     super({
-      mode: undefined,
+      gameMode: undefined,
       timeLeft: TIME_ALLOWED,
       items: [],
       status: 'WAITING_TO_START',
       themepack: themePack,
+      moves: [],
     });
   }
 
   // Method to start the game
   public startGame(player: Player): void {
     if (!this.state.themepack) {
-      throw new InvalidParametersError('No themepack selected for the game');
+      throw new InvalidParametersError('No themepack selected for the game 1');
     }
-
     if (this.state.status !== 'WAITING_TO_START') {
       throw new InvalidParametersError(GAME_NOT_STARTABLE_MESSAGE);
     }
-
     if (!this._players.includes(player)) {
       throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
     }
 
     const items = this.state.themepack.createItems(this._players.length * 20);
-    this._gameStartTime = Date.now();
 
-    this._timerIntervalId = setInterval(() => {
-      this._endGameIfTimesUp();
-    }, 500);
     this.state = {
       ...this.state,
       items,
@@ -82,6 +78,12 @@ export default abstract class ScavengerHunt extends Game<
     });
 
     this._assignRandomLocations();
+
+    this._gameStartTime = Date.now();
+
+    this._timerIntervalId = setInterval(() => {
+      this._endGameIfTimesUp(player);
+    }, 500);
   }
 
   private _assignRandomLocations(): void {
@@ -140,6 +142,8 @@ export default abstract class ScavengerHunt extends Game<
   protected _join(player: Player): void {
     if (this._players.some(p => p.id === player.id)) {
       throw new InvalidParametersError(PLAYER_ALREADY_IN_GAME_MESSAGE);
+    } else if (this.state.status === 'IN_PROGRESS') {
+      throw new InvalidParametersError(PLAYER_UNABLE_TO_JOIN_MESSAGE);
     } else if (this._players.length < MAX_PLAYERS) {
       // EDIT
       this.state = {
@@ -154,9 +158,9 @@ export default abstract class ScavengerHunt extends Game<
   /**
    * Ends the game if the time is up
    */
-  private _endGameIfTimesUp() {
+  private _endGameIfTimesUp(player: Player) {
     if (!this._isTimeRemaining(Date.now())) {
-      this._endGameForAllPlayers();
+      this.endGame(player);
     }
   }
 
@@ -194,7 +198,12 @@ export default abstract class ScavengerHunt extends Game<
       throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
     }
 
+    if (this.state.status === 'OVER') {
+      return;
+    }
+
     if (this.state.status === 'IN_PROGRESS') {
+      this._itemsFound.set(player.id, 0);
       if (this._players.length > 1) {
         // remove the given player fron list of players, but status can stay the same
         this._players = this._players.filter(p => p.id !== player.id);
@@ -203,6 +212,8 @@ export default abstract class ScavengerHunt extends Game<
         this._players = this._players.filter(p => p.id !== player.id);
         this.state = {
           ...this.state,
+          themepack: undefined,
+          gameMode: undefined,
           status: 'OVER',
         };
         clearInterval(this._timerIntervalId);
@@ -222,6 +233,20 @@ export default abstract class ScavengerHunt extends Game<
   }
 
   /**
+   *
+   * @returns a string with the hint associated with the next unfound item in the list
+   */
+  public requestHint(): string {
+    const unfoundItems = this.state.items.filter(item => item.foundBy === 'n/a');
+    if (unfoundItems.length === 0) {
+      return 'All items found!';
+    }
+
+    const nextItem = unfoundItems[0];
+    return nextItem.hint || 'No hint available';
+  }
+
+  /**
    * Adds entries of all scores from game to the leaderboard table in the database.
    */
   protected abstract _addDatabaseEntries(): void;
@@ -233,25 +258,46 @@ export default abstract class ScavengerHunt extends Game<
     if (!this._players.includes(player)) {
       throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
     }
+
+    this._itemsFound.set(player.id, 0);
+    this._addDatabaseEntries();
+
     this.state = {
       ...this.state,
+      themepack: undefined,
+      gameMode: undefined,
       status: 'OVER',
     };
 
-    this._addDatabaseEntries();
+    // go through all players and remove them from the game
+    this._players.forEach(p => {
+      this._players = this._players.filter(playera => playera.id !== p.id);
+    });
 
     clearInterval(this._timerIntervalId);
+    this._clearAllItems();
   }
 
-  private _endGameForAllPlayers(): void {
-    this._players.forEach(p => {
-      this.endGame(p);
-    });
+  private _clearAllItems(): void {
+    this.state = {
+      ...this.state,
+      items: [],
+    };
   }
 
   public getItemByLocation(x: number, y: number): ScavengerHuntItem {
-    return this.state.items.find(
-      item => item.location.x === x && item.location.y === y,
+    const item = this.state.items.find(
+      i => i.location.x === x && i.location.y === y,
     ) as ScavengerHuntItem;
+    if (!item) {
+      return {
+        id: 0,
+        name: 'Item not found',
+        location: { x: 0, y: 0 },
+        foundBy: 'n/a',
+        hint: '',
+      };
+    }
+    return item;
   }
 }

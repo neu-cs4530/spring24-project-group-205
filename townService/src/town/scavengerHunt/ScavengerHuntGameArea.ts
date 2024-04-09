@@ -62,34 +62,32 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
   ): InteractableCommandReturnType<CommandType> {
     if (command.type === 'JoinTimedGame') {
       let game = this._game;
-      const selectedThemepack = this.game?.themePack || new Themepack(command.themepack); // Declare themepack variable
-      // selectedThemepack = new Themepack(command.themepack); // Assign themepack if not already present
-      if (!selectedThemepack) {
-        throw new InvalidParametersError('No themepack selected for the game');
-      }
-      if (!game) {
-        game = new ScavengerHuntTimed(selectedThemepack);
-        this._game = game;
-        if (!this.themepack) {
-          game.themePack = selectedThemepack;
+      let selectedThemepack: Themepack | undefined; // Declare themepack variable
+      if (!game || game.state.status !== 'IN_PROGRESS') {
+        selectedThemepack = game?.themePack || new Themepack(command.themepack); // Assign themepack if not already present
+        if (!selectedThemepack) {
+          throw new InvalidParametersError('No themepack selected for the game 3');
         }
+        if (!game || game.state.status === 'OVER') {
+          game = new ScavengerHuntTimed(selectedThemepack);
+          this._game = game;
+        }
+        game.join(player); // Pass themepack to join method
       }
-      game.join(player); // Pass themepack to join method
       this._stateUpdated(game.toModel());
       return { gameID: game.id } as InteractableCommandReturnType<CommandType>;
     }
     if (command.type === 'JoinRelaxedGame') {
       let game = this._game;
       let selectedThemepack: Themepack | undefined; // Declare themepack variable
-      if (!game || game.state.status === 'OVER') {
-        selectedThemepack = new Themepack(command.themepack); // Assign themepack if not already present
+      if (!game || game.state.status !== 'IN_PROGRESS') {
+        selectedThemepack = game?.themePack || new Themepack(command.themepack); // Assign themepack if not already present
         if (!selectedThemepack) {
-          throw new InvalidParametersError('No themepack selected for the game');
+          throw new InvalidParametersError('No themepack selected for the game 3');
         }
-        game = new ScavengerHuntRelaxed(selectedThemepack);
-        this._game = game;
-        if (!this.themepack) {
-          game.themePack = selectedThemepack;
+        if (!game || game.state.status === 'OVER') {
+          game = new ScavengerHuntRelaxed(selectedThemepack);
+          this._game = game;
         }
         game.join(player); // Pass themepack to join method
       }
@@ -106,6 +104,7 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
       }
       game.leave(player);
       this._stateUpdated(game.toModel());
+      this.removeScavengerHuntOnRefresh(player);
       return undefined as InteractableCommandReturnType<CommandType>;
     }
     if (command.type === 'StartGame') {
@@ -116,10 +115,8 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
       if (this._game?.id !== command.gameID) {
         throw new InvalidParametersError(GAME_ID_MISSMATCH_MESSAGE);
       }
-      this._startTimer();
       game.startGame(player);
       this._stateUpdated(game.toModel());
-      this._startTimer();
       return undefined as InteractableCommandReturnType<CommandType>;
     }
     if (command.type === 'EndGame') {
@@ -139,8 +136,13 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
       if (!game) {
         throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
       }
-      // const item = game.getItemByLocation(command.location.x, command.location.y);
-      // game.applyMove({ gameID: game.id, playerID: player.id, move: item });
+      const item = game.getItemByLocation(command.location.x, command.location.y);
+      item.foundBy = player.id;
+      try {
+        game.applyMove({ gameID: game.id, playerID: player.id, move: item });
+      } catch (e) {
+        // catch error in edge case that two players click item at same exact time
+      }
       return undefined as InteractableCommandReturnType<CommandType>;
     }
     if (command.type === 'RelaxedLeaderboard') {
@@ -150,6 +152,17 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
     if (command.type === 'TimedLeaderboard') {
       this._sendTimedLeaderboard();
       return undefined as InteractableCommandReturnType<CommandType>;
+    if (command.type === 'RequestHint') {
+      const game = this._game;
+      if (!game) {
+        throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
+      }
+      if (this._game?.id !== command.gameID) {
+        throw new InvalidParametersError(GAME_ID_MISSMATCH_MESSAGE);
+      }
+      this._stateUpdated(game.toModel());
+      const requestedHint = game.requestHint();
+      return { hint: requestedHint } as InteractableCommandReturnType<CommandType>;
     }
     throw new InvalidParametersError('INVALID_COMMAND_MESSAGE');
   }

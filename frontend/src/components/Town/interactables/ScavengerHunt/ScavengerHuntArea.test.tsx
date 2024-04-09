@@ -87,7 +87,7 @@ describe('Scavenger Hunt Area', () => {
   describe('Render UI', () => {
     it('shows game modes', () => {
       renderScavengerHuntArea();
-      expect(screen.queryByText('Game Mode: timed')).toBeInTheDocument();
+      expect(screen.queryByText('Game Mode:')).toBeInTheDocument();
     });
     it('shows leaderboard', () => {
       renderScavengerHuntArea();
@@ -100,13 +100,6 @@ describe('Scavenger Hunt Area', () => {
       expect(screen.queryByText('Food')).toBeInTheDocument();
       expect(screen.queryByText('Emojis')).toBeInTheDocument();
       expect(screen.queryByText('Egg')).toBeInTheDocument();
-    });
-    it('shows hints', () => {
-      renderScavengerHuntArea();
-      expect(screen.queryByText('Request Hint')).toBeInTheDocument();
-      expect(
-        screen.queryByText('This is a hint. This box should only appear when a hint is requested.'),
-      ).toBeInTheDocument();
     });
     it('shows players', () => {
       renderScavengerHuntArea();

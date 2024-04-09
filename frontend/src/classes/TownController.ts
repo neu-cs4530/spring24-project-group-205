@@ -120,6 +120,10 @@ export type TownEvents = {
   relaxedLeaderboard: (relaxedLeaderboard: { username: string; objects_found: number }[]) => void;
 
   timedLeaderboard: (timedLeaderboard: { username: string; objects_found: number }[]) => void;
+  
+  startTimer: () => void;
+
+  endGame: () => void;
 };
 
 /**
@@ -475,15 +479,34 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     });
 
     this._socket.on('itemPlaced', item => {
+      const scav = this._interactableControllers.find(
+        interactable => interactable.id === 'Scavenger Hunt',
+      );
       for (const player of this.players) {
-        player.scene?.addTileOnMap(item.id, item.location.x, item.location.y);
+        if (scav?.occupants.includes(player)) {
+          try {
+            player.scene?.addTileOnMap(item.id, item.location.x, item.location.y);
+            player.scene?.updateItemsFound(true);
+          } catch (e) {
+            // fix this
+          }
+        }
       }
       this.emit('itemPlaced', item);
     });
 
     this._socket.on('itemFound', location => {
+      const scav = this._interactableControllers.find(
+        interactable => interactable.id === 'Scavenger Hunt',
+      );
       for (const player of this.players) {
-        player.scene?.removeTileOnMap(location.x, location.y);
+        if (scav?.occupants.includes(player)) {
+          try {
+            player.scene?.removeTileOnMap(location.x, location.y);
+          } catch (e) {
+            // fix this
+          }
+        }
       }
       this.emit('itemFound', location);
     });
@@ -494,6 +517,41 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
 
     this._socket.on('timedLeaderboard', timedLeaderboard => {
       this.emit('timedLeaderboard', timedLeaderboard);
+      
+    this._socket.on('startTimer', () => {
+      const scav = this._interactableControllers.find(
+        interactable => interactable.id === 'Scavenger Hunt',
+      );
+      for (const player of this.players) {
+        if (scav?.occupants.includes(player)) {
+          try {
+            player.scene?.startTimer();
+            player.scene?.resetItemsFoundCount();
+          } catch (e) {
+            // fix this
+          }
+        }
+      }
+      this.emit('startTimer');
+    });
+
+    this._socket.on('endGame', () => {
+      const scav = this._interactableControllers.find(
+        interactable => interactable.id === 'Scavenger Hunt',
+      );
+      for (const player of this.players) {
+        if (scav?.occupants.includes(player)) {
+          try {
+            player.scene?.clearItemsLayer();
+            player.scene?.updateTimer(false, 'Null');
+            player.scene?.updateItemsFound(false);
+            player.scene?.resetItemsFoundCount();
+          } catch (e) {
+            // fix this
+          }
+        }
+      }
+      this.emit('endGame');
     });
   }
 
@@ -759,6 +817,14 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
 
   public emitItemFound(location: XY) {
     this._socket.emit('itemFound', location);
+  }
+
+  public emitStartTimer() {
+    this._socket.emit('startTimer');
+  }
+
+  public emitEndGame() {
+    this._socket.emit('endGame');
   }
 
   /**
