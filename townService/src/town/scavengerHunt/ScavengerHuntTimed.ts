@@ -2,7 +2,7 @@ import GameDatabase from './GameDatabase';
 import ScavengerHunt from './ScavengerHunt';
 import Themepack from './Themepack';
 
-const TIME_ALLOWED = 20;
+const TIME_ALLOWED = 120;
 
 /**
  * A class representing a timed scavenger hunt game

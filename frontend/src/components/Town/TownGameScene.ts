@@ -26,7 +26,7 @@ function interactableTypeForObjectType(type: string): any {
   }
 }
 
-const TIME_ALLOWED = 20;
+const TIME_ALLOWED = 120;
 
 // Original inspiration and code from:
 // https://medium.com/@michaelwesthadley/modular-game-worlds-in-phaser-3-tilemaps-1-958fc7e6bbd6
