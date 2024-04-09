@@ -475,8 +475,11 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     });
 
     this._socket.on('itemPlaced', item => {
+      const scav = this._interactableControllers.find(
+        interactable => interactable.id === 'Scavenger Hunt',
+      );
       for (const player of this.players) {
-        if (player.location.interactableID === 'Scavenger Hunt') {
+        if (scav?.occupants.includes(player)) {
           try {
             player.scene?.addTileOnMap(item.id, item.location.x, item.location.y);
             player.scene?.updateItemsFound(true);
@@ -489,8 +492,11 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     });
 
     this._socket.on('itemFound', location => {
+      const scav = this._interactableControllers.find(
+        interactable => interactable.id === 'Scavenger Hunt',
+      );
       for (const player of this.players) {
-        if (player.location.interactableID === 'Scavenger Hunt') {
+        if (scav?.occupants.includes(player)) {
           try {
             player.scene?.removeTileOnMap(location.x, location.y);
           } catch (e) {
@@ -502,8 +508,11 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     });
 
     this._socket.on('startTimer', () => {
+      const scav = this._interactableControllers.find(
+        interactable => interactable.id === 'Scavenger Hunt',
+      );
       for (const player of this.players) {
-        if (player.location.interactableID === 'Scavenger Hunt') {
+        if (scav?.occupants.includes(player)) {
           try {
             player.scene?.startTimer();
             player.scene?.resetItemsFoundCount();
@@ -516,8 +525,11 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     });
 
     this._socket.on('endGame', () => {
+      const scav = this._interactableControllers.find(
+        interactable => interactable.id === 'Scavenger Hunt',
+      );
       for (const player of this.players) {
-        if (player.location.interactableID === 'Scavenger Hunt') {
+        if (scav?.occupants.includes(player)) {
           try {
             player.scene?.clearItemsLayer();
             player.scene?.updateTimer(false, 'Null');
