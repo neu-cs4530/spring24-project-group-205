@@ -60,24 +60,17 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
     player: Player,
   ): InteractableCommandReturnType<CommandType> {
     if (command.type === 'JoinTimedGame') {
-      console.log('trying to join timed game');
       let game = this._game;
       let selectedThemepack: Themepack | undefined; // Declare themepack variable
       if (!game || game.state.status !== 'IN_PROGRESS') {
-        console.log('made it here');
         selectedThemepack = game?.themePack || new Themepack(command.themepack); // Assign themepack if not already present
         if (!selectedThemepack) {
           throw new InvalidParametersError('No themepack selected for the game 3');
         }
-        if (!game) {
+        if (!game || game.state.status === 'OVER') {
           game = new ScavengerHuntTimed(selectedThemepack);
           this._game = game;
         }
-        // if (!this.themepack) {
-        //   game.themePack = selectedThemepack;
-        // }
-        console.log('made it here 2');
-        console.log('GAME: ', game);
         game.join(player); // Pass themepack to join method
       }
       this._stateUpdated(game.toModel());
@@ -91,13 +84,10 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
         if (!selectedThemepack) {
           throw new InvalidParametersError('No themepack selected for the game 3');
         }
-        if (!game) {
+        if (!game || game.state.status === 'OVER') {
           game = new ScavengerHuntTimed(selectedThemepack);
           this._game = game;
         }
-        // if (!this.themepack) {
-        //   game.themePack = selectedThemepack;
-        // }
         game.join(player); // Pass themepack to join method
       }
       this._stateUpdated(game.toModel());
@@ -124,7 +114,6 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
       if (this._game?.id !== command.gameID) {
         throw new InvalidParametersError(GAME_ID_MISSMATCH_MESSAGE);
       }
-      this._startTimer();
       game.startGame(player);
       this._stateUpdated(game.toModel());
       this._startTimer();

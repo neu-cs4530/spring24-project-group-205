@@ -323,6 +323,7 @@ export interface ServerToClientEvents {
   itemFound: (location: XY) => void;
   itemPlaced: (item: ScavengerHuntItem) => void;
   startTimer: () => void;
+  endGame: () => void;
 }
 
 export interface ClientToServerEvents {
@@ -333,4 +334,5 @@ export interface ClientToServerEvents {
   itemFound: (location: XY) => void;
   itemPlaced: (item: ScavengerHuntItem) => void;
   startTimer: () => void;
+  endGame: () => void;
 }

@@ -194,6 +194,10 @@ export default class Town {
       newPlayer.townEmitter.emit('startTimer');
     });
 
+    socket.on('endGame', () => {
+      newPlayer.townEmitter.emit('endGame');
+    });
+
     // Set up a listener to process commands to interactables.
     // Dispatches commands to the appropriate interactable and sends the response back to the client
     socket.on('interactableCommand', (command: InteractableCommand & InteractableCommandBase) => {

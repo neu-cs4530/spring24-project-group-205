@@ -117,8 +117,10 @@ export default class ScavengerHuntAreaController extends GameAreaController<
       gameID: instanceID,
       type: 'StartGame',
     });
-    this._townController.ourPlayer.scene?.startTimer();
-    this._townController.emitStartTimer();
+    if (this._model.game?.state.gameMode === 'timed') {
+      this._townController.ourPlayer.scene?.startTimer();
+      this._townController.emitStartTimer();
+    }
     this._townController.ourPlayer.scene?.updateItemsFound(true);
     this._townController.ourPlayer.scene?.resetItemsFoundCount();
   }
@@ -186,6 +188,7 @@ export default class ScavengerHuntAreaController extends GameAreaController<
     this._townController.ourPlayer.scene?.updateTimer(false, 'Null');
     this._townController.ourPlayer.scene?.updateItemsFound(false);
     this._townController.ourPlayer.scene?.clearItemsLayer();
+    this._townController.emitEndGame();
   }
 
   /**
