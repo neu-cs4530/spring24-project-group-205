@@ -146,7 +146,6 @@ export default class ScavengerHuntAreaController extends GameAreaController<
           item.location.y,
         );
       }
-      this._townController.ourPlayer.scene?.setTotalItemsPlaced(this.items.length);
     } else {
       throw new Error('Start Game could not find items');
     }
@@ -232,6 +231,7 @@ export default class ScavengerHuntAreaController extends GameAreaController<
     });
     this._instanceID = gameID;
     this._townController.ourPlayer.scene?.updateTimer(true, 'relaxed');
+    this._townController.ourPlayer.scene?.resetItemsFoundCountAndSetText();
   }
 
   /**

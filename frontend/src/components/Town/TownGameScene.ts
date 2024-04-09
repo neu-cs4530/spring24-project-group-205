@@ -65,8 +65,6 @@ export default class TownGameScene extends Phaser.Scene {
   // timer components:
   private _countDownText: Phaser.GameObjects.Text | undefined;
 
-  private _countDown = 0;
-
   private _timerFlag = false;
 
   private _timedEvent: Phaser.Time.TimerEvent | undefined;
@@ -75,8 +73,6 @@ export default class TownGameScene extends Phaser.Scene {
   private _itemsFoundText: Phaser.GameObjects.Text | undefined;
 
   private _itemsFound = 0;
-
-  private _totalItemsPlaced = 0;
 
   /**
    * Layers that the player can collide with.
@@ -336,12 +332,12 @@ export default class TownGameScene extends Phaser.Scene {
     }
   }
 
-  private _isPointerOnItem(x: number, y: number): boolean {
-    const itemsLayer = this.map.getLayer('Items');
-    const tile = itemsLayer?.tilemapLayer.getTileAtWorldXY(x, y);
-    return tile !== null;
-  }
-
+  /**
+   * Adds a tile to the map at the specified location
+   * @param tileId ID of the tile to add
+   * @param xTile x-coord of the tile
+   * @param yTile y-coord of the tile
+   */
   public addTileOnMap(tileId: number, xTile: number, yTile: number): void {
     const itemsLayer = this.map.getLayer('Items');
     try {
@@ -351,6 +347,11 @@ export default class TownGameScene extends Phaser.Scene {
     }
   }
 
+  /**
+   * Remove a tile from the map at the specified location
+   * @param xTile x-coord of the tile
+   * @param yTile y-coord of the tile
+   */
   public removeTileOnMap(xTile: number, yTile: number): void {
     const itemsLayer = this.map.getLayer('Items');
     itemsLayer?.tilemapLayer.removeTileAt(xTile, yTile);
@@ -593,14 +594,14 @@ export default class TownGameScene extends Phaser.Scene {
     this.coveyTownController.addListener('playersChanged', players => this.updatePlayers(players));
   }
 
-  _initializeItemsFound() {
+  private _initializeItemsFound() {
     this._itemsFoundText = this.add
-      .text(575, 60, `Items Found: ${this._itemsFound} / ${this._totalItemsPlaced}`, {
+      .text(570, 20, `Items Found: ${this._itemsFound}`, {
         // Adjusted Y position to appear below the timer
         font: '15px monospace',
         color: '#000000',
         padding: {
-          x: 20,
+          x: 15,
           y: 10,
         },
         backgroundColor: '#ffffff',
@@ -609,6 +610,10 @@ export default class TownGameScene extends Phaser.Scene {
       .setDepth(30);
   }
 
+  /**
+   * Adjusts visibility of the items found text component based on the game state
+   * @param gameStarted boolean indicating if the game has started
+   */
   public updateItemsFound(gameStarted: boolean) {
     // Show the items found text component when the game is started
     if (gameStarted) {
@@ -619,24 +624,37 @@ export default class TownGameScene extends Phaser.Scene {
     }
   }
 
+  /**
+   * Updates the items found count when an item is found
+   */
   public updateItemsFoundCount() {
     this._itemsFound = this._itemsFound + 1;
-    this._itemsFoundText?.setText(`Items Found: ${this._itemsFound} / ${this._totalItemsPlaced}`);
-  }
-
-  public resetItemsFoundCount() {
-    this._itemsFound = 0;
     this._itemsFoundText?.setText(`Items Found: ${this._itemsFound}`);
   }
 
-  _initializeTimer() {
+  /**
+   * Resets the items found count to 0
+   */
+  public resetItemsFoundCount() {
+    this._itemsFound = 0;
+  }
+
+  /**
+   * Resets the items found count to 0 and updates the items found text component
+   */
+  public resetItemsFoundCountAndSetText() {
+    this.resetItemsFoundCount();
+    this._itemsFoundText?.setText(`Items Found: ${this._itemsFound}`);
+  }
+
+  private _initializeTimer() {
     // Create the timer component
     this._countDownText = this.add
-      .text(575, 20, `Time Left: `, {
+      .text(570, 60, `Time Left: `, {
         font: '15px monospace',
         color: '#000000',
         padding: {
-          x: 20,
+          x: 15,
           y: 10,
         },
         backgroundColor: '#ffffff',
@@ -645,7 +663,12 @@ export default class TownGameScene extends Phaser.Scene {
       .setDepth(30);
   }
 
-  startTimer() {
+  /**
+   * Starts the timer for the game
+   */
+  public startTimer() {
+    this._countDownText?.setBackgroundColor('#ffffff');
+    this.resetItemsFoundCountAndSetText();
     // Start the timer event only if it's not already started
     if (!this._timerFlag) {
       this._timerFlag = true;
@@ -662,13 +685,19 @@ export default class TownGameScene extends Phaser.Scene {
             this.stopTimer();
             this._countDownText?.setText(`Time's up! Game over.`);
             this.clearItemsLayer();
+            setTimeout(() => {
+              this._countDownText?.setVisible(false);
+              this._itemsFoundText?.setVisible(false);
+            }, 3000);
           }
         },
       });
-      this._countDownText?.setBackgroundColor('#ffffff');
     }
   }
 
+  /**
+   * Clears the items layer by removing all the items from the layer
+   */
   public clearItemsLayer() {
     const itemsLayer = this.map.getLayer('Items');
     if (itemsLayer) {
@@ -676,12 +705,16 @@ export default class TownGameScene extends Phaser.Scene {
         itemsLayer.tilemapLayer.removeTileAt(tile.x, tile.y);
       });
       // Update the items found count after clearing the items layer
+      this._itemsFoundText?.setText(`Items Found: ${this._itemsFound}`);
       this._itemsFound = 0;
-      this._itemsFoundText?.setText(`Items Found: ${this._itemsFound} / ${this._totalItemsPlaced}`);
     }
   }
 
-  // Method to update timer component visibility and start the timer when the game starts
+  /**
+   * Adjusts visibility of the countdown text component based on the game state
+   * @param gameStarted boolean indicating if the game has started
+   * @param gameMode game mode of the game
+   */
   public updateTimer(gameStarted: boolean, gameMode: string) {
     if (gameStarted && gameMode === 'Timed') {
       // Show the countdown text when the game is started and the mode is timed
@@ -695,16 +728,13 @@ export default class TownGameScene extends Phaser.Scene {
     }
   }
 
-  // Method to stop the timer
-  stopTimer() {
+  /**
+   * Stops the timer for the game
+   */
+  public stopTimer() {
     // Stop the timer event
     this._timerFlag = false;
     this._timedEvent?.remove();
-  }
-
-  setTotalItemsPlaced(totalItemsPlaced: number) {
-    this._totalItemsPlaced = totalItemsPlaced;
-    this._itemsFoundText?.setText(`Items Found: ${this._itemsFound} / ${this._totalItemsPlaced}`);
   }
 
   /**
