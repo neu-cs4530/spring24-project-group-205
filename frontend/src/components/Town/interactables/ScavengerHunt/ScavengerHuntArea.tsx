@@ -273,7 +273,7 @@ export default function ScavengerHuntArea({
                 <Center>
                   <VStack>
                     <Heading as='h2' size='lg'>
-                      Game Mode: {mode}
+                      Game Mode: {mode.charAt(0).toUpperCase() + mode.slice(1)}
                     </Heading>
                     <HStack>
                       <VStack>
@@ -299,7 +299,7 @@ export default function ScavengerHuntArea({
                 <Center>
                   <VStack>
                     <Heading as='h2' size='lg'>
-                      Theme: {themepack}
+                      Theme: {themepack.charAt(0).toUpperCase() + themepack.slice(1)}
                     </Heading>
                     <HStack>
                       <VStack>
@@ -342,7 +342,7 @@ export default function ScavengerHuntArea({
                     <Image src={'/blank.png'} alt='Scavenger Hunt' boxSize='100px' />
                   )}
                   <Heading as='h3' size='md'>
-                    {mode} Game
+                    {mode.charAt(0).toUpperCase() + mode.slice(1)} Game
                   </Heading>
                 </VStack>
                 <Box boxSize='20px'> </Box>
@@ -353,7 +353,7 @@ export default function ScavengerHuntArea({
                     <Image src={'/blank.png'} alt='Blank' boxSize='100px' />
                   )}
                   <Heading as='h3' size='md'>
-                    {themepack} Theme
+                    {themepack.charAt(0).toUpperCase() + themepack.slice(1)} Theme
                   </Heading>
                 </VStack>
               </HStack>
