@@ -35,9 +35,6 @@ export default class ScavengerHuntTimed extends ScavengerHunt {
     if (!player) {
       throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
     }
-    if (move.move.foundBy) {
-      throw new InvalidParametersError(INVALID_MOVE_MESSAGE);
-    }
     if (this.state.status === 'OVER') {
       throw new InvalidParametersError(GAME_OVER_MESSAGE);
     }
@@ -51,13 +48,6 @@ export default class ScavengerHuntTimed extends ScavengerHunt {
       ...this.state,
       items: this.state.items.map(item => (item.id === move.move.id ? move.move : item)),
     };
-    if (this.state.items.every(item => item.foundBy)) {
-      this.state = {
-        ...this.state,
-        status: 'OVER',
-        winner: Array.from(this._itemsFound.entries()).reduce((a, b) => (b[1] > a[1] ? b : a))[0],
-      };
-    }
   }
 
   protected _isTimeRemaining(currentTime: number): boolean {

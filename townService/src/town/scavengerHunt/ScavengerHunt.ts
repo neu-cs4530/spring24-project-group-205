@@ -46,7 +46,7 @@ export default abstract class ScavengerHunt extends Game<
 
   public constructor(themePack?: Themepack) {
     super({
-      mode: undefined,
+      gameMode: undefined,
       timeLeft: TIME_ALLOWED,
       items: [],
       status: 'WAITING_TO_START',
@@ -58,7 +58,7 @@ export default abstract class ScavengerHunt extends Game<
   // Method to start the game
   public startGame(player: Player): void {
     if (!this.state.themepack) {
-      throw new InvalidParametersError('No themepack selected for the game');
+      throw new InvalidParametersError('No themepack selected for the game 1');
     }
     if (this.state.status !== 'WAITING_TO_START') {
       throw new InvalidParametersError(GAME_NOT_STARTABLE_MESSAGE);
@@ -239,7 +239,7 @@ export default abstract class ScavengerHunt extends Game<
    * @returns a string with the hint associated with the next unfound item in the list
    */
   public requestHint(): string {
-    const unfoundItems = this.state.items.filter(item => item.foundBy === undefined);
+    const unfoundItems = this.state.items.filter(item => item.foundBy === 'n/a');
     if (unfoundItems.length === 0) {
       return 'All items found!';
     }
@@ -300,8 +300,18 @@ export default abstract class ScavengerHunt extends Game<
   }
 
   public getItemByLocation(x: number, y: number): ScavengerHuntItem {
-    return this.state.items.find(
-      item => item.location.x === x && item.location.y === y,
+    const item = this.state.items.find(
+      i => i.location.x === x && i.location.y === y,
     ) as ScavengerHuntItem;
+    if (!item) {
+      return {
+        id: 0,
+        name: 'Item not found',
+        location: { x: 0, y: 0 },
+        foundBy: 'n/a',
+        hint: '',
+      };
+    }
+    return item;
   }
 }

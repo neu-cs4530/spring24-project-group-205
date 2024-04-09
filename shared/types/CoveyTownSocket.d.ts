@@ -125,7 +125,7 @@ export interface ScavengerHuntItem {
   id: number;
   name: string;
   location: XY;
-  foundBy?: PlayerID;
+  foundBy: PlayerID;
   hint: string;
 }
 
@@ -146,7 +146,6 @@ export interface TicTacToeGameState extends WinnableGameState {
 }
 
 export interface ScavengerHuntGameState extends WinnableGameState {
-  mode?: GameMode;
   timeLeft: number;
   items: ReadonlyArray<ScavengerHuntItem>;
   moves: ReadonlyArray<ScavengerHuntMove>;
@@ -323,6 +322,7 @@ export interface ServerToClientEvents {
   itemFound: (location: XY) => void;
   itemPlaced: (item: ScavengerHuntItem) => void;
   startTimer: () => void;
+  endGame: () => void;
 }
 
 export interface ClientToServerEvents {
@@ -333,4 +333,5 @@ export interface ClientToServerEvents {
   itemFound: (location: XY) => void;
   itemPlaced: (item: ScavengerHuntItem) => void;
   startTimer: () => void;
+  endGame: () => void;
 }

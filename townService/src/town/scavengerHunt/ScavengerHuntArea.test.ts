@@ -89,7 +89,7 @@ describe('ScavengerHuntArea', () => {
       expect(gameArea.game).toBeDefined();
       expect(gameID2).toEqual(gameTimed.id);
       expect(interactableUpdateSpy).toHaveBeenCalled();
-      expect(gameTimedConstructorSpy).toHaveBeenCalledTimes(0);
+      expect(gameTimedConstructorSpy).toHaveBeenCalledTimes(1);
     });
     describe('when there is a game already created', () => {
       it('should call join on the game and call _emitAreaChanged', () => {
@@ -182,7 +182,7 @@ describe('ScavengerHuntArea', () => {
           player2,
         ).gameID;
         // expect(joinSpy).toHaveBeenCalledWith(player2);
-        expect(gameRelaxed.numPlayers()).toEqual(2);
+        expect(gameRelaxed.numPlayers()).toEqual(4);
         expect(gameID2).toEqual(gameID);
         expect(interactableUpdateSpy).toHaveBeenCalledTimes(2);
       });

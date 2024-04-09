@@ -5,7 +5,7 @@
  *
  * Each themepack also has a price that the player needs to pay in order to purchase it.
  */
-import { ScavengerHuntThemepack } from '../../types/CoveyTownSocket';
+import { ScavengerHuntItem, ScavengerHuntThemepack } from '../../types/CoveyTownSocket';
 import Item from './Item';
 
 export default class Themepack implements ScavengerHuntThemepack {
@@ -53,9 +53,9 @@ export default class Themepack implements ScavengerHuntThemepack {
     return this.items;
   }
 
-  createItems(num: number): Item[] {
+  createItems(num: number): ScavengerHuntItem[] {
     for (let i = 0; i < num; i += 1) {
-      this.items.push(new Item(this.getRandomItemId(), 'item', { x: 0, y: 0 }, 'hint'));
+      this.items.push(new Item(this.getRandomItemId(), 'item', { x: 0, y: 0 }, 'hint', 'n/a'));
     }
     return this.items;
   }

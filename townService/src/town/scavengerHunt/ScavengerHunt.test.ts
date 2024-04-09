@@ -20,8 +20,8 @@ describe('ScavengerHunt', () => {
     themepack = new Themepack('Food');
     gameRelaxed = new ScavengerHuntRelaxed(themepack);
     gameTimed = new ScavengerHuntTimed(themepack);
-    burger = new Item(1234, 'burger', { x: 0, y: 0 }, '');
-    sushi = new Item(5678, 'sushi', { x: 0, y: 0 }, '');
+    burger = new Item(1234, 'burger', { x: 0, y: 0 }, '', 'n/a');
+    sushi = new Item(5678, 'sushi', { x: 0, y: 0 }, '', 'n/a');
 
     themepack.addItem(burger);
     themepack.addItem(sushi);

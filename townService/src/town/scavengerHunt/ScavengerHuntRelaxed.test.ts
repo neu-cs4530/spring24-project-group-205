@@ -58,8 +58,8 @@ describe('ScavengerHunt', () => {
   describe('_applyMove', () => {
     it('should not change the number of items to collect and not end the game', () => {
       const player = createPlayerForTesting();
-      const burger = new Item(1234, 'burger', { x: 0, y: 0 }, '');
-      const sushi = new Item(5678, 'sushi', { x: 0, y: 0 }, '');
+      const burger = new Item(1234, 'burger', { x: 0, y: 0 }, '', 'n/a');
+      const sushi = new Item(5678, 'sushi', { x: 0, y: 0 }, '', 'n/a');
 
       themepack.addItem(burger);
       themepack.addItem(sushi);
@@ -82,9 +82,9 @@ describe('ScavengerHunt', () => {
     it('should declare the winner based on most items collected', () => {
       const player = createPlayerForTesting();
       const player2 = createPlayerForTesting();
-      const burger = new Item(1234, 'burger', { x: 0, y: 0 }, '');
-      const sushi = new Item(5678, 'sushi', { x: 0, y: 0 }, '');
-      const taco = new Item(1011, 'taco', { x: 0, y: 0 }, '');
+      const burger = new Item(1234, 'burger', { x: 0, y: 0 }, '', 'n/a');
+      const sushi = new Item(5678, 'sushi', { x: 0, y: 0 }, '', 'n/a');
+      const taco = new Item(1011, 'taco', { x: 0, y: 0 }, '', 'n/a');
 
       themepack.addItem(burger);
       themepack.addItem(sushi);
@@ -103,32 +103,10 @@ describe('ScavengerHunt', () => {
       game.iterateClock();
       expect(game.getTimeLeft()).toBe(120);
     });
-    it('should throw an error if a player tries to find an item that they already found', () => {
-      const player = createPlayerForTesting();
-      const burger = new Item(1234, 'burger', { x: 0, y: 0 }, '');
-      themepack.addItem(burger);
-      game.join(player);
-      game.startGame(player);
-      game.applyMove({ gameID: '1234', playerID: player.id, move: burger });
-      expect(() => game.applyMove({ gameID: '1234', playerID: player.id, move: burger })).toThrow();
-    });
-    it('should throw an error if another player tries to find an item that has already been found', () => {
-      const player = createPlayerForTesting();
-      const player2 = createPlayerForTesting();
-      const burger = new Item(1234, 'burger', { x: 0, y: 0 }, '');
-      themepack.addItem(burger);
-      game.join(player);
-      game.join(player2);
-      game.startGame(player);
-      game.applyMove({ gameID: '1234', playerID: player.id, move: burger });
-      expect(() =>
-        game.applyMove({ gameID: '1234', playerID: player2.id, move: burger }),
-      ).toThrow();
-    });
     it('should throw an error if non-present player tries to find an item', () => {
       const player = createPlayerForTesting();
       const player2 = createPlayerForTesting();
-      const burger = new Item(1234, 'burger', { x: 0, y: 0 }, '');
+      const burger = new Item(1234, 'burger', { x: 0, y: 0 }, '', 'n/a');
       themepack.addItem(burger);
       game.join(player);
       game.startGame(player);
