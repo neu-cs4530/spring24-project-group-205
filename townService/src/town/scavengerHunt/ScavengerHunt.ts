@@ -259,8 +259,8 @@ export default abstract class ScavengerHunt extends Game<
       throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
     }
 
-    this._itemsFound.set(player.id, 0);
     this._addDatabaseEntries();
+    this._itemsFound.set(player.id, 0);
 
     this.state = {
       ...this.state,
