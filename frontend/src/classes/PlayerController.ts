@@ -35,7 +35,7 @@ export default class PlayerController extends (EventEmitter as new () => TypedEm
     this._scene = scene;
   }
 
-  get scene(): TownGameScene | undefined {
+  public getScene(): TownGameScene | undefined {
     return this._scene;
   }
 
