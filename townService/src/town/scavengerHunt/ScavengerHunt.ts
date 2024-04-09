@@ -231,7 +231,7 @@ export default abstract class ScavengerHunt extends Game<
    * @returns a string with the hint associated with the next unfound item in the list
    */
   public requestHint(): string {
-    const unfoundItems = this.state.items.filter(item => item.foundBy === undefined);
+    const unfoundItems = this.state.items.filter(item => item.foundBy === 'n/a');
     if (unfoundItems.length === 0) {
       return 'All items found!';
     }
