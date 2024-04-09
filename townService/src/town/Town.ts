@@ -176,10 +176,12 @@ export default class Town {
       }
     });
 
+    // set up a listener to process items placed in the scavenger hunt game
     socket.on('itemPlaced', (item: ScavengerHuntItem) => {
       newPlayer.townEmitter.emit('itemPlaced', item);
     });
 
+    // set up a listener to process items found in the scavenger hunt game
     socket.on('itemFound', (location: XY) => {
       newPlayer.townEmitter.emit('itemFound', location);
       const scavengerHuntArea = this._interactables.find(
@@ -188,10 +190,12 @@ export default class Town {
       scavengerHuntArea?.handleCommand({ type: 'ItemFound', location }, newPlayer);
     });
 
+    // set up a listener to process when to start the timer in the scavenger hunt game
     socket.on('startTimer', () => {
       newPlayer.townEmitter.emit('startTimer');
     });
 
+    // set up a listern to process when to end the game in the scavenger hunt game
     socket.on('endGame', () => {
       newPlayer.townEmitter.emit('endGame');
     });

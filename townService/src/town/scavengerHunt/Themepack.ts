@@ -25,7 +25,7 @@ export default class Themepack implements ScavengerHuntThemepack {
     this.name = name;
     if (name === 'food') {
       this._lowerBound = 15054;
-      this._upperBound = 15054 + 63;
+      this._upperBound = 15054 + 62;
     }
     if (name === 'emojis') {
       this._lowerBound = 15117;
@@ -38,27 +38,11 @@ export default class Themepack implements ScavengerHuntThemepack {
   }
 
   /**
-   * Returns the name of the themepack.
-   * @returns the name of the themepack
+   * Initializes ScavengerHuntItems within a themepack based on the number of items requested.
+   * @param num the amount of items to create.
+   * @returns an array of the items.
    */
-  getThemepackName() {
-    return this.name;
-  }
-
-  /**
-   * Returns the items of the themepack.
-   * @returns the items of the themepack
-   */
-  getItems() {
-    return this.items;
-  }
-
-  /**
-   * Creates a list of items for the themepack.
-   * @param num the number of items to create
-   * @returns the list of items for the themepack
-   */
-  createItems(num: number): ScavengerHuntItem[] {
+  public createItems(num: number): ScavengerHuntItem[] {
     for (let i = 0; i < num; i += 1) {
       this.items.push(new Item(this.getRandomItemId(), 'item', { x: 0, y: 0 }, 'hint', 'n/a'));
     }
@@ -69,15 +53,15 @@ export default class Themepack implements ScavengerHuntThemepack {
    * Adds a new item to the themepack.
    * @param item the item to add to the themepack
    */
-  addItem(item: Item) {
+  public addItem(item: Item) {
     this.items.push(item);
   }
 
   /**
-   *
-   * @returns a random item id from the themepack
+   * Computes a random item id of an item within the pack based on bounds of its tile indicies.
+   * @returns the random item id.
    */
-  getRandomItemId(): number {
+  public getRandomItemId(): number {
     return Math.floor(Math.random() * (this._upperBound - this._lowerBound + 1)) + this._lowerBound;
   }
 }

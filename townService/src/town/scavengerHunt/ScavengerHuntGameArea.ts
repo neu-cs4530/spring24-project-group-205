@@ -12,20 +12,12 @@ import {
 } from '../../types/CoveyTownSocket';
 import GameArea from '../games/GameArea';
 import ScavengerHunt from './ScavengerHunt';
-import InteractableArea from '../InteractableArea';
 import ScavengerHuntTimed from './ScavengerHuntTimed';
 import ScavengerHuntRelaxed from './ScavengerHuntRelaxed';
 import Themepack from './Themepack';
 import GameDatabase from './GameDatabase';
 
 export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
-  private _interactables: InteractableArea[] = [];
-
-  // Method to set interactables
-  public setInteractables(interactables: InteractableArea[]): void {
-    this._interactables = interactables;
-  }
-
   public get themepack(): Themepack | undefined {
     return this._game?.themePack;
   }
@@ -85,7 +77,7 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
       if (!game || game.state.status !== 'IN_PROGRESS') {
         selectedThemepack = game?.themePack || new Themepack(command.themepack); // Assign themepack if not already present
         if (!selectedThemepack) {
-          throw new InvalidParametersError('No themepack selected for the game 3');
+          throw new InvalidParametersError('No themepack selected for the game');
         }
         if (!game || game.state.status === 'OVER') {
           game = new ScavengerHuntTimed(selectedThemepack);
@@ -102,7 +94,7 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
       if (!game || game.state.status !== 'IN_PROGRESS') {
         selectedThemepack = game?.themePack || new Themepack(command.themepack); // Assign themepack if not already present
         if (!selectedThemepack) {
-          throw new InvalidParametersError('No themepack selected for the game 3');
+          throw new InvalidParametersError('No themepack selected for the game');
         }
         if (!game || game.state.status === 'OVER') {
           game = new ScavengerHuntRelaxed(selectedThemepack);
@@ -148,9 +140,6 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
       }
       game.endGame(player);
       this._stateUpdated(game.toModel());
-      for (const p of this.occupants) {
-        this.removeScavengerHuntOnRefresh(p);
-      }
       return undefined as InteractableCommandReturnType<CommandType>;
     }
     if (command.type === 'ItemFound') {
