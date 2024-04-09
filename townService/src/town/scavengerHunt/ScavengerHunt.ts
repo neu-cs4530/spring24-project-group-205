@@ -291,8 +291,18 @@ export default abstract class ScavengerHunt extends Game<
   }
 
   public getItemByLocation(x: number, y: number): ScavengerHuntItem {
-    return this.state.items.find(
-      item => item.location.x === x && item.location.y === y,
+    const item = this.state.items.find(
+      i => i.location.x === x && i.location.y === y,
     ) as ScavengerHuntItem;
+    if (!item) {
+      return {
+        id: 0,
+        name: 'Item not found',
+        location: { x: 0, y: 0 },
+        foundBy: 'n/a',
+        hint: '',
+      };
+    }
+    return item;
   }
 }
