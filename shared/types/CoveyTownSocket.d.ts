@@ -115,12 +115,6 @@ export interface TicTacToeMove {
   col: TicTacToeGridPosition;
 }
 
-export interface ScavengerHuntMove {
-  gamePiece: string,
-  row: number,
-  col: number,
-}
-
 export interface ScavengerHuntItem {
   id: number;
   name: string;
@@ -148,7 +142,6 @@ export interface TicTacToeGameState extends WinnableGameState {
 export interface ScavengerHuntGameState extends WinnableGameState {
   timeLeft: number;
   items: ReadonlyArray<ScavengerHuntItem>;
-  moves: ReadonlyArray<ScavengerHuntMove>;
   gameMode?: GameMode;
   themepack?: Themepack;
 }
