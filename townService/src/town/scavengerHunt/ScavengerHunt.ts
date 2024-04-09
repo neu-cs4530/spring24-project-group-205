@@ -9,7 +9,6 @@ import InvalidParametersError, {
 } from '../../lib/InvalidParametersError';
 import Player from '../../lib/Player';
 import {
-  GameMode,
   GameMove,
   PlayerID,
   ScavengerHuntGameState,
@@ -116,10 +115,6 @@ export default abstract class ScavengerHunt extends Game<
    */
   public getScoreForPlayer(player: Player): number {
     return this._itemsFound.get(player.id) || 0;
-  }
-
-  public get gameMode(): GameMode | undefined {
-    return this.state.gameMode;
   }
 
   public get themePack(): Themepack | undefined {
