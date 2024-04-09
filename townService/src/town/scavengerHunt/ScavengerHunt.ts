@@ -25,17 +25,7 @@ export default abstract class ScavengerHunt extends Game<
   ScavengerHuntGameState,
   ScavengerHuntItem
 > {
-  // INFORMATION THAT IS SPECIFIC TO THE PLAYER:
-  // The game mode the player is currently in
-  // protected _gameMode?: GameMode;
-
-  // The themepack the player is currently using; the default is the "nature" themepack
-  // protected _themepack?: Themepack;
-
-  // the time it took for the player to complete the scavenger hunt -- this is only applicable if the game mode is competitive
-  private _timeInSeconds = 0;
-
-  // number of items found by the player
+  // number of items found by each player
   protected _itemsFound = new Map<PlayerID, number>();
 
   protected _gameStartTime?: number;
@@ -124,10 +114,6 @@ export default abstract class ScavengerHunt extends Game<
    */
   public getScoreForPlayer(player: Player): number {
     return this._itemsFound.get(player.id) || 0;
-  }
-
-  public get gameMode(): GameMode | undefined {
-    return this.state.gameMode;
   }
 
   public get themePack(): Themepack | undefined {
