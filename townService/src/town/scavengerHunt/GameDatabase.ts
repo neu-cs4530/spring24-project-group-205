@@ -21,7 +21,7 @@ export default class GameDatabase {
     const { data, error } = await this.supabase
       .from('timed_leaderboard')
       .select('username, objects_found')
-      .order('objects_found', { ascending: true })
+      .order('objects_found', { ascending: false })
       .order('id', { ascending: true })
       .limit(5);
 
@@ -58,7 +58,7 @@ export default class GameDatabase {
     const { data, error } = await this.supabase
       .from('relaxed_leaderboard')
       .select('username, objects_found')
-      .order('objects_found', { ascending: true })
+      .order('objects_found', { ascending: false })
       .order('id', { ascending: true })
       .limit(5);
 

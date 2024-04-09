@@ -22,6 +22,7 @@ import {
 import React, { useEffect, useState } from 'react';
 import ScavengerHuntAreaController from '../../../../classes/interactable/ScavengerHuntAreaController';
 import { useInteractableAreaController } from '../../../../classes/TownController';
+import useTownController from '../../../../hooks/useTownController';
 import { InteractableID } from '../../../../types/CoveyTownSocket';
 
 /**
@@ -55,6 +56,29 @@ export default function ScavengerHuntArea({
 
   const [themepack, setThemepack] = useState('');
   const [mode, setMode] = useState('');
+  const [relaxedLeaderboardData, setRelaxedLeaderboardData] = useState<
+    { username: string; objects_found: number }[]
+  >([]);
+  const [timedLeaderboardData, setTimedLeaderboardData] = useState<
+    { username: string; objects_found: number }[]
+  >([]);
+
+  const townController = useTownController();
+
+  useEffect(() => {
+    townController.addListener('relaxedLeaderboard', setRelaxedLeaderboardData);
+  }, [townController]);
+
+  useEffect(() => {
+    townController.addListener('timedLeaderboard', setTimedLeaderboardData);
+  }, [townController]);
+
+  useEffect(() => {
+    const selectedGameMode = gameAreaController.gamemode;
+    if (selectedGameMode) {
+      setMode(selectedGameMode);
+    }
+  }, [gameAreaController.gamemode]);
 
   useEffect(() => {
     const selectedGameMode = gameAreaController.gamemode;
@@ -173,6 +197,18 @@ export default function ScavengerHuntArea({
     }
   };
 
+  const handleRequestRelaxedLeaderboard = async () => {
+    try {
+      await gameAreaController.getRelaxedLeaderboard();
+    } catch (err) {
+      toast({
+        title: 'Error getting relaxed leaderboard',
+        description: (err as Error).toString(),
+        status: 'error',
+      });
+    }
+  };
+
   const handleRequestHint = async () => {
     try {
       await gameAreaController.requestHint();
@@ -188,14 +224,17 @@ export default function ScavengerHuntArea({
     }
   };
 
-  // Placeholder data for the leaderboard
-  const leaderboardData = [
-    { username: 'Player1', count: 10 },
-    { username: 'Player2', count: 9 },
-    { username: 'Player3', count: 8 },
-    { username: 'Player4', count: 7 },
-    { username: 'Player5', count: 6 },
-  ];
+  const handleRequestTimedLeaderboard = async () => {
+    try {
+      await gameAreaController.getTimedLeaderboard();
+    } catch (err) {
+      toast({
+        title: 'Error getting timed leaderboard',
+        description: (err as Error).toString(),
+        status: 'error',
+      });
+    }
+  };
 
   return (
     <ChakraProvider>
@@ -204,7 +243,7 @@ export default function ScavengerHuntArea({
           <Tab>Details</Tab>
           <Tab>Mode & Theme</Tab>
           <Tab>Game</Tab>
-          <Tab>Leaderboards</Tab>
+          <Tab onClick={handleRequestTimedLeaderboard}>Leaderboards</Tab>
         </TabList>
         <TabPanels>
           <TabPanel>
@@ -358,7 +397,7 @@ export default function ScavengerHuntArea({
             <Tabs isFitted variant='enclosed'>
               <TabList mb='1em'>
                 <Tab>Timed Leaderboard</Tab>
-                <Tab>Relaxed Leaderboard</Tab>
+                <Tab onClick={handleRequestRelaxedLeaderboard}>Relaxed Leaderboard</Tab>
               </TabList>
               <TabPanels>
                 <TabPanel>
@@ -372,11 +411,11 @@ export default function ScavengerHuntArea({
                         </tr>
                       </thead>
                       <tbody>
-                        {leaderboardData.map((player, index) => (
+                        {timedLeaderboardData.map((player, index) => (
                           <tr key={index} style={{ borderBottom: '1px solid #ddd' }}>
                             <td style={{ textAlign: 'center' }}>{index + 1}</td>
                             <td style={{ textAlign: 'center' }}>{player.username}</td>
-                            <td style={{ textAlign: 'center' }}>{player.count}</td>
+                            <td style={{ textAlign: 'center' }}>{player.objects_found}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -384,26 +423,28 @@ export default function ScavengerHuntArea({
                   </TableContainer>
                 </TabPanel>
                 <TabPanel>
-                  <TableContainer>
-                    <Table variant='simple'>
-                      <thead>
-                        <tr>
-                          <th style={{ width: '33%' }}>Rank</th>
-                          <th style={{ width: '33%' }}>Username</th>
-                          <th style={{ width: '33%' }}>Objects Collected</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {leaderboardData.map((player, index) => (
-                          <tr key={index} style={{ borderBottom: '1px solid #ddd' }}>
-                            <td style={{ textAlign: 'center' }}>{index + 1}</td>
-                            <td style={{ textAlign: 'center' }}>{player.username}</td>
-                            <td style={{ textAlign: 'center' }}>{player.count}</td>
+                  {
+                    <TableContainer>
+                      <Table variant='simple'>
+                        <thead>
+                          <tr>
+                            <th style={{ width: '33%' }}>Rank</th>
+                            <th style={{ width: '33%' }}>Username</th>
+                            <th style={{ width: '33%' }}>Objects Collected</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </Table>
-                  </TableContainer>
+                        </thead>
+                        <tbody>
+                          {relaxedLeaderboardData.map((player, index) => (
+                            <tr key={index} style={{ borderBottom: '1px solid #ddd' }}>
+                              <td style={{ textAlign: 'center' }}>{index + 1}</td>
+                              <td style={{ textAlign: 'center' }}>{player.username}</td>
+                              <td style={{ textAlign: 'center' }}>{player.objects_found}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </Table>
+                    </TableContainer>
+                  }
                 </TabPanel>
               </TabPanels>
             </Tabs>

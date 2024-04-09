@@ -8,6 +8,7 @@ import {
 } from '../../types/CoveyTownSocket';
 import PlayerController from '../PlayerController';
 import GameAreaController, { GameEventTypes, NO_GAME_STARTABLE } from './GameAreaController';
+
 export type ScavengerHuntEvents = GameEventTypes & {
   itemsChanged: (items: ScavengerHuntItem[] | undefined) => void;
 };
@@ -17,6 +18,10 @@ export default class ScavengerHuntAreaController extends GameAreaController<
   ScavengerHuntEvents
 > {
   public items: ScavengerHuntItem[] = [];
+
+  public relaxedLeaderboardData: { username: string; objects_found: number }[] = [];
+
+  public timedLeaderboardData: { username: string; objects_found: number }[] = [];
 
   public requestedHint?: string;
 
@@ -218,5 +223,17 @@ export default class ScavengerHuntAreaController extends GameAreaController<
     });
     this._instanceID = gameID;
     this._townController.ourPlayer.scene?.updateTimer(true, 'relaxed');
+  }
+
+  public async getRelaxedLeaderboard(): Promise<void> {
+    await this._townController.sendInteractableCommand(this.id, {
+      type: 'RelaxedLeaderboard',
+    });
+  }
+
+  public async getTimedLeaderboard(): Promise<void> {
+    await this._townController.sendInteractableCommand(this.id, {
+      type: 'TimedLeaderboard',
+    });
   }
 }

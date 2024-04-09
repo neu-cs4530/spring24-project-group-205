@@ -117,6 +117,10 @@ export type TownEvents = {
 
   itemFound: (location: XY) => void;
 
+  relaxedLeaderboard: (relaxedLeaderboard: { username: string; objects_found: number }[]) => void;
+
+  timedLeaderboard: (timedLeaderboard: { username: string; objects_found: number }[]) => void;
+
   startTimer: () => void;
 
   endGame: () => void;
@@ -505,6 +509,14 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         }
       }
       this.emit('itemFound', location);
+    });
+
+    this._socket.on('relaxedLeaderboard', relaxedLeaderboard => {
+      this.emit('relaxedLeaderboard', relaxedLeaderboard);
+    });
+
+    this._socket.on('timedLeaderboard', timedLeaderboard => {
+      this.emit('timedLeaderboard', timedLeaderboard);
     });
 
     this._socket.on('startTimer', () => {
