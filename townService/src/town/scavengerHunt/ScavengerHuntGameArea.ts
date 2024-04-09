@@ -17,6 +17,9 @@ import ScavengerHuntRelaxed from './ScavengerHuntRelaxed';
 import Themepack from './Themepack';
 import GameDatabase from './GameDatabase';
 
+/**
+ * Class that represents the game area and handles the commands sent from the backend
+ */
 export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
   public get themepack(): Themepack | undefined {
     return this._game?.themePack;
