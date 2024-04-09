@@ -56,8 +56,8 @@ describe('ScavengerHunt', () => {
   describe('_applyMove', () => {
     it('should end the game once all the items have been collected', () => {
       const player = createPlayerForTesting();
-      const burger = new Item(1234, 'burger', { x: 0, y: 0 }, '');
-      const sushi = new Item(5678, 'sushi', { x: 0, y: 0 }, '');
+      const burger = new Item(1234, 'burger', { x: 0, y: 0 }, '', 'n/a');
+      const sushi = new Item(5678, 'sushi', { x: 0, y: 0 }, '', 'n/a');
 
       themepack.addItem(burger);
       themepack.addItem(sushi);
@@ -81,9 +81,9 @@ describe('ScavengerHunt', () => {
     it('should declare the winner based on most items collected', () => {
       const player = createPlayerForTesting();
       const player2 = createPlayerForTesting();
-      const burger = new Item(1234, 'burger', { x: 0, y: 0 }, '');
-      const sushi = new Item(5678, 'sushi', { x: 0, y: 0 }, '');
-      const taco = new Item(1011, 'taco', { x: 0, y: 0 }, '');
+      const burger = new Item(1234, 'burger', { x: 0, y: 0 }, '', 'n/a');
+      const sushi = new Item(5678, 'sushi', { x: 0, y: 0 }, '', 'n/a');
+      const taco = new Item(1011, 'taco', { x: 0, y: 0 }, '', 'n/a');
 
       themepack.addItem(burger);
       themepack.addItem(sushi);
@@ -105,7 +105,7 @@ describe('ScavengerHunt', () => {
     it('should throw an error if non-present player tries to find an item', () => {
       const player = createPlayerForTesting();
       const player2 = createPlayerForTesting();
-      const burger = new Item(1234, 'burger', { x: 0, y: 0 }, '');
+      const burger = new Item(1234, 'burger', { x: 0, y: 0 }, '', 'n/a');
       themepack.addItem(burger);
       game.join(player);
       game.startGame(player);
