@@ -11,12 +11,12 @@ export default class Item implements ScavengerHuntItem {
 
   foundBy: string;
 
-  constructor(id: number, name: string, location: XY, hint: string) {
+  constructor(id: number, name: string, location: XY, hint: string, foundBy: string) {
     this.id = id;
     this.name = name;
     this.location = location;
     this.hint = hint;
-    this.foundBy = 'n/a';
+    this.foundBy = foundBy;
   }
 
   public setID(id: number): void {
