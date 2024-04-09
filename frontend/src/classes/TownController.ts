@@ -120,7 +120,7 @@ export type TownEvents = {
   relaxedLeaderboard: (relaxedLeaderboard: { username: string; objects_found: number }[]) => void;
 
   timedLeaderboard: (timedLeaderboard: { username: string; objects_found: number }[]) => void;
-  
+
   startTimer: () => void;
 
   endGame: () => void;
@@ -517,7 +517,8 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
 
     this._socket.on('timedLeaderboard', timedLeaderboard => {
       this.emit('timedLeaderboard', timedLeaderboard);
-      
+    });
+
     this._socket.on('startTimer', () => {
       const scav = this._interactableControllers.find(
         interactable => interactable.id === 'Scavenger Hunt',

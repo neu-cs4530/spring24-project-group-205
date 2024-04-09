@@ -21,7 +21,7 @@ import {
 } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 import ScavengerHuntAreaController from '../../../../classes/interactable/ScavengerHuntAreaController';
-import TownController, { useInteractableAreaController } from '../../../../classes/TownController';
+import { useInteractableAreaController } from '../../../../classes/TownController';
 import useTownController from '../../../../hooks/useTownController';
 import { InteractableID } from '../../../../types/CoveyTownSocket';
 
@@ -208,7 +208,7 @@ export default function ScavengerHuntArea({
       });
     }
   };
-    
+
   const handleRequestHint = async () => {
     try {
       await gameAreaController.requestHint();

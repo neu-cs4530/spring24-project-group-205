@@ -152,6 +152,7 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
     if (command.type === 'TimedLeaderboard') {
       this._sendTimedLeaderboard();
       return undefined as InteractableCommandReturnType<CommandType>;
+    }
     if (command.type === 'RequestHint') {
       const game = this._game;
       if (!game) {
