@@ -63,18 +63,21 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
       console.log('trying to join timed game');
       let game = this._game;
       let selectedThemepack: Themepack | undefined; // Declare themepack variable
-      if (!game || game.state.status === 'OVER') {
+      if (!game || game.state.status !== 'IN_PROGRESS') {
         console.log('made it here');
-        selectedThemepack = new Themepack(command.themepack); // Assign themepack if not already present
+        selectedThemepack = game?.themePack || new Themepack(command.themepack); // Assign themepack if not already present
         if (!selectedThemepack) {
           throw new InvalidParametersError('No themepack selected for the game 3');
         }
-        game = new ScavengerHuntTimed(selectedThemepack);
-        this._game = game;
-        if (!this.themepack) {
-          game.themePack = selectedThemepack;
+        if (!game) {
+          game = new ScavengerHuntTimed(selectedThemepack);
+          this._game = game;
         }
+        // if (!this.themepack) {
+        //   game.themePack = selectedThemepack;
+        // }
         console.log('made it here 2');
+        console.log('GAME: ', game);
         game.join(player); // Pass themepack to join method
       }
       this._stateUpdated(game.toModel());
@@ -83,16 +86,18 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
     if (command.type === 'JoinRelaxedGame') {
       let game = this._game;
       let selectedThemepack: Themepack | undefined; // Declare themepack variable
-      if (!game || game.state.status === 'OVER') {
-        selectedThemepack = new Themepack(command.themepack); // Assign themepack if not already present
+      if (!game || game.state.status !== 'IN_PROGRESS') {
+        selectedThemepack = game?.themePack || new Themepack(command.themepack); // Assign themepack if not already present
         if (!selectedThemepack) {
           throw new InvalidParametersError('No themepack selected for the game 3');
         }
-        game = new ScavengerHuntRelaxed(selectedThemepack);
-        this._game = game;
-        if (!this.themepack) {
-          game.themePack = selectedThemepack;
+        if (!game) {
+          game = new ScavengerHuntTimed(selectedThemepack);
+          this._game = game;
         }
+        // if (!this.themepack) {
+        //   game.themePack = selectedThemepack;
+        // }
         game.join(player); // Pass themepack to join method
       }
       this._stateUpdated(game.toModel());
