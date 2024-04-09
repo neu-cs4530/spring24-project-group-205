@@ -45,7 +45,7 @@ export default abstract class ScavengerHunt extends Game<
 
   public constructor(themePack?: Themepack) {
     super({
-      mode: undefined,
+      gameMode: undefined,
       timeLeft: TIME_ALLOWED,
       items: [],
       status: 'WAITING_TO_START',

@@ -85,7 +85,7 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
           throw new InvalidParametersError('No themepack selected for the game 3');
         }
         if (!game || game.state.status === 'OVER') {
-          game = new ScavengerHuntTimed(selectedThemepack);
+          game = new ScavengerHuntRelaxed(selectedThemepack);
           this._game = game;
         }
         game.join(player); // Pass themepack to join method

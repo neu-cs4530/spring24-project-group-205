@@ -522,6 +522,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
             player.scene?.clearItemsLayer();
             player.scene?.updateTimer(false, 'Null');
             player.scene?.updateItemsFound(false);
+            player.scene?.resetItemsFoundCount();
           } catch (e) {
             // fix this
           }
