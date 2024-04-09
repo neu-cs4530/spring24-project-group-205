@@ -53,6 +53,11 @@ export default class Themepack implements ScavengerHuntThemepack {
     return this.items;
   }
 
+  /**
+   * Creates a list of items for the themepack.
+   * @param num the number of items to create
+   * @returns the list of items for the themepack
+   */
   createItems(num: number): ScavengerHuntItem[] {
     for (let i = 0; i < num; i += 1) {
       this.items.push(new Item(this.getRandomItemId(), 'item', { x: 0, y: 0 }, 'hint', 'n/a'));
@@ -68,6 +73,10 @@ export default class Themepack implements ScavengerHuntThemepack {
     this.items.push(item);
   }
 
+  /**
+   *
+   * @returns a random item id from the themepack
+   */
   getRandomItemId(): number {
     return Math.floor(Math.random() * (this._upperBound - this._lowerBound + 1)) + this._lowerBound;
   }

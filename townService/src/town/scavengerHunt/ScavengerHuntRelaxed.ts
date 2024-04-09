@@ -1,13 +1,10 @@
-import InvalidParametersError, {
-  GAME_NOT_IN_PROGRESS_MESSAGE,
-  GAME_OVER_MESSAGE,
-  PLAYER_NOT_IN_GAME_MESSAGE,
-} from '../../lib/InvalidParametersError';
-import { GameMove, ScavengerHuntItem } from '../../types/CoveyTownSocket';
 import ScavengerHunt from './ScavengerHunt';
 import Themepack from './Themepack';
 import GameDatabase from './GameDatabase';
 
+/**
+ * A class representing a relaxed scavenger hunt game
+ */
 export default class ScavengerHuntRelaxed extends ScavengerHunt {
   public constructor(themePack?: Themepack) {
     super(themePack);
@@ -20,28 +17,8 @@ export default class ScavengerHuntRelaxed extends ScavengerHunt {
     };
   }
 
-  public applyMove(move: GameMove<ScavengerHuntItem>): void {
-    const player = this._players.find(p => p.id === move.playerID);
-    if (!player) {
-      throw new InvalidParametersError(PLAYER_NOT_IN_GAME_MESSAGE);
-    }
-    if (this.state.status === 'OVER') {
-      throw new InvalidParametersError(GAME_OVER_MESSAGE);
-    }
-    if (this.state.status !== 'IN_PROGRESS') {
-      throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
-    }
-
-    move.move.foundBy = move.playerID;
-    this._itemsFound.set(move.playerID, (this._itemsFound.get(move.playerID) || 0) + 1);
-    this.state = {
-      ...this.state,
-      items: this.state.items.map(item => (item.id === move.move.id ? move.move : item)),
-    };
-  }
-
   /**
-   * Always returns true for relaxed mode since there is no time limit
+   * Does not apply to relaxed mode
    * @param currentTime
    * @returns true if the game has been started and the game is not over
    */
