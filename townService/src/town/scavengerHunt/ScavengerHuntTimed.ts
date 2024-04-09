@@ -42,6 +42,7 @@ export default class ScavengerHuntTimed extends ScavengerHunt {
       throw new InvalidParametersError(GAME_NOT_IN_PROGRESS_MESSAGE);
     }
 
+    move.move.foundBy = move.playerID;
     this._itemsFound.set(move.playerID, (this._itemsFound.get(move.playerID) || 0) + 1);
     this.state = {
       ...this.state,
