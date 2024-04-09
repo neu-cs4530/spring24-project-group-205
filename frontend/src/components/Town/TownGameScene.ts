@@ -659,7 +659,6 @@ export default class TownGameScene extends Phaser.Scene {
           }
           if (this._timedEvent?.repeatCount === 0) {
             this._countDownText?.setBackgroundColor('#E55451');
-            this._countDownText?.setText(`Time's up!`);
             this.stopTimer();
             this._countDownText?.setText(`Time's up! Game over.`);
             this.clearItemsLayer();
@@ -701,7 +700,6 @@ export default class TownGameScene extends Phaser.Scene {
     // Stop the timer event
     this._timerFlag = false;
     this._timedEvent?.remove();
-    
   }
 
   setTotalItemsPlaced(totalItemsPlaced: number) {

@@ -14,7 +14,6 @@ import {
   InteractableCommand,
   InteractableCommandBase,
   PlayerLocation,
-  ScavengerHuntGameState,
   ScavengerHuntItem,
   ServerToClientEvents,
   SocketData,
@@ -27,7 +26,6 @@ import GameAreaFactory from './games/GameAreaFactory';
 import InteractableArea from './InteractableArea';
 import ViewingArea from './ViewingArea';
 import GameArea from './games/GameArea';
-import ScavengerHuntGameArea from './scavengerHunt/ScavengerHuntGameArea';
 import ScavengerHunt from './scavengerHunt/ScavengerHunt';
 
 /**

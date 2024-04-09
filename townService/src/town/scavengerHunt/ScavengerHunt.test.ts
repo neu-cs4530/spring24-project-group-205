@@ -203,7 +203,6 @@ describe('ScavengerHunt', () => {
         expect(gameTimed.hasPlayer(player)).toBe(false);
         expect(gameTimed.hasPlayer(player2)).toBe(false);
       });
-
     });
   });
 });

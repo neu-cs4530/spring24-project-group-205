@@ -1,7 +1,6 @@
 import InvalidParametersError, {
   GAME_NOT_IN_PROGRESS_MESSAGE,
   GAME_OVER_MESSAGE,
-  INVALID_MOVE_MESSAGE,
   PLAYER_NOT_IN_GAME_MESSAGE,
 } from '../../lib/InvalidParametersError';
 import { GameMove, ScavengerHuntItem } from '../../types/CoveyTownSocket';
