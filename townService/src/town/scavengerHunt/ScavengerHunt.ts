@@ -118,10 +118,6 @@ export default abstract class ScavengerHunt extends Game<
     return this._itemsFound.get(player.id) || 0;
   }
 
-  public get gameMode(): GameMode | undefined {
-    return this.state.gameMode;
-  }
-
   public get themePack(): Themepack | undefined {
     return this.state.themepack;
   }

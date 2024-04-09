@@ -29,20 +29,4 @@ export default class Item implements ScavengerHuntItem {
     this.hint = hint;
     this.foundBy = foundBy;
   }
-
-  public setID(id: number): void {
-    this.id = id;
-  }
-
-  public setName(name: string): void {
-    this.name = name;
-  }
-
-  public setLocation(location: XY): void {
-    this.location = location;
-  }
-
-  public setHint(hint: string): void {
-    this.hint = hint;
-  }
 }
