@@ -129,6 +129,9 @@ export default class ScavengerHuntGameArea extends GameArea<ScavengerHunt> {
       }
       game.endGame(player);
       this._stateUpdated(game.toModel());
+      for (const p of this.occupants) {
+        this.removeScavengerHuntOnRefresh(p);
+      }
       return undefined as InteractableCommandReturnType<CommandType>;
     }
     if (command.type === 'ItemFound') {
