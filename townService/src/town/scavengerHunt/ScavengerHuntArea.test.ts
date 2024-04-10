@@ -122,9 +122,9 @@ describe('ScavengerHuntArea', () => {
         const joinSpy = jest.spyOn(gameTimed, 'join').mockImplementationOnce(() => {
           throw new Error('Test error');
         });
-        expect(() => gameArea.handleCommand({ type: 'JoinTimedGame', themepack: 'fruit' }, player2)).toThrowError(
-          'Test error',
-        );
+        expect(() =>
+          gameArea.handleCommand({ type: 'JoinTimedGame', themepack: 'fruit' }, player2),
+        ).toThrowError('Test error');
         expect(joinSpy).toHaveBeenCalledWith(player2);
         expect(interactableUpdateSpy).not.toHaveBeenCalled();
       });
@@ -196,9 +196,9 @@ describe('ScavengerHuntArea', () => {
         const joinSpy = jest.spyOn(gameRelaxed, 'join').mockImplementationOnce(() => {
           throw new Error('Test error');
         });
-        expect(() => gameArea.handleCommand({ type: 'JoinRelaxedGame', themepack: 'fruit' }, player2)).toThrowError(
-          'Test error',
-        );
+        expect(() =>
+          gameArea.handleCommand({ type: 'JoinRelaxedGame', themepack: 'fruit' }, player2),
+        ).toThrowError('Test error');
         expect(joinSpy).toHaveBeenCalledWith(player2);
         expect(interactableUpdateSpy).not.toHaveBeenCalled();
       });
@@ -392,8 +392,6 @@ describe('ScavengerHuntArea', () => {
         });
       });
     });
-
-
   });
   describe('RequestHint command', () => {
     describe('no game in progress', () => {
@@ -430,7 +428,5 @@ describe('ScavengerHuntArea', () => {
         });
       });
     });
-
-
   });
 });
