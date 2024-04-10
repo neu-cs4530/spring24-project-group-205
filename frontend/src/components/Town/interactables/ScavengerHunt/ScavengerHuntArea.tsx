@@ -279,7 +279,7 @@ export default function ScavengerHuntArea({
             <Text fontSize='lg'>
               Welcome to Scavenge, a scavenger hunt game in Covey.Town! During this game, you will
               be able to explore the town by competing against players to see who can pick up the
-              most items. There are two different game modes to choose from: Timed and Relaxed.In
+              most items. There are two different game modes to choose from: Timed and Relaxed. In
               the timed mode, you have 2 minutes to pick up as many items as you can. In the relaxed
               mode, you can take your time and pick up as many items as you can before someone ends
               the game. You can also choose from different themes, such as food, emojis, and eggs.
@@ -390,13 +390,13 @@ export default function ScavengerHuntArea({
             {gameAreaController.status === 'IN_PROGRESS' && gameAreaController.isPlayer && (
               <Alert status='info' colorScheme='green' variant='left-accent'>
                 <AlertTitle fontSize='md'>Game Started!</AlertTitle>
-                <AlertDescription fontSize='lg'>{'Go find some items!'}</AlertDescription>
+                <AlertDescription fontSize='md'>{'Go find some items!'}</AlertDescription>
               </Alert>
             )}
             {gameAreaController.status === 'IN_PROGRESS' && !gameAreaController.isPlayer && (
               <Alert status='info' colorScheme='green' variant='left-accent'>
                 <AlertTitle fontSize='md'>Game Started!</AlertTitle>
-                <AlertDescription fontSize='lg'>{'Join the next game!'}</AlertDescription>
+                <AlertDescription fontSize='md'>{'Join the next game!'}</AlertDescription>
               </Alert>
             )}
             {gameAreaController.status === 'WAITING_TO_START' && !gameAreaController.isPlayer && (
@@ -470,7 +470,7 @@ export default function ScavengerHuntArea({
           <TabPanel>
             <Tabs isFitted variant='enclosed'>
               <TabList mb='1em'>
-                <Tab>Timed Leaderboard</Tab>
+                <Tab onClick={handleRequestTimedLeaderboard}>Timed Leaderboard</Tab>
                 <Tab onClick={handleRequestRelaxedLeaderboard}>Relaxed Leaderboard</Tab>
               </TabList>
               <TabPanels>
