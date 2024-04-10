@@ -18,8 +18,10 @@ import {
   Table,
   Box,
   useToast,
+  AlertTitle,
+  AlertDescription,
 } from '@chakra-ui/react';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import ScavengerHuntAreaController from '../../../../classes/interactable/ScavengerHuntAreaController';
 import { useInteractableAreaController } from '../../../../classes/TownController';
 import useTownController from '../../../../hooks/useTownController';
@@ -141,8 +143,18 @@ export default function ScavengerHuntArea({
       }
       if (mode === 'timed') {
         await gameAreaController.joinTimedGame(themepack);
+        toast({
+          title: 'Joined Timed Game!',
+          description: 'Succesfully joined timed game!',
+          status: 'success',
+        });
       } else if (mode === 'relaxed') {
         await gameAreaController.joinRelaxedGame(themepack);
+        toast({
+          title: 'Joined Relaxed Game!',
+          description: 'Succesfully joined relaxed game!',
+          status: 'success',
+        });
       } else {
         throw new Error('Please select a game mode before joining the game.');
       }
@@ -160,7 +172,12 @@ export default function ScavengerHuntArea({
     setStartingGame(true);
     try {
       await gameAreaController.startGame();
-      await gameAreaController._renderInitialItems();
+      await gameAreaController.renderInitialItems();
+      toast({
+        title: 'Game Started!',
+        description: 'Succesfully started the game!',
+        status: 'success',
+      });
     } catch (err) {
       toast({
         title: 'Error starting game',
@@ -175,6 +192,11 @@ export default function ScavengerHuntArea({
     try {
       await gameAreaController.leaveGame();
       gameAreaController.resetHint();
+      toast({
+        title: 'Left Game!',
+        description: 'Succesfully left the relaxed game!',
+        status: 'success',
+      });
     } catch (err) {
       toast({
         title: 'Error leaving game',
@@ -188,6 +210,11 @@ export default function ScavengerHuntArea({
     try {
       await gameAreaController.endGame();
       gameAreaController.resetHint();
+      toast({
+        title: 'Ended Game!',
+        description: 'Succesfully ended the game!',
+        status: 'success',
+      });
     } catch (err) {
       toast({
         title: 'Error ending game',
@@ -250,16 +277,17 @@ export default function ScavengerHuntArea({
             <Image src='/logo.png' alt='Scavenge logo' />
             <Box boxSize='20px'> </Box>
             <Text fontSize='lg'>
-              Welcome to Scavenge, a scavanger hunt game in covey.town! During this game you will
-              walk be able to explore the town by competing against players to see who can pick up
-              the most items. There are two different game modes to choose from: Timed and Relaxed.
-              In the timed mode, you have four minutes to pick up as many items as you can. In the
-              relaxed mode, you can take your time and pick up as many items as you can before
-              someone ends the game. You can also choose from different themes, such as food,
-              animals. Only the first player to join the game can choose the game mode and theme. If
-              you are the first player, please select a game mode and theme and then join the game.
-              As many as 10 players can join the game, but you can also play by yourself. Once all
-              players have joined the game, the first player can start the game. Good luck!
+              Welcome to Scavenge, a scavenger hunt game in Covey.Town! During this game, you will
+              be able to explore the town by competing against players to see who can pick up the
+              most items. There are two different game modes to choose from: Timed and Relaxed.In
+              the timed mode, you have 1 minute and 30 seconds to pick up as many items as you can.
+              In the relaxed mode, you can take your time and pick up as many items as you can
+              before someone ends the game. You can also choose from different themes, such as food,
+              emojis, and eggs. Only the first player to join the game can choose the game mode and
+              theme. If you are the first player, please select a game mode and theme and then join
+              the game. As many as 10 players can join the game, but you can also play by yourself.
+              Once all players have joined the game, anyone may start the game. Once the game
+              starts, pick up as many items as you can by clicking on items you find. Good luck!
             </Text>
           </TabPanel>
           <TabPanel>
@@ -359,6 +387,51 @@ export default function ScavengerHuntArea({
               </HStack>
             </Center>
             <Box boxSize='20px'> </Box>
+            {gameAreaController.status === 'IN_PROGRESS' && gameAreaController.isPlayer && (
+              <Alert status='info' colorScheme='green' variant='left-accent'>
+                <AlertTitle fontSize='md'>Game Started!</AlertTitle>
+                <AlertDescription fontSize='lg'>{'Go find some items!'}</AlertDescription>
+              </Alert>
+            )}
+            {gameAreaController.status === 'IN_PROGRESS' && !gameAreaController.isPlayer && (
+              <Alert status='info' colorScheme='green' variant='left-accent'>
+                <AlertTitle fontSize='md'>Game Started!</AlertTitle>
+                <AlertDescription fontSize='lg'>{'Join the next game!'}</AlertDescription>
+              </Alert>
+            )}
+            {gameAreaController.status === 'WAITING_TO_START' && !gameAreaController.isPlayer && (
+              <Alert status='info' colorScheme='orange' variant='left-accent'>
+                <AlertTitle fontSize='md'>Game Not Started!</AlertTitle>
+                <AlertDescription fontSize='md'>
+                  {'If you would like to play, please join!'}
+                </AlertDescription>
+              </Alert>
+            )}
+            {gameAreaController.status === 'WAITING_TO_START' && gameAreaController.isPlayer && (
+              <Alert status='info' colorScheme='orange' variant='left-accent'>
+                <AlertTitle fontSize='md'>Game Not Started!</AlertTitle>
+                <AlertDescription fontSize='md'>
+                  {'Start the game if all players have joined!'}
+                </AlertDescription>
+              </Alert>
+            )}
+            {gameAreaController.status === 'WAITING_FOR_PLAYERS' && (
+              <Alert status='info' colorScheme='orange' variant='left-accent'>
+                <AlertTitle fontSize='md'>Game has not started!</AlertTitle>
+                <AlertDescription fontSize='md'>
+                  {'If you would like to play, please join!'}
+                </AlertDescription>
+              </Alert>
+            )}
+            {gameAreaController.status === 'OVER' && !gameAreaController.isPlayer && (
+              <Alert status='info' colorScheme='orange' variant='left-accent'>
+                <AlertTitle fontSize='md'>Game has not started!</AlertTitle>
+                <AlertDescription fontSize='md'>
+                  {'If you would like to play, please join!'}
+                </AlertDescription>
+              </Alert>
+            )}
+            <Box boxSize='20px'> </Box>
             <HStack>
               <Button onClick={handleJoinGame} isLoading={joiningGame} disabled={joiningGame}>
                 {joiningGame ? 'Joining Game...' : 'Join Game'}{' '}
@@ -387,9 +460,10 @@ export default function ScavengerHuntArea({
             </VStack>
             <Box boxSize='20px'> </Box>
             {requestedHint && (
-              <Alert status='info'>
+              <Alert status='info' variant='left-accent'>
                 <AlertIcon />
-                <span>{requestedHint}</span>
+                <AlertTitle>Hint:</AlertTitle>
+                <AlertDescription>{requestedHint}</AlertDescription>
               </Alert>
             )}
           </TabPanel>

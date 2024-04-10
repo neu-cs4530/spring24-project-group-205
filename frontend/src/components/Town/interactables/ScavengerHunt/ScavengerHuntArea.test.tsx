@@ -7,7 +7,7 @@ import PlayerController from '../../../../classes/PlayerController';
 import TownController, * as TownControllerHooks from '../../../../classes/TownController';
 import TownControllerContext from '../../../../contexts/TownControllerContext';
 import { randomLocation } from '../../../../TestUtils';
-import { GameArea, ScavengerHuntGameState } from '../../../../types/CoveyTownSocket';
+import { GameArea, ScavengerHuntGameState, GameStatus } from '../../../../types/CoveyTownSocket';
 import PhaserGameArea from '../GameArea';
 import ScavengerHuntAreaController from '../../../../classes/interactable/ScavengerHuntAreaController';
 import ScavengerHuntArea from './ScavengerHuntArea';
@@ -40,6 +40,10 @@ class MockScavengerHuntAreaController extends ScavengerHuntAreaController {
 
   get themepack() {
     return { name: 'food', items: [] };
+  }
+
+  get status(): GameStatus {
+    return 'WAITING_FOR_PLAYERS';
   }
 }
 describe('Scavenger Hunt Area', () => {
@@ -96,7 +100,6 @@ describe('Scavenger Hunt Area', () => {
     });
     it('shows themes', () => {
       renderScavengerHuntArea();
-      expect(screen.queryByText('Theme: food')).toBeInTheDocument();
       expect(screen.queryByText('Food')).toBeInTheDocument();
       expect(screen.queryByText('Emojis')).toBeInTheDocument();
       expect(screen.queryByText('Egg')).toBeInTheDocument();

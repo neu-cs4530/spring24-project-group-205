@@ -130,7 +130,7 @@ export default class ScavengerHuntAreaController extends GameAreaController<
     this._townController.ourPlayer.scene?.resetItemsFoundCount();
   }
 
-  public _renderInitialItems(): void {
+  public renderInitialItems(): void {
     if (this.items) {
       for (const item of this.items) {
         this._townController.emitItemPlaced(item);
