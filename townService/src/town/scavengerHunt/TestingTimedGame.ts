@@ -29,6 +29,8 @@ export default class TestingTimedGame extends Game<ScavengerHuntGameState, Scave
     };
   }
 
+  public requestHint(player: Player): void {}
+
   public startGame(player: Player): void {
     this.state = {
       ...this.state,
