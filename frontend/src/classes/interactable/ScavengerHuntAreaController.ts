@@ -130,6 +130,7 @@ export default class ScavengerHuntAreaController extends GameAreaController<
       this._townController.emitStartTimer();
     }
     this._townController.ourPlayer.scene?.updateItemsFound(true);
+    this._townController.ourPlayer.scene?.updateTimer(true, 'Timed');
     this._townController.ourPlayer.scene?.resetItemsFoundCount();
   }
 
@@ -216,7 +217,7 @@ export default class ScavengerHuntAreaController extends GameAreaController<
       themepack: themepack,
     });
     this._instanceID = gameID;
-    this._townController.ourPlayer.scene?.updateTimer(true, 'Timed');
+    this._townController.ourPlayer.scene?.resetItemsFoundCountAndSetText();
   }
 
   /**
