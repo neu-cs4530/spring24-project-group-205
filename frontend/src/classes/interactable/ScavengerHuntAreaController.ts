@@ -132,7 +132,7 @@ export default class ScavengerHuntAreaController extends GameAreaController<
     this._townController.ourPlayer.scene?.updateItemsFound(true);
     this._townController.ourPlayer.scene?.resetItemsFoundCount();
   }
-  
+
   /**
    * Renders the initial items and places them on the map
    */
