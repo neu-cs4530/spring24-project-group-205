@@ -1,5 +1,8 @@
 import { ScavengerHuntItem, XY } from '../../types/CoveyTownSocket';
 
+/**
+ * Represents a hiding spot in the scavenger hunt game.
+ */
 interface HidingSpot {
   topLeft: [number, number];
   topRight: [number, number];
@@ -8,6 +11,7 @@ interface HidingSpot {
   hint: string;
 }
 
+// the free hiding spots that items can be generated on the map
 const HIDING_SPOTS: HidingSpot[] = [
   {
     topLeft: [7, 26],
@@ -81,6 +85,14 @@ const HIDING_SPOTS: HidingSpot[] = [
   },
 ];
 
+/**
+ * Picks a random hiding spot from the given array of hiding spots.
+ * Throws an error if no hiding spots are available.
+ *
+ * @param boxes - An array of hiding spots.
+ * @returns The randomly picked hiding spot.
+ * @throws Error if no hiding spots are available.
+ */
 export function pickRandomHidingSpot(boxes: HidingSpot[]): HidingSpot {
   if (boxes.length === 0) {
     throw new Error('No hiding spots available');
@@ -89,6 +101,12 @@ export function pickRandomHidingSpot(boxes: HidingSpot[]): HidingSpot {
   return boxes[randomIndex];
 }
 
+/**
+ * Sets a random location and hint for a given ScavengerHuntItem.
+ * Generates a random hiding spot and then a random coordinate inside the hiding spot
+ * @param item - The ScavengerHuntItem to set the location and hint for.
+ * @returns The location object with x and y coordinates.
+ */
 export function setRandomLocationAndHint(item: ScavengerHuntItem): XY {
   const box = pickRandomHidingSpot(HIDING_SPOTS);
   const minX = Math.min(box.topLeft[0], box.bottomLeft[0]);

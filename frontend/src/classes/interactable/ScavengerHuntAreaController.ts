@@ -13,6 +13,9 @@ export type ScavengerHuntEvents = GameEventTypes & {
   itemsChanged: (items: ScavengerHuntItem[] | undefined) => void;
 };
 
+/**
+ * A class representing the controller for the Scavenger Hunt frontend
+ */
 export default class ScavengerHuntAreaController extends GameAreaController<
   ScavengerHuntGameState,
   ScavengerHuntEvents
@@ -129,7 +132,10 @@ export default class ScavengerHuntAreaController extends GameAreaController<
     this._townController.ourPlayer.scene?.updateItemsFound(true);
     this._townController.ourPlayer.scene?.resetItemsFoundCount();
   }
-
+  
+  /**
+   * Renders the initial items and places them on the map
+   */
   public renderInitialItems(): void {
     if (this.items) {
       for (const item of this.items) {
@@ -140,7 +146,6 @@ export default class ScavengerHuntAreaController extends GameAreaController<
           item.location.y,
         );
       }
-      this._townController.ourPlayer.scene?.setTotalItemsPlaced(this.items.length);
     } else {
       throw new Error('Start Game could not find items');
     }
@@ -183,6 +188,9 @@ export default class ScavengerHuntAreaController extends GameAreaController<
     this._townController.ourPlayer.scene?.clearItemsLayer();
   }
 
+  /**
+   * Sends a request to the server to end the current game in the game area.
+   */
   public async endGame(): Promise<void> {
     const instanceID = this._instanceID;
     if (instanceID) {
@@ -223,14 +231,21 @@ export default class ScavengerHuntAreaController extends GameAreaController<
     });
     this._instanceID = gameID;
     this._townController.ourPlayer.scene?.updateTimer(true, 'relaxed');
+    this._townController.ourPlayer.scene?.resetItemsFoundCountAndSetText();
   }
 
+  /**
+   * Sends a request to the server to get and populate the relaxed leaderboard
+   */
   public async getRelaxedLeaderboard(): Promise<void> {
     await this._townController.sendInteractableCommand(this.id, {
       type: 'RelaxedLeaderboard',
     });
   }
 
+  /**
+   * Sends a request to the server to get and populate the timed leaderboard
+   */
   public async getTimedLeaderboard(): Promise<void> {
     await this._townController.sendInteractableCommand(this.id, {
       type: 'TimedLeaderboard',

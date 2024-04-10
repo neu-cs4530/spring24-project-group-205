@@ -10,7 +10,6 @@ export default class TestingRelaxedGame extends Game<ScavengerHuntGameState, Sca
       timeLeft: 10,
       items: [],
       status: 'WAITING_TO_START',
-      moves: [],
     });
   }
 
