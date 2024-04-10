@@ -29,6 +29,9 @@ const useInteractableAreaControllerSpy = jest.spyOn(
   'useInteractableAreaController',
 );
 
+/* The functionality of the frontent area was tested manually through rigorous interaction with the UI. 
+All buttons, pages, toasts, and events were tested thoroughly. */
+
 class MockScavengerHuntAreaController extends ScavengerHuntAreaController {
   public constructor() {
     super(nanoid(), mock<GameArea<ScavengerHuntGameState>>(), mock<TownController>());
